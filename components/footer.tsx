@@ -62,15 +62,6 @@ export function Footer() {
             <p className="text-xs text-gray-500">© 2024 10xBuilder.ai. All rights reserved.</p>
             <div className="flex items-center gap-4 text-xs text-gray-500">
               <span>Built with AI assistance</span>
-              <span>•</span>
-              <a
-                href="https://x.com/moeghashim"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hover:text-white transition-colors"
-              >
-                Follow the journey
-              </a>
             </div>
           </div>
         </div>
