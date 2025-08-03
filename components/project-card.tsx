@@ -65,15 +65,13 @@ export function ProjectCard({ project }: ProjectCardProps) {
           <Progress value={project.progress} className="h-2" />
         </div>
 
-        {project.productivity > 0 && (
-          <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200">
-            <div className="flex items-center gap-2">
-              <TrendingUp className="h-4 w-4 text-gray-600" />
-              <span className="text-sm text-gray-600">Productivity Gain</span>
-            </div>
-            <span className="font-bold text-black">{project.productivity}x</span>
+        <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200">
+          <div className="flex items-center gap-2">
+            <TrendingUp className="h-4 w-4 text-gray-600" />
+            <span className="text-sm text-gray-600">Productivity Gain</span>
           </div>
-        )}
+          <span className="font-bold text-black">{project.productivity}x</span>
+        </div>
 
         <div className="flex items-center gap-2 text-sm text-gray-500">
           <Clock className="h-4 w-4" />
