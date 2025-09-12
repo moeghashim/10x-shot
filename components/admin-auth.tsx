@@ -28,7 +28,10 @@ export function AdminAuth({ onAuthSuccess }: AdminAuthProps) {
         ? await supabase.auth.signUp({ email, password })
         : await supabase.auth.signInWithPassword({ email, password })
 
-      if (error) throw error
+      if (error) {
+        console.warn("Auth error:", error)
+        throw error // Keep throwing for auth errors as they need to be handled
+      }
 
       if (isSignUp) {
         setError("Check your email for the confirmation link!")

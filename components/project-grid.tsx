@@ -1,6 +1,26 @@
-import { ProjectCard } from "@/components/project-card"
+"use client"
 
-const projects = [
+import { useState, useEffect } from "react"
+import { ProjectCard } from "@/components/project-card"
+import { supabase } from "@/lib/supabase"
+
+interface Project {
+  id: number
+  title: string
+  domain: string
+  description: string
+  progress: number
+  status: "active" | "planning" | "completed"
+  mySkills: string[]
+  aiSkills: string[]
+  tools: string[]
+  productivity: number
+  timeframe: string
+  url: string
+}
+
+// Fallback data for when database isn't ready - Complete 10x experiment portfolio
+const fallbackProjects: Project[] = [
   {
     id: 1,
     title: "AI E-commerce Platform",
@@ -25,7 +45,7 @@ const projects = [
     mySkills: ["Content Strategy", "Management"],
     aiSkills: ["Writing", "Video Editing", "Image Generation"],
     tools: ["ChatGPT", "Claude", "Runway ML", "N8N", "Airtable", "VEO", "Gemini", "Midjourney"],
-    productivity: 0.1, // still early
+    productivity: 0.1,
     timeframe: "2 months",
     url: "https://bannaa.ai",
   },
@@ -144,6 +164,64 @@ const projects = [
 ]
 
 export function ProjectGrid() {
+  const [projects, setProjects] = useState<Project[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    loadProjects()
+  }, [])
+
+  const loadProjects = async () => {
+    setLoading(true)
+    try {
+      const { data, error } = await supabase
+        .from('projects')
+        .select('*')
+        .order('id', { ascending: true })
+
+      if (error) {
+        console.warn('Database not ready, using fallback data:', error)
+        // Fallback to hardcoded data if database isn't set up yet
+        setProjects(fallbackProjects)
+        setLoading(false)
+        return
+      }
+
+      // Map database fields to expected interface
+      const mappedProjects: Project[] = (data || []).map(project => ({
+        id: project.id,
+        title: project.title,
+        domain: project.domain,
+        description: project.description,
+        progress: project.progress,
+        status: project.status as "active" | "planning" | "completed",
+        mySkills: project.my_skills || [],
+        aiSkills: project.ai_skills || [],
+        tools: project.tools || [],
+        productivity: project.productivity,
+        timeframe: project.timeframe,
+        url: project.url
+      }))
+
+      setProjects(mappedProjects)
+    } catch (error) {
+      console.warn('Database connection failed, using fallback data:', error)
+      setProjects(fallbackProjects)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  if (loading) {
+    return (
+      <section id="projects" className="px-6 py-16 bg-white">
+        <div className="mx-auto max-w-7xl">
+          <div className="text-center">Loading projects...</div>
+        </div>
+      </section>
+    )
+  }
+
   return (
     <section id="projects" className="px-6 py-16 bg-white">
       <div className="mx-auto max-w-7xl">

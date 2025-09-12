@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { AdminAuth } from "@/components/admin-auth"
 import { ProjectManager } from "@/components/project-manager"
 import { MetricsManager } from "@/components/metrics-manager"
+import { GlobalMetricsManager } from "@/components/global-metrics-manager"
 
 export default function AdminPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
@@ -67,17 +68,22 @@ export default function AdminPage() {
 
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <Tabs defaultValue="projects" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="projects">Project Management</TabsTrigger>
-            <TabsTrigger value="metrics">Metrics Tracking</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="projects">Projects</TabsTrigger>
+            <TabsTrigger value="project-metrics">Project Metrics</TabsTrigger>
+            <TabsTrigger value="global-metrics">Global Metrics</TabsTrigger>
           </TabsList>
           
           <TabsContent value="projects" className="mt-6">
             <ProjectManager />
           </TabsContent>
           
-          <TabsContent value="metrics" className="mt-6">
+          <TabsContent value="project-metrics" className="mt-6">
             <MetricsManager />
+          </TabsContent>
+          
+          <TabsContent value="global-metrics" className="mt-6">
+            <GlobalMetricsManager />
           </TabsContent>
         </Tabs>
       </main>

@@ -43,10 +43,14 @@ export function ProjectManager() {
         .select('*')
         .order('id')
 
-      if (error) throw error
+      if (error) {
+        console.warn("Database not ready, using fallback data:", error)
+        loadFallbackProjects()
+        return
+      }
       setProjects(data || [])
     } catch (error) {
-      console.error("Failed to load projects:", error)
+      console.warn("Failed to load projects:", error)
       // Fallback to hardcoded data if database fails
       loadFallbackProjects()
     } finally {
@@ -55,7 +59,7 @@ export function ProjectManager() {
   }
 
   const loadFallbackProjects = () => {
-    // This uses the existing project data from project-grid.tsx as fallback
+    // Complete 10x experiment portfolio fallback data
     const fallbackProjects: Project[] = [
       {
         id: 1,
@@ -71,7 +75,132 @@ export function ProjectManager() {
         timeframe: "3 months",
         url: "https://ai-ecommerce-demo.vercel.app",
       },
-      // Add more projects from the original data...
+      {
+        id: 2,
+        title: "Bannaa - Arabic AI School",
+        domain: "Media & Content",
+        description: "AI‑focused school targeting the Arab world.",
+        progress: 2,
+        status: "active",
+        mySkills: ["Content Strategy", "Management"],
+        aiSkills: ["Writing", "Video Editing", "Image Generation"],
+        tools: ["ChatGPT", "Claude", "Runway ML", "N8N", "Airtable", "VEO", "Gemini", "Midjourney"],
+        productivity: 0.1,
+        timeframe: "2 months",
+        url: "https://bannaa.ai",
+      },
+      {
+        id: 3,
+        title: "Data Analytics Dashboard",
+        domain: "Analytics",
+        description: "Automated data processing, visualization, and insight generation",
+        progress: 78,
+        status: "active",
+        mySkills: ["Data Analysis", "Visualization", "Statistics"],
+        aiSkills: ["Data Processing", "Pattern Recognition", "Report Generation"],
+        tools: ["ChatGPT", "Tableau", "Python", "Jupyter", "AWS", "MongoDB"],
+        productivity: 6.8,
+        timeframe: "4 months",
+        url: "https://analytics-ai-dashboard.vercel.app",
+      },
+      {
+        id: 4,
+        title: "Mobile Fitness App",
+        domain: "Health & Fitness",
+        description: "Personalized workout plans, nutrition tracking, and progress monitoring",
+        progress: 65,
+        status: "active",
+        mySkills: ["Mobile Development", "UI/UX", "Health Domain"],
+        aiSkills: ["Personalization", "Computer Vision", "Nutrition Analysis"],
+        tools: ["ChatGPT", "React Native", "Firebase", "TensorFlow", "Figma"],
+        productivity: 5.2,
+        timeframe: "5 months",
+        url: "https://fitness-ai-app.vercel.app",
+      },
+      {
+        id: 5,
+        title: "Legal Document Processor",
+        domain: "Legal Tech",
+        description: "Contract analysis, document generation, and compliance checking",
+        progress: 45,
+        status: "active",
+        mySkills: ["Legal Research", "Document Processing", "Compliance"],
+        aiSkills: ["NLP", "Document Analysis", "Legal Reasoning"],
+        tools: ["ChatGPT", "Claude", "LangChain", "Pinecone", "Notion", "DocuSign"],
+        productivity: 4.1,
+        timeframe: "6 months",
+        url: "https://legal-ai-processor.vercel.app",
+      },
+      {
+        id: 6,
+        title: "Educational Platform",
+        domain: "EdTech",
+        description: "Personalized learning paths, automated grading, and content adaptation",
+        progress: 58,
+        status: "active",
+        mySkills: ["Education", "Curriculum Design", "Learning Theory"],
+        aiSkills: ["Personalization", "Content Generation", "Assessment"],
+        tools: ["ChatGPT", "Teachable Machine", "Moodle", "Zoom", "Loom", "Calendly"],
+        productivity: 7.3,
+        timeframe: "4 months",
+        url: "https://edu-ai-platform.vercel.app",
+      },
+      {
+        id: 7,
+        title: "Financial Planning Tool",
+        domain: "FinTech",
+        description: "Investment recommendations, risk assessment, and portfolio optimization",
+        progress: 72,
+        status: "active",
+        mySkills: ["Finance", "Investment Strategy", "Risk Management"],
+        aiSkills: ["Market Analysis", "Risk Modeling", "Optimization"],
+        tools: ["ChatGPT", "Alpha Vantage", "Plaid", "Chart.js", "Vercel", "PostgreSQL"],
+        productivity: 9.1,
+        timeframe: "3 months",
+        url: "https://fintech-ai-planner.vercel.app",
+      },
+      {
+        id: 8,
+        title: "Smart Home Automation",
+        domain: "IoT",
+        description: "Intelligent device control, energy optimization, and predictive maintenance",
+        progress: 25,
+        status: "planning",
+        mySkills: ["IoT", "Hardware Integration", "System Architecture"],
+        aiSkills: ["Predictive Analytics", "Optimization", "Pattern Recognition"],
+        tools: ["ChatGPT", "Arduino", "Raspberry Pi", "MQTT", "InfluxDB", "Grafana"],
+        productivity: 3.2,
+        timeframe: "8 months",
+        url: "https://smarthome-ai-demo.vercel.app",
+      },
+      {
+        id: 9,
+        title: "Marketing Automation Suite",
+        domain: "Marketing",
+        description: "Campaign optimization, lead scoring, and personalized messaging",
+        progress: 15,
+        status: "planning",
+        mySkills: ["Marketing Strategy", "Campaign Management", "Analytics"],
+        aiSkills: ["Personalization", "Optimization", "Predictive Modeling"],
+        tools: ["ChatGPT", "HubSpot", "Mailchimp", "Google Analytics", "Zapier", "Airtable"],
+        productivity: 2.8,
+        timeframe: "6 months",
+        url: "https://marketing-ai-suite.vercel.app",
+      },
+      {
+        id: 10,
+        title: "Creative Design Studio",
+        domain: "Design",
+        description: "Automated design generation, brand consistency, and creative workflows",
+        progress: 8,
+        status: "planning",
+        mySkills: ["Design Principles", "Brand Strategy", "Creative Direction"],
+        aiSkills: ["Image Generation", "Design Automation", "Style Transfer"],
+        tools: ["ChatGPT", "Midjourney", "DALL-E", "Figma", "Adobe Creative Suite", "Framer"],
+        productivity: 1.9,
+        timeframe: "7 months",
+        url: "https://design-ai-studio.vercel.app",
+      },
     ]
     setProjects(fallbackProjects)
   }
@@ -85,7 +214,10 @@ export function ProjectManager() {
           .update(project)
           .eq('id', project.id)
 
-        if (error) throw error
+        if (error) {
+          console.warn("Database error:", error)
+          return
+        }
         
         setProjects(prev => prev.map(p => p.id === project.id ? project : p))
       } else {
@@ -95,7 +227,10 @@ export function ProjectManager() {
           .insert([project])
           .select()
 
-        if (error) throw error
+        if (error) {
+          console.warn("Database error:", error)
+          return
+        }
         
         if (data) {
           setProjects(prev => [...prev, data[0]])
@@ -105,7 +240,7 @@ export function ProjectManager() {
       setEditingProject(null)
       setIsCreating(false)
     } catch (error) {
-      console.error("Failed to save project:", error)
+      console.warn("Failed to save project:", error)
     }
   }
 
