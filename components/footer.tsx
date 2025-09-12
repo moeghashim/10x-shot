@@ -1,4 +1,5 @@
 import { ExternalLink, Twitter, Zap } from "lucide-react"
+import Link from "next/link"
 
 export function Footer() {
   return (
@@ -24,6 +25,11 @@ export function Footer() {
                 <a href="#projects" className="text-gray-400 hover:text-white transition-colors">
                   View Projects
                 </a>
+              </li>
+              <li>
+                <Link href="/progress" className="text-gray-400 hover:text-white transition-colors">
+                  Progress Tracker
+                </Link>
               </li>
               <li>
                 <a href="#" className="text-gray-400 hover:text-white transition-colors">

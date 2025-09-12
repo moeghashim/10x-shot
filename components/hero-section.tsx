@@ -1,7 +1,8 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { ArrowDown, Zap, Target, TrendingUp } from "lucide-react"
+import { ArrowDown, Zap, Target, TrendingUp, BarChart3 } from "lucide-react"
+import Link from "next/link"
 
 export function HeroSection() {
   return (
@@ -38,14 +39,27 @@ export function HeroSection() {
           </div>
         </div>
 
-        <Button
-          size="lg"
-          className="bg-black hover:bg-gray-800 text-white px-8 py-3 text-lg"
-          onClick={() => document.getElementById("projects")?.scrollIntoView({ behavior: "smooth" })}
-        >
-          View Projects
-          <ArrowDown className="ml-2 h-5 w-5" />
-        </Button>
+        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <Button
+            size="lg"
+            className="bg-black hover:bg-gray-800 text-white px-8 py-3 text-lg"
+            onClick={() => document.getElementById("projects")?.scrollIntoView({ behavior: "smooth" })}
+          >
+            View Projects
+            <ArrowDown className="ml-2 h-5 w-5" />
+          </Button>
+
+          <Link href="/progress">
+            <Button
+              size="lg"
+              variant="outline"
+              className="border-black text-black hover:bg-black hover:text-white px-8 py-3 text-lg bg-transparent"
+            >
+              Track Progress
+              <BarChart3 className="ml-2 h-5 w-5" />
+            </Button>
+          </Link>
+        </div>
       </div>
     </section>
   )
