@@ -14,7 +14,7 @@ Any changes you make to your deployed app will be automatically pushed to this r
 
 Your project is live at:
 
-**[https://vercel.com/bannaa/v0-10x-builder-ai-website](https://vercel.com/bannaa/v0-10x-builder-ai-website)**
+**[https://www.10xbuilder.ai/](https://www.10xbuilder.ai/)**
 
 ## Build your app
 
