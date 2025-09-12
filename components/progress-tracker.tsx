@@ -17,8 +17,6 @@ import {
   Palette,
   Settings,
   Code,
-  ArrowUp,
-  ArrowDown,
 } from "lucide-react"
 
 // Mock data - in a real app, this would come from your analytics APIs
@@ -140,23 +138,6 @@ export function ProgressTracker() {
     return (((current - initial) / initial) * 100).toFixed(1)
   }
 
-  const calculateMonthOverMonth = (current: number, previous: number) => {
-    if (previous === 0) return 0
-    return (((current - previous) / previous) * 100).toFixed(1)
-  }
-
-  const getChangeIcon = (change: number) => {
-    if (change > 0) return <ArrowUp className="h-3 w-3 text-green-600" />
-    if (change < 0) return <ArrowDown className="h-3 w-3 text-red-600" />
-    return null
-  }
-
-  const getChangeColor = (change: number) => {
-    if (change > 0) return "text-green-600"
-    if (change < 0) return "text-red-600"
-    return "text-gray-600"
-  }
-
   return (
     <div className="space-y-8">
       {/* Overview Cards */}
@@ -228,331 +209,139 @@ export function ProgressTracker() {
       <div className="space-y-6">
         <h2 className="text-2xl font-bold text-black">Monthly Progress</h2>
 
-        {progressData.reverse().map((monthData, index) => {
-          const previousMonth = progressData[index + 1]
-
-          return (
-            <Card key={monthData.date} className="bg-white border-gray-200">
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <Calendar className="h-5 w-5 text-gray-600" />
-                    <CardTitle className="text-xl text-black">{monthData.month}</CardTitle>
-                  </div>
-                  <Badge variant="outline" className="text-gray-600 border-gray-300">
-                    Month {progressData.length - index}
-                  </Badge>
+        {progressData.reverse().map((monthData, index) => (
+          <Card key={monthData.date} className="bg-white border-gray-200">
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <Calendar className="h-5 w-5 text-gray-600" />
+                  <CardTitle className="text-xl text-black">{monthData.month}</CardTitle>
                 </div>
-              </CardHeader>
+                <Badge variant="outline" className="text-gray-600 border-gray-300">
+                  Month {progressData.length - index}
+                </Badge>
+              </div>
+            </CardHeader>
 
-              <CardContent className="space-y-6">
-                {/* Metrics Grid */}
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                  <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg">
-                    <Twitter className="h-5 w-5 text-blue-600" />
-                    <div className="flex-1">
-                      <div className="font-semibold text-blue-900">
-                        {monthData.metrics.twitterFollowers.toLocaleString()}
-                      </div>
-                      <div className="text-xs text-blue-600">Twitter</div>
-                      {previousMonth && (
-                        <div
-                          className={`text-xs flex items-center gap-1 ${getChangeColor(
-                            Number.parseFloat(
-                              calculateMonthOverMonth(
-                                monthData.metrics.twitterFollowers,
-                                previousMonth.metrics.twitterFollowers,
-                              ),
-                            ),
-                          )}`}
-                        >
-                          {getChangeIcon(
-                            Number.parseFloat(
-                              calculateMonthOverMonth(
-                                monthData.metrics.twitterFollowers,
-                                previousMonth.metrics.twitterFollowers,
-                              ),
-                            ),
-                          )}
-                          {calculateMonthOverMonth(
-                            monthData.metrics.twitterFollowers,
-                            previousMonth.metrics.twitterFollowers,
-                          )}
-                          %
-                        </div>
-                      )}
+            <CardContent className="space-y-6">
+              {/* Metrics Grid */}
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg">
+                  <Twitter className="h-5 w-5 text-blue-600" />
+                  <div>
+                    <div className="font-semibold text-blue-900">
+                      {monthData.metrics.twitterFollowers.toLocaleString()}
                     </div>
-                  </div>
-
-                  <div className="flex items-center gap-3 p-3 bg-red-50 rounded-lg">
-                    <Youtube className="h-5 w-5 text-red-600" />
-                    <div className="flex-1">
-                      <div className="font-semibold text-red-900">
-                        {monthData.metrics.youtubeSubscribers.toLocaleString()}
-                      </div>
-                      <div className="text-xs text-red-600">YouTube</div>
-                      {previousMonth && (
-                        <div
-                          className={`text-xs flex items-center gap-1 ${getChangeColor(
-                            Number.parseFloat(
-                              calculateMonthOverMonth(
-                                monthData.metrics.youtubeSubscribers,
-                                previousMonth.metrics.youtubeSubscribers,
-                              ),
-                            ),
-                          )}`}
-                        >
-                          {getChangeIcon(
-                            Number.parseFloat(
-                              calculateMonthOverMonth(
-                                monthData.metrics.youtubeSubscribers,
-                                previousMonth.metrics.youtubeSubscribers,
-                              ),
-                            ),
-                          )}
-                          {calculateMonthOverMonth(
-                            monthData.metrics.youtubeSubscribers,
-                            previousMonth.metrics.youtubeSubscribers,
-                          )}
-                          %
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-3 p-3 bg-pink-50 rounded-lg">
-                    <Heart className="h-5 w-5 text-pink-600" />
-                    <div className="flex-1">
-                      <div className="font-semibold text-pink-900">
-                        {monthData.metrics.tiktokFollowers.toLocaleString()}
-                      </div>
-                      <div className="text-xs text-pink-600">TikTok</div>
-                      {previousMonth && (
-                        <div
-                          className={`text-xs flex items-center gap-1 ${getChangeColor(
-                            Number.parseFloat(
-                              calculateMonthOverMonth(
-                                monthData.metrics.tiktokFollowers,
-                                previousMonth.metrics.tiktokFollowers,
-                              ),
-                            ),
-                          )}`}
-                        >
-                          {getChangeIcon(
-                            Number.parseFloat(
-                              calculateMonthOverMonth(
-                                monthData.metrics.tiktokFollowers,
-                                previousMonth.metrics.tiktokFollowers,
-                              ),
-                            ),
-                          )}
-                          {calculateMonthOverMonth(
-                            monthData.metrics.tiktokFollowers,
-                            previousMonth.metrics.tiktokFollowers,
-                          )}
-                          %
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-3 p-3 bg-purple-50 rounded-lg">
-                    <Instagram className="h-5 w-5 text-purple-600" />
-                    <div className="flex-1">
-                      <div className="font-semibold text-purple-900">
-                        {monthData.metrics.instagramFollowers.toLocaleString()}
-                      </div>
-                      <div className="text-xs text-purple-600">Instagram</div>
-                      {previousMonth && (
-                        <div
-                          className={`text-xs flex items-center gap-1 ${getChangeColor(
-                            Number.parseFloat(
-                              calculateMonthOverMonth(
-                                monthData.metrics.instagramFollowers,
-                                previousMonth.metrics.instagramFollowers,
-                              ),
-                            ),
-                          )}`}
-                        >
-                          {getChangeIcon(
-                            Number.parseFloat(
-                              calculateMonthOverMonth(
-                                monthData.metrics.instagramFollowers,
-                                previousMonth.metrics.instagramFollowers,
-                              ),
-                            ),
-                          )}
-                          {calculateMonthOverMonth(
-                            monthData.metrics.instagramFollowers,
-                            previousMonth.metrics.instagramFollowers,
-                          )}
-                          %
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                    <Mail className="h-5 w-5 text-gray-600" />
-                    <div className="flex-1">
-                      <div className="font-semibold text-gray-900">
-                        {monthData.metrics.newsletterSubscribers.toLocaleString()}
-                      </div>
-                      <div className="text-xs text-gray-600">Newsletter</div>
-                      {previousMonth && (
-                        <div
-                          className={`text-xs flex items-center gap-1 ${getChangeColor(
-                            Number.parseFloat(
-                              calculateMonthOverMonth(
-                                monthData.metrics.newsletterSubscribers,
-                                previousMonth.metrics.newsletterSubscribers,
-                              ),
-                            ),
-                          )}`}
-                        >
-                          {getChangeIcon(
-                            Number.parseFloat(
-                              calculateMonthOverMonth(
-                                monthData.metrics.newsletterSubscribers,
-                                previousMonth.metrics.newsletterSubscribers,
-                              ),
-                            ),
-                          )}
-                          {calculateMonthOverMonth(
-                            monthData.metrics.newsletterSubscribers,
-                            previousMonth.metrics.newsletterSubscribers,
-                          )}
-                          %
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-3 p-3 bg-green-50 rounded-lg">
-                    <DollarSign className="h-5 w-5 text-green-600" />
-                    <div className="flex-1">
-                      <div className="font-semibold text-green-900">${monthData.metrics.totalGMV.toLocaleString()}</div>
-                      <div className="text-xs text-green-600">Total GMV</div>
-                      {previousMonth && (
-                        <div
-                          className={`text-xs flex items-center gap-1 ${getChangeColor(
-                            Number.parseFloat(
-                              calculateMonthOverMonth(monthData.metrics.totalGMV, previousMonth.metrics.totalGMV),
-                            ),
-                          )}`}
-                        >
-                          {getChangeIcon(
-                            Number.parseFloat(
-                              calculateMonthOverMonth(monthData.metrics.totalGMV, previousMonth.metrics.totalGMV),
-                            ),
-                          )}
-                          {calculateMonthOverMonth(monthData.metrics.totalGMV, previousMonth.metrics.totalGMV)}%
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-3 p-3 bg-orange-50 rounded-lg">
-                    <TrendingUp className="h-5 w-5 text-orange-600" />
-                    <div className="flex-1">
-                      <div className="font-semibold text-orange-900">{monthData.metrics.productivityGain}x</div>
-                      <div className="text-xs text-orange-600">Productivity</div>
-                      {previousMonth && (
-                        <div
-                          className={`text-xs flex items-center gap-1 ${getChangeColor(
-                            Number.parseFloat(
-                              calculateMonthOverMonth(
-                                monthData.metrics.productivityGain,
-                                previousMonth.metrics.productivityGain,
-                              ),
-                            ),
-                          )}`}
-                        >
-                          {getChangeIcon(
-                            Number.parseFloat(
-                              calculateMonthOverMonth(
-                                monthData.metrics.productivityGain,
-                                previousMonth.metrics.productivityGain,
-                              ),
-                            ),
-                          )}
-                          {calculateMonthOverMonth(
-                            monthData.metrics.productivityGain,
-                            previousMonth.metrics.productivityGain,
-                          )}
-                          %
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-3 p-3 bg-indigo-50 rounded-lg">
-                    <Zap className="h-5 w-5 text-indigo-600" />
-                    <div className="flex-1">
-                      <div className="font-semibold text-indigo-900">{monthData.skillsGained.length}</div>
-                      <div className="text-xs text-indigo-600">Skills Gained</div>
-                      {previousMonth && (
-                        <div
-                          className={`text-xs flex items-center gap-1 ${getChangeColor(
-                            Number.parseFloat(
-                              calculateMonthOverMonth(monthData.skillsGained.length, previousMonth.skillsGained.length),
-                            ),
-                          )}`}
-                        >
-                          {getChangeIcon(
-                            Number.parseFloat(
-                              calculateMonthOverMonth(monthData.skillsGained.length, previousMonth.skillsGained.length),
-                            ),
-                          )}
-                          {calculateMonthOverMonth(monthData.skillsGained.length, previousMonth.skillsGained.length)}%
-                        </div>
-                      )}
-                    </div>
+                    <div className="text-xs text-blue-600">Twitter</div>
                   </div>
                 </div>
 
-                {/* Skills Gained */}
-                <div>
-                  <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                    <Zap className="h-4 w-4" />
-                    Skills Gained This Month
-                  </h4>
-                  <div className="flex flex-wrap gap-2">
-                    {monthData.skillsGained.map((skill, skillIndex) => {
-                      const IconComponent = skillIcons[skill as keyof typeof skillIcons] || Code
-                      return (
-                        <Badge
-                          key={skillIndex}
-                          variant="outline"
-                          className="flex items-center gap-1 text-gray-700 border-gray-300"
-                        >
-                          <IconComponent className="h-3 w-3" />
-                          {skill}
-                        </Badge>
-                      )
-                    })}
+                <div className="flex items-center gap-3 p-3 bg-red-50 rounded-lg">
+                  <Youtube className="h-5 w-5 text-red-600" />
+                  <div>
+                    <div className="font-semibold text-red-900">
+                      {monthData.metrics.youtubeSubscribers.toLocaleString()}
+                    </div>
+                    <div className="text-xs text-red-600">YouTube</div>
                   </div>
                 </div>
 
-                {/* Milestones */}
-                <div>
-                  <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                    <TrendingUp className="h-4 w-4" />
-                    Key Milestones
-                  </h4>
-                  <ul className="space-y-1">
-                    {monthData.milestones.map((milestone, milestoneIndex) => (
-                      <li key={milestoneIndex} className="flex items-center gap-2 text-sm text-gray-600">
-                        <div className="w-1.5 h-1.5 bg-gray-400 rounded-full"></div>
-                        {milestone}
-                      </li>
-                    ))}
-                  </ul>
+                <div className="flex items-center gap-3 p-3 bg-pink-50 rounded-lg">
+                  <Heart className="h-5 w-5 text-pink-600" />
+                  <div>
+                    <div className="font-semibold text-pink-900">
+                      {monthData.metrics.tiktokFollowers.toLocaleString()}
+                    </div>
+                    <div className="text-xs text-pink-600">TikTok</div>
+                  </div>
                 </div>
-              </CardContent>
-            </Card>
-          )
-        })}
+
+                <div className="flex items-center gap-3 p-3 bg-purple-50 rounded-lg">
+                  <Instagram className="h-5 w-5 text-purple-600" />
+                  <div>
+                    <div className="font-semibold text-purple-900">
+                      {monthData.metrics.instagramFollowers.toLocaleString()}
+                    </div>
+                    <div className="text-xs text-purple-600">Instagram</div>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                  <Mail className="h-5 w-5 text-gray-600" />
+                  <div>
+                    <div className="font-semibold text-gray-900">
+                      {monthData.metrics.newsletterSubscribers.toLocaleString()}
+                    </div>
+                    <div className="text-xs text-gray-600">Newsletter</div>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3 p-3 bg-green-50 rounded-lg">
+                  <DollarSign className="h-5 w-5 text-green-600" />
+                  <div>
+                    <div className="font-semibold text-green-900">${monthData.metrics.totalGMV.toLocaleString()}</div>
+                    <div className="text-xs text-green-600">Total GMV</div>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3 p-3 bg-orange-50 rounded-lg">
+                  <TrendingUp className="h-5 w-5 text-orange-600" />
+                  <div>
+                    <div className="font-semibold text-orange-900">{monthData.metrics.productivityGain}x</div>
+                    <div className="text-xs text-orange-600">Productivity</div>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3 p-3 bg-indigo-50 rounded-lg">
+                  <Zap className="h-5 w-5 text-indigo-600" />
+                  <div>
+                    <div className="font-semibold text-indigo-900">{monthData.skillsGained.length}</div>
+                    <div className="text-xs text-indigo-600">Skills Gained</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Skills Gained */}
+              <div>
+                <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                  <Zap className="h-4 w-4" />
+                  Skills Gained This Month
+                </h4>
+                <div className="flex flex-wrap gap-2">
+                  {monthData.skillsGained.map((skill, skillIndex) => {
+                    const IconComponent = skillIcons[skill as keyof typeof skillIcons] || Code
+                    return (
+                      <Badge
+                        key={skillIndex}
+                        variant="outline"
+                        className="flex items-center gap-1 text-gray-700 border-gray-300"
+                      >
+                        <IconComponent className="h-3 w-3" />
+                        {skill}
+                      </Badge>
+                    )
+                  })}
+                </div>
+              </div>
+
+              {/* Milestones */}
+              <div>
+                <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                  <TrendingUp className="h-4 w-4" />
+                  Key Milestones
+                </h4>
+                <ul className="space-y-1">
+                  {monthData.milestones.map((milestone, milestoneIndex) => (
+                    <li key={milestoneIndex} className="flex items-center gap-2 text-sm text-gray-600">
+                      <div className="w-1.5 h-1.5 bg-gray-400 rounded-full"></div>
+                      {milestone}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
       </div>
     </div>
   )
