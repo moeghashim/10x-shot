@@ -58,8 +58,9 @@ CREATE INDEX IF NOT EXISTS idx_admin_users_active ON admin_users(is_active);
 CREATE INDEX IF NOT EXISTS idx_admin_activity_user_id ON admin_activity(user_id);
 CREATE INDEX IF NOT EXISTS idx_admin_activity_created_at ON admin_activity(created_at);
 
--- Insert initial admin user (password: AdminUser2024!Secure)  
--- Note: This is a proper bcrypt hash for the password "AdminUser2024!Secure"
-INSERT INTO admin_users (email, password_hash, full_name, role) VALUES 
-('admin@10xbuilder.ai', '$2b$12$lWQ6vwXCG4LNrmqYu7JfYuRkb/Xc4gsb09FHb6uJjeavhNlpIZ0NO', '10x Admin', 'super_admin')
-ON CONFLICT (email) DO NOTHING;
+-- Insert initial admin user
+-- Note: Create your admin user through the application interface or manually
+-- Example SQL (replace with your own credentials):
+-- INSERT INTO admin_users (email, password_hash, full_name, role) VALUES 
+-- ('your-admin@example.com', '$2b$12$your_bcrypt_hash_here', 'Admin Name', 'super_admin')
+-- ON CONFLICT (email) DO NOTHING;

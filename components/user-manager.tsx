@@ -70,12 +70,12 @@ export function UserManager() {
 
       if (error) {
         console.warn('Database not ready for users, using fallback:', error)
-        // Fallback data
+        // Fallback data - no real credentials
         setUsers([
           {
-            id: '1',
-            email: 'admin@10xbuilder.ai',
-            full_name: '10x Admin',
+            id: 'fallback-1',
+            email: 'admin@example.com',
+            full_name: 'System Admin',
             role: 'super_admin',
             is_active: true,
             last_login: new Date().toISOString(),
