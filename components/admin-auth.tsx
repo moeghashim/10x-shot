@@ -2,7 +2,6 @@
 
 import { useState } from "react"
 import { supabase } from "@/lib/supabase"
-import { AuthService } from "@/lib/auth"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -24,13 +23,17 @@ export function AdminAuth({ onAuthSuccess }: AdminAuthProps) {
     setError("")
 
     try {
-      // Use our custom admin authentication
-      const { user, error } = await AuthService.authenticateAdmin(email, password)
-      
-      if (error || !user) {
-        throw new Error(error || "Invalid credentials")
+      const res = await fetch('/api/admin/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      })
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({ error: 'Login failed' }))
+        throw new Error(data.error || 'Login failed')
       }
-      
+
       onAuthSuccess()
     } catch (error: any) {
       setError(error.message || "Authentication failed")

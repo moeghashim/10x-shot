@@ -69,20 +69,18 @@ export async function middleware(request: NextRequest) {
     // If user exists, check if they have admin privileges
     if (user) {
       try {
-        const { data: adminUser } = await supabase
+        const { data: adminUser, error: adminError } = await supabase
           .from('admin_users')
-          .select('*')
+          .select('id,email,role,is_active')
           .eq('email', user.email)
           .eq('is_active', true)
           .single()
 
-        // If not an admin user, redirect to unauthorized
-        if (!adminUser) {
+        if (adminError || !adminUser) {
           return new NextResponse('Unauthorized', { status: 401 })
         }
-      } catch (error) {
-        console.warn('Admin check failed, allowing access for fallback mode:', error)
-        // In fallback mode (no database), allow access
+      } catch {
+        return new NextResponse('Unauthorized', { status: 401 })
       }
     }
   }

@@ -11,52 +11,6 @@ export interface AdminUser {
 }
 
 export class AuthService {
-  // Authenticate admin user
-  static async authenticateAdmin(email: string, password: string): Promise<{ user: AdminUser | null, error: string | null }> {
-    try {
-      // Get user from admin_users table
-      const { data: user, error } = await supabase
-        .from('admin_users')
-        .select('*')
-        .eq('email', email)
-        .eq('is_active', true)
-        .single()
-
-      if (error || !user) {
-        return { user: null, error: 'Invalid credentials' }
-      }
-
-      // Verify password (in production, use proper bcrypt comparison)
-      const isValidPassword = await this.verifyPassword(password, user.password_hash)
-      if (!isValidPassword) {
-        return { user: null, error: 'Invalid credentials' }
-      }
-
-      // Update last login
-      await supabase
-        .from('admin_users')
-        .update({ last_login: new Date().toISOString() })
-        .eq('id', user.id)
-
-      // Log login activity
-      await this.logActivity(user.id, 'LOGIN', undefined, undefined, 'User logged in')
-
-      const adminUser: AdminUser = {
-        id: user.id,
-        email: user.email,
-        full_name: user.full_name,
-        role: user.role,
-        is_active: user.is_active,
-        last_login: new Date().toISOString()
-      }
-
-      return { user: adminUser, error: null }
-    } catch (error) {
-      console.error('Authentication error:', error)
-      return { user: null, error: 'Authentication failed' }
-    }
-  }
-
   // Create new admin user
   static async createAdminUser(userData: {
     email: string
