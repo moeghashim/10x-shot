@@ -10,6 +10,7 @@ import { AdminAuth } from "@/components/admin-auth"
 import { ProjectManager } from "@/components/project-manager"
 import { MetricsManager } from "@/components/metrics-manager"
 import { GlobalMetricsManager } from "@/components/global-metrics-manager"
+import { UserManager } from "@/components/user-manager"
 
 export default function AdminPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
@@ -68,10 +69,11 @@ export default function AdminPage() {
 
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <Tabs defaultValue="projects" className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="projects">Projects</TabsTrigger>
             <TabsTrigger value="project-metrics">Project Metrics</TabsTrigger>
             <TabsTrigger value="global-metrics">Global Metrics</TabsTrigger>
+            <TabsTrigger value="users">Users</TabsTrigger>
           </TabsList>
           
           <TabsContent value="projects" className="mt-6">
@@ -84,6 +86,10 @@ export default function AdminPage() {
           
           <TabsContent value="global-metrics" className="mt-6">
             <GlobalMetricsManager />
+          </TabsContent>
+          
+          <TabsContent value="users" className="mt-6">
+            <UserManager />
           </TabsContent>
         </Tabs>
       </main>

@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { supabase } from "@/lib/supabase"
+import { AuthService } from "@/lib/auth"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -16,7 +17,6 @@ export function AdminAuth({ onAuthSuccess }: AdminAuthProps) {
   const [password, setPassword] = useState("")
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
-  const [isSignUp, setIsSignUp] = useState(false)
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -24,21 +24,14 @@ export function AdminAuth({ onAuthSuccess }: AdminAuthProps) {
     setError("")
 
     try {
-      const { data, error } = isSignUp 
-        ? await supabase.auth.signUp({ email, password })
-        : await supabase.auth.signInWithPassword({ email, password })
-
-      if (error) {
-        console.warn("Auth error:", error)
-        throw error // Keep throwing for auth errors as they need to be handled
+      // Use our custom admin authentication
+      const { user, error } = await AuthService.authenticateAdmin(email, password)
+      
+      if (error || !user) {
+        throw new Error(error || "Invalid credentials")
       }
-
-      if (isSignUp) {
-        setError("Check your email for the confirmation link!")
-        setIsSignUp(false)
-      } else {
-        onAuthSuccess()
-      }
+      
+      onAuthSuccess()
     } catch (error: any) {
       setError(error.message || "Authentication failed")
     } finally {
@@ -52,7 +45,7 @@ export function AdminAuth({ onAuthSuccess }: AdminAuthProps) {
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl text-center">Admin Access</CardTitle>
           <CardDescription className="text-center">
-            {isSignUp ? "Create an admin account" : "Sign in to manage projects and metrics"}
+            Sign in to manage projects and metrics
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -84,19 +77,7 @@ export function AdminAuth({ onAuthSuccess }: AdminAuthProps) {
             )}
 
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "Loading..." : isSignUp ? "Sign Up" : "Sign In"}
-            </Button>
-
-            <Button 
-              type="button" 
-              variant="ghost" 
-              className="w-full"
-              onClick={() => {
-                setIsSignUp(!isSignUp)
-                setError("")
-              }}
-            >
-              {isSignUp ? "Already have an account? Sign in" : "Need an account? Sign up"}
+              {loading ? "Loading..." : "Sign In"}
             </Button>
           </form>
         </CardContent>
