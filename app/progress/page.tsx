@@ -1,5 +1,6 @@
 import { ProgressTracker } from "@/components/progress-tracker"
 import { Button } from "@/components/ui/button"
+import { Footer } from "@/components/footer"
 import { ArrowLeft } from "lucide-react"
 import Link from "next/link"
 
@@ -22,6 +23,8 @@ export default function ProgressPage() {
 
         <ProgressTracker />
       </div>
+      
+      <Footer />
     </div>
   )
 }
