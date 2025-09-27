@@ -5,7 +5,7 @@ import "./globals.css"
 import { Analytics } from "@vercel/analytics/next"
 import { Suspense } from "react"
 
-const plexSans = IBM_Plex_Sans({ subsets: ["latin"] })
+const plexSans = IBM_Plex_Sans({ subsets: ["latin"], weight: ["400"] })
 
 export const metadata: Metadata = {
   title: "10xBuilder.ai - Measuring AI Productivity Impact",
