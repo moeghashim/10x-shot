@@ -207,15 +207,31 @@ export function ProjectManager() {
 
   const saveProject = async (project: Omit<Project, 'id'> | Project) => {
     try {
+      // Map camelCase to snake_case for database
+      const dbProject = {
+        title: project.title,
+        domain: project.domain,
+        description: project.description,
+        progress: project.progress,
+        status: project.status,
+        my_skills: project.mySkills,
+        ai_skills: project.aiSkills,
+        tools: project.tools,
+        productivity: project.productivity,
+        timeframe: project.timeframe,
+        url: project.url,
+      }
+
       if ('id' in project && project.id) {
         // Update existing project
         const { error } = await supabase
           .from('projects')
-          .update(project)
+          .update(dbProject)
           .eq('id', project.id)
 
         if (error) {
-          console.warn("Database error:", error)
+          console.error("Database error:", error)
+          alert(`Failed to save: ${error.message}`)
           return
         }
         
@@ -224,11 +240,12 @@ export function ProjectManager() {
         // Create new project
         const { data, error } = await supabase
           .from('projects')
-          .insert([project])
+          .insert([dbProject])
           .select()
 
         if (error) {
-          console.warn("Database error:", error)
+          console.error("Database error:", error)
+          alert(`Failed to create: ${error.message}`)
           return
         }
         
