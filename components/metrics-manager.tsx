@@ -196,7 +196,7 @@ export function MetricsManager() {
               <SelectValue placeholder="Select a project" />
             </SelectTrigger>
             <SelectContent>
-              {projects.map((project) => (
+              {(projects || []).map((project) => (
                 <SelectItem key={project.id} value={project.id.toString()}>
                   {project.title}
                 </SelectItem>
@@ -312,7 +312,7 @@ export function MetricsManager() {
           </Card>
         ) : (
           <div className="grid gap-4">
-            {filteredMetrics.map((metric) => {
+            {(filteredMetrics || []).map((metric) => {
               const project = projects.find(p => p.id === metric.project_id)
               const progressTrend = calculateTrend(metric.project_id, 'progress')
               const productivityTrend = calculateTrend(metric.project_id, 'productivity_score')

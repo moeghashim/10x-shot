@@ -343,7 +343,7 @@ export function GlobalMetricsManager() {
       <div className="space-y-4">
         <h3 className="text-xl font-semibold text-gray-900">Monthly Progress</h3>
         
-        {metrics.map((metric, index) => {
+        {(metrics || []).map((metric, index) => {
           const previousMetric = metrics[index + 1]
           
           return (
@@ -489,14 +489,14 @@ export function GlobalMetricsManager() {
                 </div>
 
                 {/* Skills Gained */}
-                {metric.skills_gained.length > 0 && (
+                {metric.skills_gained && metric.skills_gained.length > 0 && (
                   <div>
                     <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
                       <Zap className="h-4 w-4" />
                       Skills Gained This Month
                     </h4>
                     <div className="flex flex-wrap gap-2">
-                      {metric.skills_gained.map((skill, skillIndex) => (
+                      {(metric.skills_gained || []).map((skill, skillIndex) => (
                         <Badge
                           key={skillIndex}
                           variant="outline"
@@ -510,14 +510,14 @@ export function GlobalMetricsManager() {
                 )}
 
                 {/* Milestones */}
-                {metric.milestones.length > 0 && (
+                {metric.milestones && metric.milestones.length > 0 && (
                   <div>
                     <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
                       <TrendingUp className="h-4 w-4" />
                       Key Milestones
                     </h4>
                     <ul className="space-y-1">
-                      {metric.milestones.map((milestone, milestoneIndex) => (
+                      {(metric.milestones || []).map((milestone, milestoneIndex) => (
                         <li key={milestoneIndex} className="flex items-center gap-2 text-sm text-gray-600">
                           <div className="w-1.5 h-1.5 bg-gray-400 rounded-full"></div>
                           {milestone}

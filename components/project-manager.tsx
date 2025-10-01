@@ -429,7 +429,7 @@ export function ProjectManager() {
       )}
 
       <div className="grid gap-4">
-        {projects.map((project) => (
+        {(projects || []).map((project) => (
           <Card key={project.id}>
             <CardHeader>
               <div className="flex justify-between items-start">
@@ -478,7 +478,7 @@ export function ProjectManager() {
                   <div>
                     <span className="font-medium text-sm">My Skills: </span>
                     <div className="flex flex-wrap gap-1 mt-1">
-                      {project.mySkills.map((skill, index) => (
+                      {(project.mySkills || []).map((skill, index) => (
                         <Badge key={index} variant="outline" className="text-xs">
                           {skill}
                         </Badge>
@@ -489,7 +489,7 @@ export function ProjectManager() {
                   <div>
                     <span className="font-medium text-sm">AI Skills: </span>
                     <div className="flex flex-wrap gap-1 mt-1">
-                      {project.aiSkills.map((skill, index) => (
+                      {(project.aiSkills || []).map((skill, index) => (
                         <Badge key={index} variant="secondary" className="text-xs">
                           {skill}
                         </Badge>

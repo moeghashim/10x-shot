@@ -272,7 +272,7 @@ export function UserManager() {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {users.map((user) => (
+            {(users || []).map((user) => (
               <div key={user.id} className="flex items-center justify-between p-4 border rounded-lg">
                 <div className="flex-1">
                   <div className="flex items-center gap-3">
@@ -340,7 +340,7 @@ export function UserManager() {
             {activities.length === 0 ? (
               <p className="text-gray-500 text-sm">No activity recorded yet</p>
             ) : (
-              activities.slice(0, 10).map((activity) => (
+              (activities || []).slice(0, 10).map((activity) => (
                 <div key={activity.id} className="flex items-center justify-between py-2 border-b last:border-b-0">
                   <div>
                     <p className="text-sm font-medium">{activity.action.replace('_', ' ')}</p>
