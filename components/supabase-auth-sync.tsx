@@ -9,13 +9,21 @@ export function SupabaseAuthSync({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (status === 'authenticated' && session?.user?.email) {
-      // Sign in to Supabase Auth to enable RLS policies
-      supabase.auth.signInWithPassword({
-        email: session.user.email,
-        password: 'admin123456' // This matches the password we set earlier
-      }).catch(err => {
-        console.warn('Supabase auth sync failed:', err.message)
-      })
+      // Get Supabase session tokens from secure API endpoint
+      fetch('/api/auth/supabase-sync', { method: 'POST' })
+        .then(res => res.json())
+        .then(data => {
+          if (data.access_token && data.refresh_token) {
+            // Set the session in Supabase client
+            supabase.auth.setSession({
+              access_token: data.access_token,
+              refresh_token: data.refresh_token
+            })
+          }
+        })
+        .catch(err => {
+          console.warn('Supabase auth sync failed:', err.message)
+        })
     } else if (status === 'unauthenticated') {
       // Sign out from Supabase Auth
       supabase.auth.signOut().catch(() => {})
