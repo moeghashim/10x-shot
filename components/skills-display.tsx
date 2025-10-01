@@ -16,7 +16,7 @@ export function SkillsDisplay({ mySkills, aiSkills, tools }: SkillsDisplayProps)
           <span className="text-sm font-medium text-gray-700">My Skills</span>
         </div>
         <div className="flex flex-wrap gap-1">
-          {mySkills.map((skill, index) => (
+          {(mySkills || []).map((skill, index) => (
             <Badge key={index} variant="outline" className="text-xs text-gray-700 border-gray-300 bg-white">
               {skill}
             </Badge>
@@ -30,7 +30,7 @@ export function SkillsDisplay({ mySkills, aiSkills, tools }: SkillsDisplayProps)
           <span className="text-sm font-medium text-gray-700">AI-Powered Skills</span>
         </div>
         <div className="flex flex-wrap gap-1">
-          {aiSkills.map((skill, index) => (
+          {(aiSkills || []).map((skill, index) => (
             <Badge key={index} variant="outline" className="text-xs text-black border-black bg-gray-50">
               {skill}
             </Badge>
@@ -44,7 +44,7 @@ export function SkillsDisplay({ mySkills, aiSkills, tools }: SkillsDisplayProps)
           <span className="text-sm font-medium text-gray-700">Tools Used</span>
         </div>
         <div className="flex flex-wrap gap-1">
-          {tools.map((tool, index) => (
+          {(tools || []).map((tool, index) => (
             <Badge key={index} variant="outline" className="text-xs text-gray-500 border-gray-400 bg-gray-50">
               {tool}
             </Badge>
