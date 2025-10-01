@@ -1,7 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { supabase } from "@/lib/supabase"
+import { useSession, signOut } from "next-auth/react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -13,27 +12,12 @@ import { GlobalMetricsManager } from "@/components/global-metrics-manager"
 import { UserManager } from "@/components/user-manager"
 
 export default function AdminPage() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    checkAuth()
-  }, [])
-
-  const checkAuth = async () => {
-    try {
-      const { data: { session } } = await supabase.auth.getSession()
-      setIsAuthenticated(!!session)
-    } catch (error) {
-      console.error("Auth check failed:", error)
-    } finally {
-      setLoading(false)
-    }
-  }
+  const { data: session, status } = useSession()
+  const loading = status === "loading"
+  const isAuthenticated = !!session
 
   const handleSignOut = async () => {
-    await supabase.auth.signOut()
-    setIsAuthenticated(false)
+    await signOut({ callbackUrl: '/admin' })
   }
 
   if (loading) {
@@ -48,7 +32,7 @@ export default function AdminPage() {
   }
 
   if (!isAuthenticated) {
-    return <AdminAuth onAuthSuccess={() => setIsAuthenticated(true)} />
+    return <AdminAuth />
   }
 
   return (

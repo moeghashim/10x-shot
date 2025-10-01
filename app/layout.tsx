@@ -4,6 +4,8 @@ import { IBM_Plex_Sans } from "next/font/google"
 import "./globals.css"
 import { Analytics } from "@vercel/analytics/next"
 import { Suspense } from "react"
+import AuthSessionProvider from "@/components/session-provider"
+import { SupabaseAuthSync } from "@/components/supabase-auth-sync"
 
 const plexSans = IBM_Plex_Sans({ subsets: ["latin"], weight: ["400"] })
 
@@ -31,10 +33,14 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={plexSans.className}>
-        <Suspense fallback={<div>Loading...</div>}>
-          {children}
-          <Analytics />
-        </Suspense>
+        <AuthSessionProvider>
+          <SupabaseAuthSync>
+            <Suspense fallback={<div>Loading...</div>}>
+              {children}
+              <Analytics />
+            </Suspense>
+          </SupabaseAuthSync>
+        </AuthSessionProvider>
       </body>
     </html>
   )

@@ -1,3 +1,4 @@
+import { auth } from "@/auth"
 import { supabase } from "@/lib/supabase"
 import bcrypt from 'bcryptjs'
 
@@ -11,7 +12,7 @@ export interface AdminUser {
 }
 
 export class AuthService {
-  // Create new admin user
+  // Create new admin user (for Supabase Auth)
   static async createAdminUser(userData: {
     email: string
     password: string
@@ -19,15 +20,13 @@ export class AuthService {
     role: 'admin' | 'super_admin'
   }): Promise<{ success: boolean, error: string | null }> {
     try {
-      // Hash password
-      const hashedPassword = await this.hashPassword(userData.password)
-
-      // Insert user
+      // Insert user into admin_users table
+      // Note: Password is managed by Supabase Auth, not stored in admin_users
       const { error } = await supabase
         .from('admin_users')
         .insert([{
           email: userData.email,
-          password_hash: hashedPassword,
+          password_hash: 'managed_by_supabase_auth',
           full_name: userData.full_name,
           role: userData.role
         }])
@@ -41,16 +40,6 @@ export class AuthService {
       console.error('User creation error:', error)
       return { success: false, error: 'Failed to create user' }
     }
-  }
-
-  // Hash password
-  static async hashPassword(password: string): Promise<string> {
-    return await bcrypt.hash(password, 12)
-  }
-
-  // Verify password
-  static async verifyPassword(password: string, hashedPassword: string): Promise<boolean> {
-    return await bcrypt.compare(password, hashedPassword)
   }
 
   // Log user activity
@@ -76,17 +65,17 @@ export class AuthService {
     }
   }
 
-  // Get current user from session
+  // Get current user from NextAuth session
   static async getCurrentUser(): Promise<AdminUser | null> {
     try {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) return null
+      const session = await auth()
+      if (!session?.user) return null
 
-      // Get admin user details
+      // Get admin user details from database
       const { data: adminUser } = await supabase
         .from('admin_users')
         .select('*')
-        .eq('email', user.email)
+        .eq('email', session.user.email)
         .eq('is_active', true)
         .single()
 
@@ -109,7 +98,7 @@ export class AuthService {
   // Check if user has permission
   static hasPermission(user: AdminUser, action: string): boolean {
     if (user.role === 'super_admin') return true
-    
+
     // Define permissions for regular admin
     const adminPermissions = [
       'view_projects',
@@ -118,17 +107,17 @@ export class AuthService {
       'edit_metrics',
       'view_global_metrics'
     ]
-    
+
     const superAdminOnlyPermissions = [
       'manage_users',
       'edit_global_metrics',
       'system_settings'
     ]
-    
+
     if (superAdminOnlyPermissions.includes(action)) {
       return false
     }
-    
+
     return adminPermissions.includes(action)
   }
 }

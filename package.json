@@ -5,10 +5,12 @@
   "scripts": {
     "build": "next build",
     "dev": "next dev",
+    "diagnose-rls": "node scripts/diagnose-and-fix-rls.js",
     "lint": "next lint",
     "start": "next start"
   },
   "dependencies": {
+    "@auth/supabase-adapter": "^1.10.0",
     "@hookform/resolvers": "^3.10.0",
     "@radix-ui/react-accordion": "latest",
     "@radix-ui/react-alert-dialog": "latest",
@@ -52,6 +54,7 @@
     "input-otp": "latest",
     "lucide-react": "^0.454.0",
     "next": "15.2.4",
+    "next-auth": "5.0.0-beta.29",
     "next-themes": "latest",
     "react": "^19",
     "react-day-picker": "latest",

@@ -1,82 +1,24 @@
-import { createServerClient } from '@supabase/ssr'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
+import { auth } from '@/auth'
 
 export async function middleware(request: NextRequest) {
-  let response = NextResponse.next({
-    request: {
-      headers: request.headers,
-    },
-  })
-
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        get(name: string) {
-          return request.cookies.get(name)?.value
-        },
-        set(name: string, value: string, options: any) {
-          request.cookies.set({
-            name,
-            value,
-            ...options,
-          })
-          response = NextResponse.next({
-            request: {
-              headers: request.headers,
-            },
-          })
-          response.cookies.set({
-            name,
-            value,
-            ...options,
-          })
-        },
-        remove(name: string, options: any) {
-          request.cookies.set({
-            name,
-            value: '',
-            ...options,
-          })
-          response = NextResponse.next({
-            request: {
-              headers: request.headers,
-            },
-          })
-          response.cookies.set({
-            name,
-            value: '',
-            ...options,
-          })
-        },
-      },
-    }
-  )
-
   // Check if route needs protection
   if (request.nextUrl.pathname.startsWith('/admin')) {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser()
+    const session = await auth()
 
-    // If no user, redirect to admin login
-    if (!user && request.nextUrl.pathname !== '/admin') {
+    // If no session and not on login page, redirect to admin login
+    if (!session && request.nextUrl.pathname !== '/admin') {
       return NextResponse.redirect(new URL('/admin', request.url))
     }
 
-    // If user exists, check if they have admin privileges
-    if (user) {
+    // If session exists, verify they are an active admin
+    if (session?.user) {
       try {
-        const { data: adminUser, error: adminError } = await supabase
-          .from('admin_users')
-          .select('id,email,role,is_active')
-          .eq('email', user.email)
-          .eq('is_active', true)
-          .single()
-
-        if (adminError || !adminUser) {
+        // For additional admin verification, you can add a check here
+        // The auth callback already verified admin status during login
+        const userRole = (session.user as any).role
+        if (!userRole || !['admin', 'super_admin'].includes(userRole)) {
           return new NextResponse('Unauthorized', { status: 401 })
         }
       } catch {
@@ -85,7 +27,7 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  return response
+  return NextResponse.next()
 }
 
 export const config = {
