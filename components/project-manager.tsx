@@ -22,7 +22,6 @@ interface Project {
   aiSkills: string[]
   tools: string[]
   productivity: number
-  timeframe: string
   url: string
 }
 
@@ -72,7 +71,6 @@ export function ProjectManager() {
         aiSkills: ["Content Generation", "Price Optimization", "Customer Support"],
         tools: ["ChatGPT", "Stripe", "Vercel", "Supabase", "Midjourney"],
         productivity: 8.2,
-        timeframe: "3 months",
         url: "https://ai-ecommerce-demo.vercel.app",
       },
       {
@@ -86,7 +84,6 @@ export function ProjectManager() {
         aiSkills: ["Writing", "Video Editing", "Image Generation"],
         tools: ["ChatGPT", "Claude", "Runway ML", "N8N", "Airtable", "VEO", "Gemini", "Midjourney"],
         productivity: 0.1,
-        timeframe: "2 months",
         url: "https://bannaa.ai",
       },
       {
@@ -100,7 +97,6 @@ export function ProjectManager() {
         aiSkills: ["Data Processing", "Pattern Recognition", "Report Generation"],
         tools: ["ChatGPT", "Tableau", "Python", "Jupyter", "AWS", "MongoDB"],
         productivity: 6.8,
-        timeframe: "4 months",
         url: "https://analytics-ai-dashboard.vercel.app",
       },
       {
@@ -114,7 +110,6 @@ export function ProjectManager() {
         aiSkills: ["Personalization", "Computer Vision", "Nutrition Analysis"],
         tools: ["ChatGPT", "React Native", "Firebase", "TensorFlow", "Figma"],
         productivity: 5.2,
-        timeframe: "5 months",
         url: "https://fitness-ai-app.vercel.app",
       },
       {
@@ -128,7 +123,6 @@ export function ProjectManager() {
         aiSkills: ["NLP", "Document Analysis", "Legal Reasoning"],
         tools: ["ChatGPT", "Claude", "LangChain", "Pinecone", "Notion", "DocuSign"],
         productivity: 4.1,
-        timeframe: "6 months",
         url: "https://legal-ai-processor.vercel.app",
       },
       {
@@ -142,7 +136,6 @@ export function ProjectManager() {
         aiSkills: ["Personalization", "Content Generation", "Assessment"],
         tools: ["ChatGPT", "Teachable Machine", "Moodle", "Zoom", "Loom", "Calendly"],
         productivity: 7.3,
-        timeframe: "4 months",
         url: "https://edu-ai-platform.vercel.app",
       },
       {
@@ -156,7 +149,6 @@ export function ProjectManager() {
         aiSkills: ["Market Analysis", "Risk Modeling", "Optimization"],
         tools: ["ChatGPT", "Alpha Vantage", "Plaid", "Chart.js", "Vercel", "PostgreSQL"],
         productivity: 9.1,
-        timeframe: "3 months",
         url: "https://fintech-ai-planner.vercel.app",
       },
       {
@@ -170,7 +162,6 @@ export function ProjectManager() {
         aiSkills: ["Predictive Analytics", "Optimization", "Pattern Recognition"],
         tools: ["ChatGPT", "Arduino", "Raspberry Pi", "MQTT", "InfluxDB", "Grafana"],
         productivity: 3.2,
-        timeframe: "8 months",
         url: "https://smarthome-ai-demo.vercel.app",
       },
       {
@@ -184,7 +175,6 @@ export function ProjectManager() {
         aiSkills: ["Personalization", "Optimization", "Predictive Modeling"],
         tools: ["ChatGPT", "HubSpot", "Mailchimp", "Google Analytics", "Zapier", "Airtable"],
         productivity: 2.8,
-        timeframe: "6 months",
         url: "https://marketing-ai-suite.vercel.app",
       },
       {
@@ -198,7 +188,6 @@ export function ProjectManager() {
         aiSkills: ["Image Generation", "Design Automation", "Style Transfer"],
         tools: ["ChatGPT", "Midjourney", "DALL-E", "Figma", "Adobe Creative Suite", "Framer"],
         productivity: 1.9,
-        timeframe: "7 months",
         url: "https://design-ai-studio.vercel.app",
       },
     ]
@@ -218,7 +207,6 @@ export function ProjectManager() {
         ai_skills: project.aiSkills,
         tools: project.tools,
         productivity: project.productivity,
-        timeframe: project.timeframe,
         url: project.url,
       }
 
@@ -276,24 +264,27 @@ export function ProjectManager() {
       aiSkills: project?.aiSkills || [],
       tools: project?.tools || [],
       productivity: project?.productivity || 0,
-      timeframe: project?.timeframe || "",
       url: project?.url || "",
     })
 
+    // Store string versions for editing
+    const [mySkillsInput, setMySkillsInput] = useState(project?.mySkills?.join(', ') || '')
+    const [aiSkillsInput, setAiSkillsInput] = useState(project?.aiSkills?.join(', ') || '')
+    const [toolsInput, setToolsInput] = useState(project?.tools?.join(', ') || '')
+
     const handleSubmit = (e: React.FormEvent) => {
       e.preventDefault()
-      if (project) {
-        onSave({ ...formData, id: project.id })
-      } else {
-        onSave(formData)
+      const projectData = {
+        ...formData,
+        mySkills: mySkillsInput.split(',').map(item => item.trim()).filter(Boolean),
+        aiSkills: aiSkillsInput.split(',').map(item => item.trim()).filter(Boolean),
+        tools: toolsInput.split(',').map(item => item.trim()).filter(Boolean),
       }
-    }
-
-    const updateArrayField = (field: 'mySkills' | 'aiSkills' | 'tools', value: string) => {
-      setFormData(prev => ({
-        ...prev,
-        [field]: value.split(',').map(item => item.trim()).filter(Boolean)
-      }))
+      if (project) {
+        onSave({ ...projectData, id: project.id })
+      } else {
+        onSave(projectData)
+      }
     }
 
     return (
@@ -364,12 +355,7 @@ export function ProjectManager() {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <Input
-                placeholder="Timeframe"
-                value={formData.timeframe}
-                onChange={(e) => setFormData(prev => ({ ...prev, timeframe: e.target.value }))}
-              />
+            <div>
               <Input
                 placeholder="Project URL"
                 value={formData.url}
@@ -381,8 +367,8 @@ export function ProjectManager() {
               <label className="text-sm font-medium">My Skills (comma-separated)</label>
               <Input
                 placeholder="React, Node.js, Database Design"
-                value={formData.mySkills.join(', ')}
-                onChange={(e) => updateArrayField('mySkills', e.target.value)}
+                value={mySkillsInput}
+                onChange={(e) => setMySkillsInput(e.target.value)}
               />
             </div>
 
@@ -390,8 +376,8 @@ export function ProjectManager() {
               <label className="text-sm font-medium">AI Skills (comma-separated)</label>
               <Input
                 placeholder="Content Generation, Optimization, Analysis"
-                value={formData.aiSkills.join(', ')}
-                onChange={(e) => updateArrayField('aiSkills', e.target.value)}
+                value={aiSkillsInput}
+                onChange={(e) => setAiSkillsInput(e.target.value)}
               />
             </div>
 
@@ -399,8 +385,8 @@ export function ProjectManager() {
               <label className="text-sm font-medium">Tools (comma-separated)</label>
               <Input
                 placeholder="ChatGPT, Vercel, Supabase"
-                value={formData.tools.join(', ')}
-                onChange={(e) => updateArrayField('tools', e.target.value)}
+                value={toolsInput}
+                onChange={(e) => setToolsInput(e.target.value)}
               />
             </div>
 
@@ -480,15 +466,9 @@ export function ProjectManager() {
                   <Progress value={project.progress} />
                 </div>
 
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div>
-                    <span className="font-medium">Productivity: </span>
-                    <span>{project.productivity}/10</span>
-                  </div>
-                  <div>
-                    <span className="font-medium">Timeframe: </span>
-                    <span>{project.timeframe}</span>
-                  </div>
+                <div className="text-sm">
+                  <span className="font-medium">Productivity: </span>
+                  <span>{project.productivity}/10</span>
                 </div>
 
                 <div className="space-y-2">
