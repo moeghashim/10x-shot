@@ -2,21 +2,34 @@ import NextAuth from "next-auth"
 import Credentials from "next-auth/providers/credentials"
 import { createClient } from "@supabase/supabase-js"
 
-// Create Supabase clients once at module level
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  {
-    auth: {
-      persistSession: false
-    }
-  }
-)
+// Lazy client creation to avoid build-time issues
+let supabaseAdmin: ReturnType<typeof createClient> | null = null
+let supabaseAuth: ReturnType<typeof createClient> | null = null
 
-const supabaseAuth = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-)
+function getSupabaseAdmin() {
+  if (!supabaseAdmin) {
+    supabaseAdmin = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!,
+      {
+        auth: {
+          persistSession: false
+        }
+      }
+    )
+  }
+  return supabaseAdmin
+}
+
+function getSupabaseAuth() {
+  if (!supabaseAuth) {
+    supabaseAuth = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    )
+  }
+  return supabaseAuth
+}
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
@@ -33,7 +46,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
         try {
           // Check if user exists in admin_users table
-          const { data: adminUser, error } = await supabaseAdmin
+          const { data: adminUser, error } = await getSupabaseAdmin()
             .from('admin_users')
             .select('id, email, full_name, role, is_active')
             .eq('email', credentials.email as string)
@@ -46,7 +59,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           }
 
           // Validate against Supabase Auth
-          const { data: authData, error: authError } = await supabaseAuth.auth.signInWithPassword({
+          const { data: authData, error: authError } = await getSupabaseAuth().auth.signInWithPassword({
             email: credentials.email as string,
             password: credentials.password as string,
           })
