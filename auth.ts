@@ -2,6 +2,22 @@ import NextAuth from "next-auth"
 import Credentials from "next-auth/providers/credentials"
 import { createClient } from "@supabase/supabase-js"
 
+// Create Supabase clients once at module level
+const supabaseAdmin = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!,
+  {
+    auth: {
+      persistSession: false
+    }
+  }
+)
+
+const supabaseAuth = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+)
+
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
     Credentials({
@@ -16,19 +32,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         }
 
         try {
-          // Create Supabase clients (only on server side during authorize)
-          const supabase = createClient(
-            process.env.NEXT_PUBLIC_SUPABASE_URL!,
-            process.env.SUPABASE_SERVICE_ROLE_KEY!,
-            {
-              auth: {
-                persistSession: false
-              }
-            }
-          )
-
           // Check if user exists in admin_users table
-          const { data: adminUser, error } = await supabase
+          const { data: adminUser, error } = await supabaseAdmin
             .from('admin_users')
             .select('id, email, full_name, role, is_active')
             .eq('email', credentials.email as string)
@@ -41,12 +46,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           }
 
           // Validate against Supabase Auth
-          const authClient = createClient(
-            process.env.NEXT_PUBLIC_SUPABASE_URL!,
-            process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-          )
-
-          const { data: authData, error: authError } = await authClient.auth.signInWithPassword({
+          const { data: authData, error: authError } = await supabaseAuth.auth.signInWithPassword({
             email: credentials.email as string,
             password: credentials.password as string,
           })

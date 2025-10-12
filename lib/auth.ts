@@ -1,24 +1,18 @@
+/**
+ * Authentication service and utilities
+ * Provides business logic for user authentication and authorization
+ */
+
 import { auth } from "@/auth"
 import { supabase } from "@/lib/supabase"
-import bcrypt from 'bcryptjs'
-
-export interface AdminUser {
-  id: string
-  email: string
-  full_name?: string
-  role: 'admin' | 'super_admin'
-  is_active: boolean
-  last_login?: string
-}
+import { logActivity } from "@/lib/data-fetching"
+import type { AdminUser, CreateAdminUserInput, AuthResult } from "@/types/database"
 
 export class AuthService {
-  // Create new admin user (for Supabase Auth)
-  static async createAdminUser(userData: {
-    email: string
-    password: string
-    full_name?: string
-    role: 'admin' | 'super_admin'
-  }): Promise<{ success: boolean, error: string | null }> {
+  /**
+   * Create new admin user (for Supabase Auth)
+   */
+  static async createAdminUser(userData: CreateAdminUserInput): Promise<AuthResult> {
     try {
       // Insert user into admin_users table
       // Note: Password is managed by Supabase Auth, not stored in admin_users
@@ -42,30 +36,21 @@ export class AuthService {
     }
   }
 
-  // Log user activity
+  /**
+   * Log user activity - now delegates to data-fetching layer
+   */
   static async logActivity(
-    userId: string,
     action: string,
     resourceType?: string,
     resourceId?: number,
     details?: string
   ) {
-    try {
-      await supabase
-        .from('admin_activity')
-        .insert([{
-          user_id: userId,
-          action,
-          resource_type: resourceType,
-          resource_id: resourceId,
-          details
-        }])
-    } catch (error) {
-      console.warn('Failed to log activity:', error)
-    }
+    await logActivity(action, resourceType, resourceId, details)
   }
 
-  // Get current user from NextAuth session
+  /**
+   * Get current user from NextAuth session
+   */
   static async getCurrentUser(): Promise<AdminUser | null> {
     try {
       const session = await auth()
@@ -95,7 +80,9 @@ export class AuthService {
     }
   }
 
-  // Check if user has permission
+  /**
+   * Check if user has permission for a specific action
+   */
   static hasPermission(user: AdminUser, action: string): boolean {
     if (user.role === 'super_admin') return true
 
@@ -122,7 +109,9 @@ export class AuthService {
   }
 }
 
-// Role-based access control decorator
+/**
+ * Role-based access control decorator
+ */
 export function requirePermission(permission: string) {
   return function (_target: any, _propertyName: string, descriptor: PropertyDescriptor) {
     const method = descriptor.value

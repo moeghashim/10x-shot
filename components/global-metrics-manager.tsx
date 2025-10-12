@@ -1,7 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { supabase } from "@/lib/supabase"
+import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -11,118 +10,21 @@ import {
   Calendar, 
   Plus, 
   Save, 
-  TrendingUp, 
-  TrendingDown, 
-  Minus,
   Twitter,
   Youtube,
   Heart,
   Instagram,
   Mail,
   DollarSign,
-  Zap
+  Zap,
+  TrendingUp
 } from "lucide-react"
 import { format, parseISO } from "date-fns"
-
-interface GlobalMetric {
-  id?: number
-  month: string
-  twitter_followers: number
-  youtube_subscribers: number
-  tiktok_followers: number
-  instagram_followers: number
-  newsletter_subscribers: number
-  total_gmv: number
-  productivity_gain: number
-  skills_gained: string[]
-  milestones: string[]
-  created_at?: string
-}
-
-// Fallback data for when database isn't ready
-const fallbackGlobalMetrics: GlobalMetric[] = [
-  {
-    id: 6,
-    month: "2024-06-01",
-    twitter_followers: 4200,
-    youtube_subscribers: 1850,
-    tiktok_followers: 4100,
-    instagram_followers: 6800,
-    newsletter_subscribers: 2100,
-    total_gmv: 51500,
-    productivity_gain: 9.1,
-    skills_gained: ["Advanced Management", "Full-Stack Vibe Coding"],
-    milestones: ["4k Twitter followers", "2k Newsletter subscribers"]
-  },
-  {
-    id: 5,
-    month: "2024-05-01",
-    twitter_followers: 3600,
-    youtube_subscribers: 1450,
-    tiktok_followers: 3200,
-    instagram_followers: 5300,
-    newsletter_subscribers: 1680,
-    total_gmv: 42800,
-    productivity_gain: 7.9,
-    skills_gained: ["UI/UX Design", "Team Leadership"],
-    milestones: ["5k Instagram followers", "$40k month"]
-  },
-  {
-    id: 4,
-    month: "2024-04-01",
-    twitter_followers: 2850,
-    youtube_subscribers: 1100,
-    tiktok_followers: 2450,
-    instagram_followers: 4100,
-    newsletter_subscribers: 1250,
-    total_gmv: 34200,
-    productivity_gain: 6.2,
-    skills_gained: ["Project Management", "Advanced Vibe Coding"],
-    milestones: ["1k YouTube subscribers", "First viral TikTok"]
-  },
-  {
-    id: 3,
-    month: "2024-03-01",
-    twitter_followers: 2100,
-    youtube_subscribers: 780,
-    tiktok_followers: 1890,
-    instagram_followers: 3200,
-    newsletter_subscribers: 920,
-    total_gmv: 25600,
-    productivity_gain: 4.8,
-    skills_gained: ["Advanced Design Systems", "Vibe Coding Fundamentals"],
-    milestones: ["2k Twitter followers", "Launched Bannaa.ai"]
-  },
-  {
-    id: 2,
-    month: "2024-02-01",
-    twitter_followers: 1580,
-    youtube_subscribers: 520,
-    tiktok_followers: 1340,
-    instagram_followers: 2650,
-    newsletter_subscribers: 680,
-    total_gmv: 18900,
-    productivity_gain: 3.4,
-    skills_gained: ["Figma Basics", "Team Management"],
-    milestones: ["Reached 500 YouTube subscribers", "First $15k month"]
-  },
-  {
-    id: 1,
-    month: "2024-01-01",
-    twitter_followers: 1250,
-    youtube_subscribers: 340,
-    tiktok_followers: 890,
-    instagram_followers: 2100,
-    newsletter_subscribers: 450,
-    total_gmv: 12500,
-    productivity_gain: 2.1,
-    skills_gained: ["Basic Design Principles"],
-    milestones: ["Started 10x experiment", "Launched first project"]
-  },
-]
+import { useGlobalMetrics } from "@/hooks/use-global-metrics"
+import type { GlobalMetric } from "@/types/database"
 
 export function GlobalMetricsManager() {
-  const [metrics, setMetrics] = useState<GlobalMetric[]>([])
+  const { metrics, loading, saveMetric, reload } = useGlobalMetrics()
   const [newMetric, setNewMetric] = useState<Omit<GlobalMetric, 'id' | 'created_at'>>({
     month: format(new Date(), 'yyyy-MM-01'),
     twitter_followers: 0,
@@ -137,56 +39,17 @@ export function GlobalMetricsManager() {
   })
   const [skillsInput, setSkillsInput] = useState("")
   const [milestonesInput, setMilestonesInput] = useState("")
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    loadMetrics()
-  }, [])
-
-  const loadMetrics = async () => {
-    setLoading(true)
-    try {
-      const { data, error } = await supabase
-        .from('global_metrics')
-        .select('*')
-        .order('month', { ascending: false })
-
-      if (error) {
-        console.warn('Database not ready for global metrics, using fallback:', error)
-        // Use fallback global metrics data
-        setMetrics(fallbackGlobalMetrics)
-        setLoading(false)
-        return
-      }
-
-      setMetrics(data || [])
-    } catch (error) {
-      console.warn('Error loading metrics, using fallback:', error)
-      setMetrics(fallbackGlobalMetrics)
-    } finally {
-      setLoading(false)
-    }
-  }
 
   const handleSaveMetric = async () => {
-    try {
-      const metricData = {
-        ...newMetric,
-        skills_gained: skillsInput.split(',').map(s => s.trim()).filter(s => s.length > 0),
-        milestones: milestonesInput.split(',').map(m => m.trim()).filter(m => m.length > 0)
-      }
+    const metricData = {
+      ...newMetric,
+      skills_gained: skillsInput.split(',').map(s => s.trim()).filter(s => s.length > 0),
+      milestones: milestonesInput.split(',').map(m => m.trim()).filter(m => m.length > 0)
+    }
 
-      const { error } = await supabase
-        .from('global_metrics')
-        .upsert([metricData])
-
-      if (error) {
-        console.warn('Error saving metric:', error)
-        return
-      }
-
-      await loadMetrics()
-      
+    const result = await saveMetric(metricData)
+    
+    if (result.success) {
       // Reset form
       setNewMetric({
         month: format(new Date(), 'yyyy-MM-01'),
@@ -202,8 +65,6 @@ export function GlobalMetricsManager() {
       })
       setSkillsInput("")
       setMilestonesInput("")
-    } catch (error) {
-      console.warn('Error saving metric:', error)
     }
   }
 

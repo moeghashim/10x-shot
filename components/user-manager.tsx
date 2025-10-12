@@ -1,7 +1,6 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { supabase } from "@/lib/supabase"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -21,26 +20,8 @@ import {
 } from "lucide-react"
 import { format } from "date-fns"
 import { AuthService } from "@/lib/auth"
-
-interface AdminUser {
-  id: string
-  email: string
-  full_name?: string
-  role: 'admin' | 'super_admin'
-  is_active: boolean
-  last_login?: string
-  created_at: string
-  updated_at: string
-}
-
-interface UserActivity {
-  id: string
-  action: string
-  resource_type?: string
-  resource_id?: number
-  details?: string
-  created_at: string
-}
+import { fetchAdminUsers, fetchUserActivity, updateAdminUser, logActivity } from "@/lib/data-fetching"
+import type { AdminUser, UserActivity } from "@/types/database"
 
 export function UserManager() {
   const [users, setUsers] = useState<AdminUser[]>([])
@@ -62,71 +43,14 @@ export function UserManager() {
 
   const loadUsers = async () => {
     setLoading(true)
-    try {
-      const { data, error } = await supabase
-        .from('admin_users')
-        .select('*')
-        .order('created_at', { ascending: false })
-
-      if (error) {
-        console.warn('Database not ready for users, using fallback:', error)
-        // Fallback data - no real credentials
-        setUsers([
-          {
-            id: 'fallback-1',
-            email: 'admin@example.com',
-            full_name: 'System Admin',
-            role: 'super_admin',
-            is_active: true,
-            last_login: new Date().toISOString(),
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
-          }
-        ])
-        return
-      }
-
-      setUsers(data || [])
-    } catch (error) {
-      console.warn('Failed to load users:', error)
-      setUsers([])
-    } finally {
-      setLoading(false)
-    }
+    const { data } = await fetchAdminUsers()
+    setUsers(data || [])
+    setLoading(false)
   }
 
   const loadActivity = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('admin_activity')
-        .select('*')
-        .order('created_at', { ascending: false })
-        .limit(50)
-
-      if (error) {
-        console.warn('Failed to load activity:', error)
-        return
-      }
-
-      setActivities(data || [])
-    } catch (error) {
-      console.warn('Failed to load activity:', error)
-    }
-  }
-
-  const logActivity = async (action: string, resourceType?: string, resourceId?: number, details?: string) => {
-    try {
-      await supabase
-        .from('admin_activity')
-        .insert([{
-          action,
-          resource_type: resourceType,
-          resource_id: resourceId,
-          details
-        }])
-    } catch (error) {
-      console.warn('Failed to log activity:', error)
-    }
+    const { data } = await fetchUserActivity(50)
+    setActivities(data || [])
   }
 
   const createUser = async () => {
@@ -152,27 +76,17 @@ export function UserManager() {
   }
 
   const updateUser = async (user: AdminUser) => {
-    try {
-      const { error } = await supabase
-        .from('admin_users')
-        .update({
-          email: user.email,
-          full_name: user.full_name,
-          role: user.role,
-          is_active: user.is_active
-        })
-        .eq('id', user.id)
+    const { error } = await updateAdminUser(user.id, {
+      email: user.email,
+      full_name: user.full_name,
+      role: user.role,
+      is_active: user.is_active
+    })
 
-      if (error) {
-        console.warn('Failed to update user:', error)
-        return
-      }
-
+    if (!error) {
       await logActivity('UPDATE_USER', 'admin_user', undefined, `Updated user: ${user.email}`)
       loadUsers()
       setEditingUser(null)
-    } catch (error) {
-      console.warn('Failed to update user:', error)
     }
   }
 

@@ -1,7 +1,6 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { supabase } from "@/lib/supabase"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -9,31 +8,15 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge"
 import { Calendar, Plus, Save, TrendingUp, TrendingDown, Minus } from "lucide-react"
 import { format, parseISO } from "date-fns"
-
-interface Metric {
-  id?: number
-  project_id: number
-  month: string
-  progress: number
-  productivity_score: number
-  hours_worked: number
-  ai_assistance_hours: number
-  manual_hours: number
-  notes?: string
-  created_at?: string
-}
-
-interface Project {
-  id: number
-  title: string
-  domain: string
-}
+import { useProjectMetrics } from "@/hooks/use-metrics"
+import { fetchProjectSummaries } from "@/lib/data-fetching"
+import type { ProjectMetric, ProjectSummary } from "@/types/database"
 
 export function MetricsManager() {
-  const [projects, setProjects] = useState<Project[]>([])
-  const [metrics, setMetrics] = useState<Metric[]>([])
+  const [projects, setProjects] = useState<ProjectSummary[]>([])
   const [selectedProject, setSelectedProject] = useState<number | null>(null)
-  const [newMetric, setNewMetric] = useState<Omit<Metric, 'id' | 'created_at'>>({
+  const { metrics, loading, saveMetric: saveMetricDb, reload } = useProjectMetrics(selectedProject || undefined)
+  const [newMetric, setNewMetric] = useState<Omit<ProjectMetric, 'id' | 'created_at'>>({
     project_id: 0,
     month: format(new Date(), 'yyyy-MM'),
     progress: 0,
@@ -43,11 +26,9 @@ export function MetricsManager() {
     manual_hours: 0,
     notes: ""
   })
-  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     loadProjects()
-    loadMetrics()
   }, [])
 
   useEffect(() => {
@@ -57,92 +38,18 @@ export function MetricsManager() {
   }, [selectedProject])
 
   const loadProjects = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('projects')
-        .select('id, title, domain')
-        .order('title')
-
-      if (error) {
-        console.warn("Database not ready for projects, using fallback:", error)
-        // Use fallback projects for metrics manager
-        const fallbackProjects = [
-          { id: 1, title: "AI E-commerce Platform", domain: "E-commerce" },
-          { id: 2, title: "Bannaa - Arabic AI School", domain: "Media & Content" },
-          { id: 3, title: "Data Analytics Dashboard", domain: "Analytics" },
-          { id: 4, title: "Mobile Fitness App", domain: "Health & Fitness" },
-          { id: 5, title: "Legal Document Processor", domain: "Legal Tech" },
-          { id: 6, title: "Educational Platform", domain: "EdTech" },
-          { id: 7, title: "Financial Planning Tool", domain: "FinTech" },
-          { id: 8, title: "Smart Home Automation", domain: "IoT" },
-          { id: 9, title: "Marketing Automation Suite", domain: "Marketing" },
-          { id: 10, title: "Creative Design Studio", domain: "Design" },
-        ]
-        setProjects(fallbackProjects)
-        if (!selectedProject) {
-          setSelectedProject(1)
-        }
-        return
-      }
-      setProjects(data || [])
-      
-      if (data && data.length > 0 && !selectedProject) {
-        setSelectedProject(data[0].id)
-      }
-    } catch (error) {
-      console.warn("Failed to load projects, using fallback:", error)
-      const fallbackProjects = [
-        { id: 1, title: "AI E-commerce Platform", domain: "E-commerce" },
-        { id: 2, title: "Bannaa - Arabic AI School", domain: "Media & Content" },
-        { id: 3, title: "Data Analytics Dashboard", domain: "Analytics" },
-        { id: 4, title: "Mobile Fitness App", domain: "Health & Fitness" },
-        { id: 5, title: "Legal Document Processor", domain: "Legal Tech" },
-        { id: 6, title: "Educational Platform", domain: "EdTech" },
-        { id: 7, title: "Financial Planning Tool", domain: "FinTech" },
-        { id: 8, title: "Smart Home Automation", domain: "IoT" },
-        { id: 9, title: "Marketing Automation Suite", domain: "Marketing" },
-        { id: 10, title: "Creative Design Studio", domain: "Design" },
-      ]
-      setProjects(fallbackProjects)
-      if (!selectedProject) {
-        setSelectedProject(1)
-      }
+    const { data } = await fetchProjectSummaries()
+    setProjects(data || [])
+    
+    if (data && data.length > 0 && !selectedProject) {
+      setSelectedProject(data[0].id)
     }
   }
 
-  const loadMetrics = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('project_metrics')
-        .select(`
-          *,
-          projects:project_id (title, domain)
-        `)
-        .order('month', { ascending: false })
-
-      if (error) {
-        console.warn("Database error:", error)
-        return
-      }
-      setMetrics(data || [])
-    } catch (error) {
-      console.warn("Failed to load metrics:", error)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const saveMetric = async () => {
-    try {
-      const { error } = await supabase
-        .from('project_metrics')
-        .insert([newMetric])
-
-      if (error) {
-        console.warn("Database error:", error)
-        return
-      }
-
+  const handleSaveMetric = async () => {
+    const result = await saveMetricDb(newMetric)
+    
+    if (result.success) {
       // Reset form
       setNewMetric({
         project_id: selectedProject || 0,
@@ -154,11 +61,6 @@ export function MetricsManager() {
         manual_hours: 0,
         notes: ""
       })
-
-      // Reload metrics
-      loadMetrics()
-    } catch (error) {
-      console.warn("Failed to save metric:", error)
     }
   }
 
@@ -291,7 +193,7 @@ export function MetricsManager() {
             />
           </div>
           
-          <Button onClick={saveMetric} className="mt-4">
+          <Button onClick={handleSaveMetric} className="mt-4">
             <Save className="h-4 w-4 mr-2" />
             Save Metric
           </Button>

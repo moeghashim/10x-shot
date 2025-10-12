@@ -3,102 +3,63 @@
 import { useState, useEffect } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
-import { supabase } from "@/lib/supabase"
+import { useProjects } from "@/hooks/use-projects"
+import { fetchLatestGlobalMetric } from "@/lib/data-fetching"
 
 export function StatsSection() {
+  const { projects, loading: projectsLoading } = useProjects()
   const [stats, setStats] = useState([
     { label: "Projects Launched", value: 0, max: 10 },
     { label: "Avg Productivity Gain", value: 0, max: 1000, suffix: "%" },
     { label: "AI Tools Integrated", value: 0, max: 50 },
     { label: "Current Productivity", value: 0, max: 10, suffix: "x" },
   ])
-  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    loadStats()
-  }, [])
-
-  const loadStats = async () => {
-    setLoading(true)
-    try {
-      // Get projects data
-      const { data: projects, error: projectsError } = await supabase
-        .from('projects')
-        .select('*')
-
-      if (projectsError) {
-        console.warn('Database not ready, using fallback stats:', projectsError)
-        // Use fallback values
-        setStats([
-          { label: "Projects Launched", value: 7, max: 10 },
-          { label: "Avg Productivity Gain", value: 480, max: 1000, suffix: "%" },
-          { label: "AI Tools Integrated", value: 35, max: 50 },
-          { label: "Current Productivity", value: 9.1, max: 10, suffix: "x" },
-        ])
-        setLoading(false)
-        return
-      }
-
-      // Get latest global metrics
-      const { data: globalMetrics, error: metricsError } = await supabase
-        .from('global_metrics')
-        .select('*')
-        .order('month', { ascending: false })
-        .limit(1)
-
-      if (metricsError) {
-        console.warn('Global metrics not ready, using project data only:', metricsError)
-      }
-
-      const activeProjects = projects?.filter(p => p.status === 'active' || p.status === 'completed') || []
-      const allTools = projects?.reduce((tools: string[], project) => {
-        return [...tools, ...(project.tools || [])]
-      }, []) || []
-      const uniqueTools = [...new Set(allTools)]
-      
-      const avgProductivity = projects?.length > 0 
-        ? projects.reduce((sum, p) => sum + (p.productivity || 0), 0) / projects.length
-        : 0
-
-      const latestMetrics = globalMetrics?.[0]
-      const currentProductivity = latestMetrics?.productivity_gain || avgProductivity
-
-      setStats([
-        { 
-          label: "Projects Launched", 
-          value: activeProjects.length, 
-          max: 10 
-        },
-        { 
-          label: "Avg Productivity Gain", 
-          value: Math.round(avgProductivity * 100), 
-          max: 1000, 
-          suffix: "%" 
-        },
-        { 
-          label: "AI Tools Integrated", 
-          value: uniqueTools.length, 
-          max: 50 
-        },
-        { 
-          label: "Current Productivity", 
-          value: Math.round(currentProductivity * 10) / 10, 
-          max: 10, 
-          suffix: "x" 
-        },
-      ])
-    } catch (error) {
-      console.warn('Database connection failed, using fallback stats:', error)
-      // Use fallback values on connection error
-      setStats([
-        { label: "Projects Launched", value: 7, max: 10 },
-        { label: "Avg Productivity Gain", value: 480, max: 1000, suffix: "%" },
-        { label: "AI Tools Integrated", value: 35, max: 50 },
-        { label: "Current Productivity", value: 9.1, max: 10, suffix: "x" },
-      ])
-    } finally {
-      setLoading(false)
+    if (!projectsLoading && projects.length > 0) {
+      calculateStats()
     }
+  }, [projects, projectsLoading])
+
+  const calculateStats = async () => {
+    const activeProjects = projects.filter(p => p.status === 'active' || p.status === 'completed')
+    const allTools = projects.reduce((tools: string[], project) => {
+      return [...tools, ...(project.tools || [])]
+    }, [])
+    const uniqueTools = [...new Set(allTools)]
+    
+    const avgProductivity = projects.length > 0 
+      ? projects.reduce((sum, p) => sum + (p.productivity || 0), 0) / projects.length
+      : 0
+
+    // Get latest global metric for current productivity
+    const { data: latestMetric } = await fetchLatestGlobalMetric()
+    const currentProductivity = latestMetric?.productivity_gain || avgProductivity
+
+    setStats([
+      { 
+        label: "Projects Launched", 
+        value: activeProjects.length, 
+        max: 10 
+      },
+      { 
+        label: "Avg Productivity Gain", 
+        value: Math.round(avgProductivity * 100), 
+        max: 1000, 
+        suffix: "%" 
+      },
+      { 
+        label: "AI Tools Integrated", 
+        value: uniqueTools.length, 
+        max: 50 
+      },
+      { 
+        label: "Current Productivity", 
+        value: Math.round(currentProductivity * 10) / 10, 
+        max: 10, 
+        suffix: "x" 
+      },
+    ])
   }
 
   return (
