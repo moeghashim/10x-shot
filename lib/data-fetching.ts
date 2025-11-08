@@ -4,7 +4,6 @@
  */
 
 import { supabase } from "@/lib/supabase"
-import { supabaseAdmin } from "@/lib/supabase-admin"
 import { FALLBACK_PROJECTS, FALLBACK_GLOBAL_METRICS, mapDbProjectToApp } from "@/lib/constants"
 import type { Project, ProjectMetric, GlobalMetric, ProjectSummary, AdminUser, UserActivity } from "@/types/database"
 
@@ -204,16 +203,19 @@ export async function fetchUserActivity(limit: number = 50): Promise<{ data: Use
 }
 
 /**
- * Save or update a project
+ * Save or update a project (deprecated - use API route /api/admin/projects for admin operations)
+ * This function uses the anon key and may fail due to RLS policies
  */
 export async function saveProject(project: Omit<Project, 'id'> | Project): Promise<{ data: Project | null, error: string | null }> {
+  console.warn('saveProject is deprecated for admin operations. Use /api/admin/projects API route instead.')
+  
   try {
     const { mapAppProjectToDb } = await import('@/lib/constants')
     const dbProject = mapAppProjectToDb(project)
 
     if ('id' in project && project.id) {
-      // Update existing project - use admin client to bypass RLS
-      const { data, error } = await supabaseAdmin
+      // Update existing project
+      const { data, error } = await supabase
         .from('projects')
         .update(dbProject)
         .eq('id', project.id)
@@ -228,10 +230,10 @@ export async function saveProject(project: Omit<Project, 'id'> | Project): Promi
         return { data: mapDbProjectToApp(data[0]), error: null }
       }
       
-      return { data: null, error: 'Failed to update project' }
+      return { data: null, error: 'No data returned from update' }
     } else {
-      // Create new project - use admin client to bypass RLS
-      const { data, error } = await supabaseAdmin
+      // Create new project
+      const { data, error } = await supabase
         .from('projects')
         .insert([dbProject])
         .select()
