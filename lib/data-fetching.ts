@@ -206,17 +206,22 @@ export async function saveProject(project: Omit<Project, 'id'> | Project): Promi
 
     if ('id' in project && project.id) {
       // Update existing project
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('projects')
         .update(dbProject)
         .eq('id', project.id)
+        .select()
 
       if (error) {
         console.error("Database error:", error)
         return { data: null, error: error.message }
       }
       
-      return { data: project, error: null }
+      if (data && data[0]) {
+        return { data: mapDbProjectToApp(data[0]), error: null }
+      }
+      
+      return { data: null, error: 'Failed to update project' }
     } else {
       // Create new project
       const { data, error } = await supabase

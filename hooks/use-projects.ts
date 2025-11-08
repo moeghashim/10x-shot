@@ -33,11 +33,13 @@ export function useProjects() {
       return { success: false, error: saveError }
     }
 
-    // Update local state
-    if ('id' in project && project.id) {
-      setProjects(prev => prev.map(p => p.id === project.id ? project : p))
-    } else if (data) {
-      setProjects(prev => [...prev, data])
+    // Update local state with data returned from DB
+    if (data) {
+      if ('id' in project && project.id) {
+        setProjects(prev => prev.map(p => p.id === data.id ? data : p))
+      } else {
+        setProjects(prev => [...prev, data])
+      }
     }
 
     return { success: true, error: null, data }
