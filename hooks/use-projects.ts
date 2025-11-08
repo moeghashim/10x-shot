@@ -15,10 +15,12 @@ export function useProjects() {
     setLoading(true)
     setError(null)
     
-    const { data, error: fetchError } = await fetchProjects()
+    // Disable fallback for admin - we need real DB data
+    const { data, error: fetchError } = await fetchProjects({ allowFallback: false })
     
     if (fetchError) {
       setError(fetchError)
+      console.error('Failed to load projects from database:', fetchError)
     }
     
     setProjects(data || [])

@@ -4,13 +4,16 @@
  */
 
 import { supabase } from "@/lib/supabase"
+import { supabaseAdmin } from "@/lib/supabase-admin"
 import { FALLBACK_PROJECTS, FALLBACK_GLOBAL_METRICS, mapDbProjectToApp } from "@/lib/constants"
 import type { Project, ProjectMetric, GlobalMetric, ProjectSummary, AdminUser, UserActivity } from "@/types/database"
 
 /**
- * Fetch all projects with fallback to hardcoded data
+ * Fetch all projects with optional fallback to hardcoded data
  */
-export async function fetchProjects(): Promise<{ data: Project[], error: string | null }> {
+export async function fetchProjects(opts?: { allowFallback?: boolean }): Promise<{ data: Project[], error: string | null }> {
+  const allowFallback = opts?.allowFallback ?? true
+  
   try {
     const { data, error } = await supabase
       .from('projects')
@@ -18,16 +21,20 @@ export async function fetchProjects(): Promise<{ data: Project[], error: string 
       .order('id', { ascending: true })
 
     if (error) {
-      console.warn('Database not ready, using fallback data:', error)
-      return { data: FALLBACK_PROJECTS, error: null }
+      console.warn('Database error in fetchProjects:', error)
+      return allowFallback
+        ? { data: FALLBACK_PROJECTS, error: null }
+        : { data: [], error: error.message }
     }
 
     // Map database fields to app format
     const mappedProjects = (data || []).map(mapDbProjectToApp)
     return { data: mappedProjects, error: null }
-  } catch (error) {
-    console.warn('Database connection failed, using fallback data:', error)
-    return { data: FALLBACK_PROJECTS, error: null }
+  } catch (error: any) {
+    console.warn('Database connection failed in fetchProjects:', error)
+    return allowFallback
+      ? { data: FALLBACK_PROJECTS, error: null }
+      : { data: [], error: error.message || 'Database connection failed' }
   }
 }
 
@@ -205,8 +212,8 @@ export async function saveProject(project: Omit<Project, 'id'> | Project): Promi
     const dbProject = mapAppProjectToDb(project)
 
     if ('id' in project && project.id) {
-      // Update existing project
-      const { data, error } = await supabase
+      // Update existing project - use admin client to bypass RLS
+      const { data, error } = await supabaseAdmin
         .from('projects')
         .update(dbProject)
         .eq('id', project.id)
@@ -223,8 +230,8 @@ export async function saveProject(project: Omit<Project, 'id'> | Project): Promi
       
       return { data: null, error: 'Failed to update project' }
     } else {
-      // Create new project
-      const { data, error } = await supabase
+      // Create new project - use admin client to bypass RLS
+      const { data, error } = await supabaseAdmin
         .from('projects')
         .insert([dbProject])
         .select()
