@@ -21,6 +21,7 @@ export interface Project {
   title: string
   domain: string
   description: string
+  objectives?: string
   progress: number
   status: ProjectStatus
   mySkills: string[]
@@ -109,6 +110,7 @@ export interface DbProject {
   title: string
   domain: string
   description: string
+  objectives?: string
   progress: number
   status: string
   my_skills: string[]

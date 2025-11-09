@@ -38,6 +38,7 @@ export function ProjectManager() {
       title: project?.title || "",
       domain: project?.domain || "",
       description: project?.description || "",
+      objectives: project?.objectives || "",
       progress: project?.progress || 0,
       status: project?.status || "planning",
       mySkills: project?.mySkills || [],
@@ -91,6 +92,23 @@ export function ProjectManager() {
             onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
             required
           />
+
+          <div>
+            <label className="text-sm font-medium">Objectives (max 15 words)</label>
+            <Input
+              placeholder="Brief project objectives"
+              value={formData.objectives || ""}
+              onChange={(e) => {
+                const words = e.target.value.trim().split(/\s+/).filter(Boolean)
+                if (words.length <= 15) {
+                  setFormData(prev => ({ ...prev, objectives: e.target.value }))
+                }
+              }}
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              {formData.objectives ? formData.objectives.trim().split(/\s+/).filter(Boolean).length : 0}/15 words
+            </p>
+          </div>
 
           <div className="grid grid-cols-3 gap-4">
             <div>

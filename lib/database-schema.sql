@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS projects (
   title VARCHAR(255) NOT NULL,
   domain VARCHAR(100) NOT NULL,
   description TEXT NOT NULL,
+  objectives VARCHAR(150),
   progress INTEGER DEFAULT 0 CHECK (progress >= 0 AND progress <= 100),
   status VARCHAR(20) DEFAULT 'planning' CHECK (status IN ('planning', 'active', 'completed')),
   my_skills TEXT[] DEFAULT '{}',
