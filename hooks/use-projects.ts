@@ -69,6 +69,31 @@ export function useProjects() {
     }
   }
 
+  const deleteProject = async (projectId: number) => {
+    try {
+      const response = await fetch('/api/admin/projects', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ id: projectId }),
+      })
+
+      const result = await response.json()
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to delete project')
+      }
+
+      setProjects(prev => prev.filter(project => project.id !== projectId))
+      return { success: true, error: null }
+    } catch (err: any) {
+      const errorMsg = err.message || 'Failed to delete project'
+      setError(errorMsg)
+      return { success: false, error: errorMsg }
+    }
+  }
+
   useEffect(() => {
     loadProjects()
   }, [])
@@ -78,7 +103,8 @@ export function useProjects() {
     loading,
     error,
     reload: loadProjects,
-    saveProject
+    saveProject,
+    deleteProject
   }
 }
 

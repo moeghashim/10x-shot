@@ -256,6 +256,28 @@ export async function saveProject(project: Omit<Project, 'id'> | Project): Promi
 }
 
 /**
+ * Delete a project by id
+ */
+export async function deleteProject(projectId: number): Promise<{ error: string | null }> {
+  try {
+    const { error } = await supabase
+      .from('projects')
+      .delete()
+      .eq('id', projectId)
+
+    if (error) {
+      console.warn('Failed to delete project:', error)
+      return { error: error.message }
+    }
+
+    return { error: null }
+  } catch (error: any) {
+    console.warn('Failed to delete project:', error)
+    return { error: error.message || 'Failed to delete project' }
+  }
+}
+
+/**
  * Save a project metric
  */
 export async function saveProjectMetric(metric: Omit<ProjectMetric, 'id' | 'created_at'>): Promise<{ error: string | null }> {

@@ -101,3 +101,40 @@ export async function GET() {
     )
   }
 }
+
+/**
+ * DELETE - Remove a project by id
+ */
+export async function DELETE(request: NextRequest) {
+  try {
+    const { id } = await request.json()
+
+    if (!id) {
+      return NextResponse.json(
+        { error: 'Project id is required' },
+        { status: 400 }
+      )
+    }
+
+    const { error } = await supabaseAdmin
+      .from('projects')
+      .delete()
+      .eq('id', id)
+
+    if (error) {
+      console.error('Database error deleting project:', error)
+      return NextResponse.json(
+        { error: error.message },
+        { status: 400 }
+      )
+    }
+
+    return NextResponse.json({ success: true })
+  } catch (error: any) {
+    console.error('Failed to delete project:', error)
+    return NextResponse.json(
+      { error: error.message || 'Failed to delete project' },
+      { status: 500 }
+    )
+  }
+}

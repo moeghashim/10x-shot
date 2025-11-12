@@ -8,12 +8,17 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Pencil, Plus, Save, X } from "lucide-react"
+import { Pencil, Plus, Save, Trash2, X } from "lucide-react"
 import { useProjects } from "@/hooks/use-projects"
 import type { Project } from "@/types/database"
 
 export function ProjectManager() {
-  const { projects, loading, saveProject: saveProjectDb } = useProjects()
+  const {
+    projects,
+    loading,
+    saveProject: saveProjectDb,
+    deleteProject: deleteProjectDb,
+  } = useProjects()
   const [editingProjectId, setEditingProjectId] = useState<number | null>(null)
   const [isCreating, setIsCreating] = useState(false)
 
@@ -25,6 +30,23 @@ export function ProjectManager() {
       setIsCreating(false)
     } else if (result.error) {
       alert(`Failed to save: ${result.error}`)
+    }
+  }
+
+  const handleDeleteProject = async (project: Project) => {
+    const confirmed = window.confirm(`Delete "${project.title}"? This action cannot be undone.`)
+    if (!confirmed) {
+      return
+    }
+
+    const result = await deleteProjectDb(project.id)
+    if (!result.success && result.error) {
+      alert(`Failed to delete project: ${result.error}`)
+      return
+    }
+
+    if (editingProjectId === project.id) {
+      setEditingProjectId(null)
     }
   }
 
@@ -365,13 +387,24 @@ export function ProjectManager() {
                       </CardTitle>
                       <CardDescription>{project.domain}</CardDescription>
                     </div>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setEditingProjectId(project.id)}
-                    >
-                      <Pencil className="h-4 w-4" />
-                    </Button>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setEditingProjectId(project.id)}
+                        aria-label={`Edit ${project.title}`}
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => handleDeleteProject(project)}
+                        aria-label={`Delete ${project.title}`}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </div>
                 </CardHeader>
                 <CardContent>
