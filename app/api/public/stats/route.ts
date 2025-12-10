@@ -32,14 +32,31 @@ export async function GET() {
     }
 
     const totalProjects = (projects || []).length
-    const projectsLaunched = (projects || []).filter((project) =>
-      ['active', 'completed'].includes((project.status || '').toLowerCase())
-    ).length
+    
+    // Filter active/completed projects - handle both string and case variations
+    const activeProjects = (projects || []).filter((project) => {
+      const status = String(project.status || '').toLowerCase().trim()
+      return status === 'active' || status === 'completed'
+    })
+    const projectsLaunched = activeProjects.length
 
-    const avgProductivityGain = totalProjects
-      ? (projects || []).reduce((sum, project) => sum + (project.productivity ?? 0), 0) /
-        totalProjects
+    // Average productivity from ALL projects (for the "Avg Productivity Gain" stat)
+    // Convert productivity to number, defaulting to 0 if null/undefined
+    const avgProductivityGain = totalProjects > 0
+      ? (projects || []).reduce((sum, project) => {
+          const prod = Number(project.productivity) || 0
+          return sum + prod
+        }, 0) / totalProjects
       : 0
+
+    // Current Productivity should be the average from ACTIVE/COMPLETED projects only
+    // This reflects the productivity of projects that are actually running
+    const currentProductivity = activeProjects.length > 0
+      ? activeProjects.reduce((sum, project) => {
+          const prod = Number(project.productivity) || 0
+          return sum + prod
+        }, 0) / activeProjects.length
+      : avgProductivityGain // Fallback to overall average if no active projects
 
     const aiToolsIntegrated = Array.from(
       new Set(
@@ -47,10 +64,15 @@ export async function GET() {
       )
     ).length
 
-    const currentProductivity =
-      globalMetrics && globalMetrics.length > 0
-        ? globalMetrics[0].productivity_gain ?? 0
-        : avgProductivityGain
+    // Debug logging (remove in production)
+    console.log('Stats calculation:', {
+      totalProjects,
+      allProjects: (projects || []).map(p => ({ id: p.id, status: p.status, productivity: p.productivity })),
+      activeProjectsCount: activeProjects.length,
+      activeProductivities: activeProjects.map(p => ({ id: p.id, status: p.status, productivity: p.productivity })),
+      avgProductivityGain,
+      currentProductivity
+    })
 
     return NextResponse.json({
       data: {

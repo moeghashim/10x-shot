@@ -15,9 +15,8 @@ type Stat = {
 export function StatsSection() {
   const [stats, setStats] = useState<Stat[]>([
     { label: "Projects Launched", value: 0, max: 1, showMax: true },
-    { label: "Avg Productivity Gain", value: 0, max: 1000, suffix: "%", showMax: true },
+    { label: "Avg Productivity Gain", value: 0, max: 10, suffix: "x", showMax: true },
     { label: "AI Tools Integrated", value: 0, max: 50, showMax: true },
-    { label: "Current Productivity", value: 0, max: 10, suffix: "x", showMax: false },
   ])
   const [loading, setLoading] = useState(true)
 
@@ -37,7 +36,6 @@ export function StatsSection() {
           totalProjects,
           avgProductivityGain,
           aiToolsIntegrated,
-          currentProductivity,
         } = result.data || {}
 
         setStats([
@@ -51,10 +49,10 @@ export function StatsSection() {
             label: "Avg Productivity Gain",
             value:
               typeof avgProductivityGain === "number"
-                ? Math.round(avgProductivityGain * 100)
+                ? Math.round(avgProductivityGain * 10) / 10
                 : 0,
-            max: 1000,
-            suffix: "%",
+            max: 10,
+            suffix: "x",
             showMax: true,
           },
           {
@@ -62,16 +60,6 @@ export function StatsSection() {
             value: typeof aiToolsIntegrated === "number" ? aiToolsIntegrated : 0,
             max: 50,
             showMax: true,
-          },
-          {
-            label: "Current Productivity",
-            value:
-              typeof currentProductivity === "number"
-                ? Math.round(currentProductivity * 10) / 10
-                : 0,
-            max: 10,
-            suffix: "x",
-            showMax: false,
           },
         ])
       } catch (error) {
@@ -91,7 +79,7 @@ export function StatsSection() {
           Current Impact Metrics
         </h2>
 
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {stats.map((stat, index) => (
             <Card key={index} className="bg-white border-gray-200">
               <CardContent className="p-6">
