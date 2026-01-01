@@ -10,8 +10,8 @@ export function VibeHero() {
     <section className={`${GeistMono.className} py-12 px-6 bg-white text-black`}>
       <div className="mx-auto max-w-5xl">
         <h1 className="text-6xl md:text-8xl font-black tracking-tight mb-8 flex flex-wrap items-center gap-x-6 gap-y-4 uppercase">
-          <span>Build</span>
-          <span>10X faster</span>
+          <span>My attempt to</span>
+          <span>build 10x faster</span>
           <span>with</span>
           <span className="border-2 border-dashed border-gray-300 px-6 py-2 min-w-[280px] text-center inline-block">
             <TextLoop interval={3} transition={{ duration: 0.5 }}>
