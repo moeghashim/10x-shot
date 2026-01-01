@@ -1,32 +1,40 @@
 "use client"
 
 import { GeistMono } from "geist/font/mono"
+import { TextLoop } from "@/components/ui/text-loop"
 
 export function VibeHero() {
+  const tools = ["AI Agents", "Cursor CLI", "Claude Code", "Gemini CLI", "Copilot", "v0.dev"]
+
   return (
     <section className={`${GeistMono.className} py-12 px-6 bg-white text-black`}>
       <div className="mx-auto max-w-5xl">
-        <h1 className="text-6xl md:text-8xl font-black tracking-tight mb-8 flex flex-wrap items-center gap-x-6 gap-y-4">
-          <span>Move faster</span>
+        <h1 className="text-6xl md:text-8xl font-black tracking-tight mb-8 flex flex-wrap items-center gap-x-6 gap-y-4 uppercase">
+          <span>Build</span>
+          <span>10X faster</span>
           <span>with</span>
-          <span className="border-2 border-dashed border-gray-300 px-6 py-2">
-            Cursor CLI
+          <span className="border-2 border-dashed border-gray-300 px-6 py-2 min-w-[280px] text-center inline-block">
+            <TextLoop interval={2}>
+              {tools.map((tool) => (
+                <span key={tool}>{tool}</span>
+              ))}
+            </TextLoop>
           </span>
         </h1>
 
         <p className="max-w-3xl text-xl md:text-2xl font-medium leading-relaxed mb-12 text-gray-800">
-          10X Builder lets you run coding agents in parallel without conflicts, and perform code review through our diff tool. 
-          Now you can focus on planning and quality instead of watching terminal logs.
+          Tracking the real-world impact of AI on productivity across 10 diverse projects. 
+          Discover if artificial intelligence can truly deliver 10x improvements in modern software development.
         </p>
 
         <div className="space-y-4">
           <p className="text-lg font-bold">
-            Install <span className="underline decoration-2 underline-offset-4 font-black">Node.js 18+</span> then run:
+            Follow the experiment journey:
           </p>
           
           <div className="inline-block bg-white border-2 border-black p-4">
-            <code className="text-lg md:text-xl font-bold">
-              npx 10x-builder@latest init
+            <code className="text-lg md:text-xl font-bold uppercase">
+              npx 10xbuilder@latest view-projects
             </code>
           </div>
         </div>
