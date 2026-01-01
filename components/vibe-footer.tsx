@@ -27,17 +27,17 @@ export function VibeFooter() {
             <h3 className="text-xs font-black uppercase tracking-widest border-b-2 border-black inline-block pb-1">Quick Links</h3>
             <ul className="space-y-3 font-bold uppercase tracking-tighter text-sm">
               <li>
-                <a href="#projects" className="hover:line-through transition-all">
+                <a href="#projects" className="hover:underline transition-all">
                   View Projects
                 </a>
               </li>
               <li>
-                <Link href="/progress" className="hover:line-through transition-all">
+                <Link href="/progress" className="hover:underline transition-all">
                   Progress Tracker
                 </Link>
               </li>
               <li>
-                <a href="#" className="hover:line-through transition-all">
+                <a href="#" className="hover:underline transition-all">
                   Methodology
                 </a>
               </li>
@@ -53,7 +53,7 @@ export function VibeFooter() {
                   href="https://x.com/moeghashim"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 font-black uppercase tracking-tighter hover:line-through transition-all"
+                  className="inline-flex items-center gap-2 font-black uppercase tracking-tighter hover:underline transition-all"
                 >
                   <Twitter className="h-4 w-4" />
                   @moeghashim
@@ -63,7 +63,7 @@ export function VibeFooter() {
                   href="https://github.com/moeghashim"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 font-black uppercase tracking-tighter hover:line-through transition-all"
+                  className="inline-flex items-center gap-2 font-black uppercase tracking-tighter hover:underline transition-all"
                 >
                   <Github className="h-4 w-4" />
                   GitHub
