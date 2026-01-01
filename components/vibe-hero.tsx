@@ -4,7 +4,20 @@ import { GeistMono } from "geist/font/mono"
 import { TextLoop } from "@/components/ui/text-loop"
 
 export function VibeHero() {
-  const tools = ["AI Agents", "Cursor CLI", "Claude Code", "Gemini CLI", "Copilot", "v0.dev"]
+  const tools = [
+    "AI Agents",
+    "Cursor",
+    "Claude Code",
+    "Gemini",
+    "Nano Banana",
+    "V0",
+    "Codex",
+    "Replit",
+    "Kling",
+    "Droid",
+    "AMP",
+    "Midjourney",
+  ]
 
   return (
     <section className={`${GeistMono.className} pt-12 pb-2 px-6 bg-white text-black`}>
