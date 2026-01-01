@@ -14,7 +14,7 @@ export function VibeHero() {
           <span>10X faster</span>
           <span>with</span>
           <span className="border-2 border-dashed border-gray-300 px-6 py-2 min-w-[280px] text-center inline-block">
-            <TextLoop interval={2}>
+            <TextLoop interval={3} transition={{ duration: 0.5 }}>
               {tools.map((tool) => (
                 <span key={tool}>{tool}</span>
               ))}
@@ -27,17 +27,6 @@ export function VibeHero() {
           Discover if artificial intelligence can truly deliver 10x improvements in modern software development.
         </p>
 
-        <div className="space-y-4">
-          <p className="text-lg font-bold">
-            Follow the experiment journey:
-          </p>
-          
-          <div className="inline-block bg-white border-2 border-black p-4">
-            <code className="text-lg md:text-xl font-bold uppercase">
-              npx 10xbuilder@latest view-projects
-            </code>
-          </div>
-        </div>
       </div>
     </section>
   )
