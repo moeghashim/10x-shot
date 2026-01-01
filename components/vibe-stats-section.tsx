@@ -72,9 +72,9 @@ export function VibeStatsSection() {
   }, [])
 
   return (
-    <section className={`${GeistMono.className} px-6 py-24 bg-white border-y border-dashed border-gray-300`}>
+    <section className={`${GeistMono.className} px-6 py-12 bg-white border-y border-dashed border-gray-300`}>
       <div className="mx-auto max-w-7xl">
-        <div className="flex items-center gap-4 mb-16">
+        <div className="flex items-center gap-4 mb-8">
           <div className="h-[1px] flex-1 bg-gray-300 border-t border-dashed border-gray-300"></div>
           <h2 className="text-3xl font-black uppercase tracking-tighter">
             Impact Metrics

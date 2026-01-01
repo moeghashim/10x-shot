@@ -7,7 +7,7 @@ import { GeistMono } from "geist/font/mono"
 export function VibeFooter() {
   return (
     <footer className={`${GeistMono.className} bg-white text-black border-t-2 border-black`}>
-      <div className="mx-auto max-w-7xl px-6 py-16">
+      <div className="mx-auto max-w-7xl px-6 py-8">
         <div className="grid gap-12 md:grid-cols-3">
           {/* Brand Section */}
           <div className="space-y-6">

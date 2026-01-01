@@ -4,7 +4,7 @@ import { GeistMono } from "geist/font/mono"
 
 export function VibeHero() {
   return (
-    <section className={`${GeistMono.className} py-24 px-6 bg-white text-black`}>
+    <section className={`${GeistMono.className} py-12 px-6 bg-white text-black`}>
       <div className="mx-auto max-w-5xl">
         <h1 className="text-6xl md:text-8xl font-black tracking-tight mb-8 flex flex-wrap items-center gap-x-6 gap-y-4">
           <span>Move faster</span>

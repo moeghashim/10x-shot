@@ -31,7 +31,7 @@ export function VibeCodingAgents() {
 
   if (loading && projects.length === 0) {
     return (
-      <section className={`${GeistMono.className} px-6 py-24 bg-white`}>
+      <section className={`${GeistMono.className} px-6 py-12 bg-white`}>
         <div className="mx-auto max-w-7xl border-2 border-dashed border-gray-300 p-8 md:p-12 flex flex-col lg:flex-row gap-12 items-center">
           <div className="text-center w-full font-black uppercase tracking-widest animate-pulse">
             Loading Project Tech Stacks...
@@ -42,7 +42,7 @@ export function VibeCodingAgents() {
   }
 
   return (
-    <section className={`${GeistMono.className} px-6 py-24 bg-white`}>
+    <section className={`${GeistMono.className} px-6 py-12 bg-white`}>
       <div className="mx-auto max-w-7xl border-2 border-dashed border-gray-300 p-8 md:p-12 flex flex-col lg:flex-row gap-12 items-start">
         <div className="lg:w-1/3">
           <h2 className="text-4xl font-black tracking-tight mb-6 leading-tight uppercase">

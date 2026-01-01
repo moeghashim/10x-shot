@@ -9,7 +9,7 @@ export function VibeProjectGrid() {
 
   if (loading) {
     return (
-      <section id="projects" className={`${GeistMono.className} px-6 py-24 bg-white`}>
+      <section id="projects" className={`${GeistMono.className} px-6 py-12 bg-white`}>
         <div className="mx-auto max-w-7xl">
           <div className="text-center font-black uppercase tracking-widest animate-pulse">Loading Projects...</div>
         </div>
@@ -18,9 +18,9 @@ export function VibeProjectGrid() {
   }
 
   return (
-    <section id="projects" className={`${GeistMono.className} px-6 py-24 bg-white`}>
+    <section id="projects" className={`${GeistMono.className} px-6 py-12 bg-white`}>
       <div className="mx-auto max-w-7xl">
-        <div className="flex flex-col items-center mb-20 text-center">
+        <div className="flex flex-col items-center mb-12 text-center">
           <div className="mb-4 px-4 py-1 border-2 border-black text-xs font-black uppercase tracking-widest bg-black text-white">
             The Experiment
           </div>

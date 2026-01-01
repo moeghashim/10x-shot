@@ -5,7 +5,7 @@ import { GeistMono } from "geist/font/mono"
 
 export function VibeNewsletterSection() {
   return (
-    <section className={`${GeistMono.className} px-6 py-24 bg-white border-b border-dashed border-gray-300`}>
+    <section className={`${GeistMono.className} px-6 py-12 bg-white border-b border-dashed border-gray-300`}>
       <div className="mx-auto max-w-4xl text-center">
         <div className="mb-8 flex justify-center">
           <div className="flex items-center gap-2 border-2 border-dashed border-gray-300 px-4 py-1 text-xs font-black uppercase tracking-widest bg-white">
