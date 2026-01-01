@@ -1,0 +1,94 @@
+"use client"
+
+import { ExternalLink, Twitter, Zap, Github } from "lucide-react"
+import Link from "next/link"
+import { GeistMono } from "geist/font/mono"
+
+export function VibeFooter() {
+  return (
+    <footer className={`${GeistMono.className} bg-white text-black border-t-2 border-black`}>
+      <div className="mx-auto max-w-7xl px-6 py-16">
+        <div className="grid gap-12 md:grid-cols-3">
+          {/* Brand Section */}
+          <div className="space-y-6">
+            <div className="flex items-center">
+              <Link href="/" className="text-3xl font-black tracking-tighter uppercase group">
+                <span className="bg-black text-white px-1.5 py-0.5 mr-0.5 transform -skew-x-6">10X</span>
+                <span className="border-2 border-black px-1.5 py-0.5 ml-0.5 transform skew-x-6">BUILDER</span>
+              </Link>
+            </div>
+            <p className="text-gray-800 font-medium leading-relaxed">
+              Measuring the real impact of AI on productivity across 10 diverse projects.
+            </p>
+          </div>
+
+          {/* Quick Links */}
+          <div className="space-y-6">
+            <h3 className="text-xs font-black uppercase tracking-widest border-b-2 border-black inline-block pb-1">Quick Links</h3>
+            <ul className="space-y-3 font-bold uppercase tracking-tighter text-sm">
+              <li>
+                <a href="#projects" className="hover:line-through transition-all">
+                  View Projects
+                </a>
+              </li>
+              <li>
+                <Link href="/progress" className="hover:line-through transition-all">
+                  Progress Tracker
+                </Link>
+              </li>
+              <li>
+                <a href="#" className="hover:line-through transition-all">
+                  Methodology
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          {/* Creator Section */}
+          <div className="space-y-6">
+            <h3 className="text-xs font-black uppercase tracking-widest border-b-2 border-black inline-block pb-1">Connect</h3>
+            <div className="space-y-4">
+              <div className="flex flex-col gap-3">
+                <a
+                  href="https://x.com/moeghashim"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 font-black uppercase tracking-tighter hover:line-through transition-all"
+                >
+                  <Twitter className="h-4 w-4" />
+                  @moeghashim
+                  <ExternalLink className="h-3 w-3" />
+                </a>
+                <a
+                  href="https://github.com/moeghashim"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 font-black uppercase tracking-tighter hover:line-through transition-all"
+                >
+                  <Github className="h-4 w-4" />
+                  GitHub
+                  <ExternalLink className="h-3 w-3" />
+                </a>
+              </div>
+              <p className="text-[10px] font-black uppercase tracking-widest text-gray-500">
+                Follow for real-time updates and insights from the experiment
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-16 pt-8 border-t border-dashed border-gray-300">
+          <div className="flex flex-col sm:flex-row justify-between items-center gap-6">
+            <p className="text-[10px] font-black uppercase tracking-widest text-gray-500">
+              © 2026 10XBUILDER. NO RIGHTS RESERVED.
+            </p>
+            <div className="flex items-center gap-2 px-3 py-1 border-2 border-black text-[10px] font-black uppercase tracking-widest">
+              Built with AI assistance
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+  )
+}
+

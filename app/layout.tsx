@@ -10,7 +10,7 @@ import { SupabaseAuthSync } from "@/components/supabase-auth-sync"
 const plexSans = IBM_Plex_Sans({ subsets: ["latin"], weight: ["400"] })
 
 export const metadata: Metadata = {
-  title: "10xBuilder.ai - Measuring AI Productivity Impact",
+  title: "10XBuilder.ai - Measuring AI Productivity Impact",
   description:
     "Tracking the real impact of AI on productivity across 10 diverse projects. Can artificial intelligence truly deliver 10x improvements?",
   generator: "v0.dev",
