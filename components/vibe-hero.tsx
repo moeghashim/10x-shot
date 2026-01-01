@@ -7,7 +7,7 @@ export function VibeHero() {
   const tools = ["AI Agents", "Cursor CLI", "Claude Code", "Gemini CLI", "Copilot", "v0.dev"]
 
   return (
-    <section className={`${GeistMono.className} py-12 px-6 bg-white text-black`}>
+    <section className={`${GeistMono.className} pt-12 pb-2 px-6 bg-white text-black`}>
       <div className="mx-auto max-w-5xl">
         <h1 className="text-4xl md:text-6xl font-black tracking-tight mb-8 flex flex-wrap items-center gap-x-5 gap-y-3 uppercase">
           <span>My attempt to</span>
@@ -22,7 +22,7 @@ export function VibeHero() {
           </span>
         </h1>
 
-        <p className="max-w-3xl text-lg md:text-xl font-medium leading-relaxed mb-12 text-gray-800">
+        <p className="max-w-3xl text-lg md:text-xl font-medium leading-relaxed mb-4 text-gray-800">
           Tracking the real-world impact of AI on productivity across 10 diverse projects. 
           Discover if artificial intelligence can truly deliver 10x improvements in modern software development.
         </p>
