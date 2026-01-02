@@ -3,22 +3,7 @@
 import { SkillsDisplay } from "@/components/skills-display"
 import { Clock, TrendingUp, Play, Pause, ExternalLink } from "lucide-react"
 import { GeistMono } from "geist/font/mono"
-
-interface Project {
-  id: number
-  title: string
-  domain: string
-  description: string
-  objectives?: string
-  progress: number
-  status: "active" | "planning" | "completed"
-  mySkills: string[]
-  aiSkills: string[]
-  tools: string[]
-  productivity: number
-  timeframe: string
-  url: string | null
-}
+import type { Project } from "@/types/database"
 
 interface VibeProjectCardProps {
   project: Project
@@ -84,10 +69,12 @@ export function VibeProjectCard({ project }: VibeProjectCardProps) {
           <span className="text-xl font-black">{project.productivity}x</span>
         </div>
 
-        <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-gray-400">
-          <Clock className="h-4 w-4" />
-          <span>{project.timeframe}</span>
-        </div>
+        {project.timeframe && (
+          <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-gray-400">
+            <Clock className="h-4 w-4" />
+            <span>{project.timeframe}</span>
+          </div>
+        )}
 
         <div className="pt-2 border-t border-dashed border-gray-200">
           <SkillsDisplay mySkills={project.mySkills} aiSkills={project.aiSkills} tools={project.tools} />

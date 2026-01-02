@@ -3,11 +3,20 @@
 import { VibeProjectCard } from "@/components/vibe-project-card"
 import { useProjects } from "@/hooks/use-projects"
 import { GeistMono } from "geist/font/mono"
+import type { Project } from "@/types/database"
 
-export function VibeProjectGrid() {
-  const { projects, loading } = useProjects()
+interface VibeProjectGridProps {
+  initialProjects?: Project[]
+}
 
-  if (loading) {
+export function VibeProjectGrid({ initialProjects }: VibeProjectGridProps) {
+  const { projects: clientProjects, loading } = useProjects()
+  
+  // Use initialProjects if available, otherwise use projects from the hook
+  const projects = initialProjects || clientProjects
+
+  // If we have initialProjects, we don't show the loading state even if the hook is still loading
+  if (loading && !initialProjects) {
     return (
       <section id="projects" className={`${GeistMono.className} px-6 py-12 bg-white`}>
         <div className="mx-auto max-w-7xl">
