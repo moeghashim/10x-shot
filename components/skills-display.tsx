@@ -1,5 +1,6 @@
 import { Badge } from "@/components/ui/badge"
 import { User, Bot, Wrench } from "lucide-react"
+import { useTranslations } from "next-intl"
 
 interface SkillsDisplayProps {
   mySkills: string[]
@@ -8,12 +9,14 @@ interface SkillsDisplayProps {
 }
 
 export function SkillsDisplay({ mySkills, aiSkills, tools }: SkillsDisplayProps) {
+  const t = useTranslations("HomePage.skills")
+
   return (
     <div className="space-y-3">
       <div>
         <div className="flex items-center gap-2 mb-2">
           <User className="h-4 w-4 text-gray-600" />
-          <span className="text-sm font-medium text-gray-700">My Skills</span>
+          <span className="text-sm font-medium text-gray-700">{t("mySkills")}</span>
         </div>
         <div className="flex flex-wrap gap-1">
           {(mySkills || []).map((skill, index) => (
@@ -27,7 +30,7 @@ export function SkillsDisplay({ mySkills, aiSkills, tools }: SkillsDisplayProps)
       <div>
         <div className="flex items-center gap-2 mb-2">
           <Bot className="h-4 w-4 text-black" />
-          <span className="text-sm font-medium text-gray-700">AI-Powered Skills</span>
+          <span className="text-sm font-medium text-gray-700">{t("aiSkills")}</span>
         </div>
         <div className="flex flex-wrap gap-1">
           {(aiSkills || []).map((skill, index) => (
@@ -41,7 +44,7 @@ export function SkillsDisplay({ mySkills, aiSkills, tools }: SkillsDisplayProps)
       <div>
         <div className="flex items-center gap-2 mb-2">
           <Wrench className="h-4 w-4 text-gray-500" />
-          <span className="text-sm font-medium text-gray-700">Tools Used</span>
+          <span className="text-sm font-medium text-gray-700">{t("toolsUsed")}</span>
         </div>
         <div className="flex flex-wrap gap-1">
           {(tools || []).map((tool, index) => (

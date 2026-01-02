@@ -2,14 +2,21 @@
 
 import { SkillsDisplay } from "@/components/skills-display"
 import { Clock, TrendingUp, Play, Pause, ExternalLink } from "lucide-react"
-import { GeistMono } from "geist/font/mono"
+import { IBM_Plex_Mono, Noto_Kufi_Arabic } from "next/font/google"
 import type { Project } from "@/types/database"
+import { useTranslations, useLocale } from "next-intl"
+
+const plexMono = IBM_Plex_Mono({ subsets: ["latin"], weight: ["400", "700"] })
+const notoKufiArabic = Noto_Kufi_Arabic({ subsets: ["arabic"], weight: ["400", "700"] })
 
 interface VibeProjectCardProps {
   project: Project
 }
 
 export function VibeProjectCard({ project }: VibeProjectCardProps) {
+  const t = useTranslations("HomePage.projects")
+  const locale = useLocale()
+
   const getStatusIcon = (status: string) => {
     switch (status) {
       case "active":
@@ -23,8 +30,10 @@ export function VibeProjectCard({ project }: VibeProjectCardProps) {
     }
   }
 
+  const fontClass = locale === "ar" ? notoKufiArabic.className : plexMono.className
+
   return (
-    <div className={`${GeistMono.className} bg-white border-2 border-dashed border-gray-300 p-6 transition-all hover:border-black`}>
+    <div className={`${fontClass} bg-white border-2 border-dashed border-gray-300 p-6 transition-all hover:border-black text-start`}>
       <div className="flex items-start justify-between mb-4">
         <div className="flex-1">
           <h3 className="text-xl font-black uppercase tracking-tighter mb-2">{project.title}</h3>
@@ -32,9 +41,9 @@ export function VibeProjectCard({ project }: VibeProjectCardProps) {
             {project.domain}
           </span>
         </div>
-        <div className="flex items-center gap-1 px-2 py-1 border-2 border-black text-[10px] font-black uppercase tracking-widest bg-white">
+        <div className="flex items-center gap-1 px-2 py-1 border-2 border-black text-[10px] font-black uppercase tracking-widest bg-white whitespace-nowrap">
           {getStatusIcon(project.status)}
-          {project.status}
+          {t(`status.${project.status}`)}
         </div>
       </div>
 
@@ -43,14 +52,14 @@ export function VibeProjectCard({ project }: VibeProjectCardProps) {
         
         {project.objectives && (
           <div className="p-3 border border-dashed border-gray-300 bg-gray-50/50">
-            <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">Objectives</p>
+            <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">{t("objectives")}</p>
             <p className="text-sm font-bold text-gray-900 leading-tight">{project.objectives}</p>
           </div>
         )}
 
         <div className="space-y-2">
           <div className="flex justify-between text-[10px] font-black uppercase tracking-widest">
-            <span>Progress</span>
+            <span>{t("progress")}</span>
             <span>{project.progress}%</span>
           </div>
           <div className="h-3 border border-dashed border-gray-300 bg-gray-50 p-0.5 overflow-hidden">
@@ -64,7 +73,7 @@ export function VibeProjectCard({ project }: VibeProjectCardProps) {
         <div className="flex items-center justify-between p-3 border-2 border-dashed border-gray-300 bg-white group hover:border-black transition-colors">
           <div className="flex items-center gap-2">
             <TrendingUp className="h-4 w-4" />
-            <span className="text-xs font-black uppercase tracking-widest">Productivity Gain</span>
+            <span className="text-xs font-black uppercase tracking-widest">{t("productivityGain")}</span>
           </div>
           <span className="text-xl font-black">{project.productivity}x</span>
         </div>
@@ -87,7 +96,7 @@ export function VibeProjectCard({ project }: VibeProjectCardProps) {
             rel="noopener noreferrer"
             className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 text-sm font-black uppercase tracking-tighter text-black border-2 border-black hover:bg-black hover:text-white transition-colors"
           >
-            Launch Project
+            {t("launch")}
             <ExternalLink className="h-4 w-4" />
           </a>
         )}

@@ -1,0 +1,71 @@
+{
+  "HomePage": {
+    "title": "10XBuilder.ai - Measuring AI Productivity Impact",
+    "description": "Tracking the real impact of AI on productivity across 10 diverse projects. Can artificial intelligence truly deliver 10x improvements?",
+    "navbar": {
+      "vibeGuide": "Vibe Guide",
+      "events": "Events",
+      "blog": "Blog",
+      "docs": "Docs"
+    },
+    "hero": {
+      "attempt": "My attempt to",
+      "buildFaster": "build 10x faster",
+      "with": "with",
+      "tagline": "Tracking the real-world impact of AI on productivity across 10 diverse projects. Discover if artificial intelligence can truly deliver 10x improvements in modern software development."
+    },
+    "stats": {
+      "title": "Impact Metrics",
+      "projectsLaunched": "Projects Launched",
+      "productivityGain": "Avg Productivity Gain",
+      "toolsIntegrated": "AI Tools Integrated"
+    },
+    "techStack": {
+      "title": "Project Tech Stack",
+      "description": "Explore the specialized AI agents and tools powering each experiment.",
+      "selectProject": "Select Project",
+      "placeholder": "Select a project",
+      "noData": "No tech stack data available",
+      "loading": "Loading Project Tech Stacks..."
+    },
+    "projects": {
+      "experiment": "The Experiment",
+      "title": "Current Projects",
+      "description": "Each project tests AI's ability to amplify human capabilities across different domains.",
+      "loading": "Loading Projects...",
+      "objectives": "Objectives",
+      "progress": "Progress",
+      "productivityGain": "Productivity Gain",
+      "launch": "Launch Project",
+      "status": {
+        "active": "Active",
+        "planning": "Planning",
+        "completed": "Completed"
+      }
+    },
+    "skills": {
+      "mySkills": "My Skills",
+      "aiSkills": "AI-Powered Skills",
+      "toolsUsed": "Tools Used"
+    },
+    "newsletter": {
+      "stayUpdated": "Stay Updated",
+      "title": "Get the Latest Updates",
+      "description": "Follow along as I document the real impact of AI on productivity. Get insights, lessons learned, and behind-the-scenes updates from each project.",
+      "noSpam": "No spam, unsubscribe at any time. Updates sent weekly.",
+      "iframeTitle": "Subscribe to Building in Public Newsletter"
+    },
+    "footer": {
+      "rights": "© 2026 10XBUILDER. NO RIGHTS RESERVED.",
+      "tagline": "Measuring the real impact of AI on productivity across 10 diverse projects.",
+      "quickLinks": "Quick Links",
+      "viewProjects": "View Projects",
+      "progressTracker": "Progress Tracker",
+      "methodology": "Methodology",
+      "connect": "Connect",
+      "follow": "Follow for real-time updates and insights from the experiment",
+      "builtWith": "Built with AI assistance"
+    }
+  }
+}
+

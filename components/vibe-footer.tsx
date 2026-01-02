@@ -1,44 +1,53 @@
 "use client"
 
-import { ExternalLink, Twitter, Zap, Github } from "lucide-react"
-import Link from "next/link"
-import { GeistMono } from "geist/font/mono"
+import { ExternalLink, Twitter, Github } from "lucide-react"
+import { IBM_Plex_Mono, Noto_Kufi_Arabic } from "next/font/google"
+import { useTranslations, useLocale } from "next-intl"
+import { Link } from "@/i18n/routing"
+
+const plexMono = IBM_Plex_Mono({ subsets: ["latin"], weight: ["400", "700"] })
+const notoKufiArabic = Noto_Kufi_Arabic({ subsets: ["arabic"], weight: ["400", "700"] })
 
 export function VibeFooter() {
+  const t = useTranslations("HomePage.footer")
+  const locale = useLocale()
+
+  const fontClass = locale === "ar" ? notoKufiArabic.className : plexMono.className
+
   return (
-    <footer className={`${GeistMono.className} bg-white text-black border-t-2 border-black`}>
+    <footer className={`${fontClass} bg-white text-black border-t-2 border-black`}>
       <div className="mx-auto max-w-7xl px-6 py-8">
         <div className="grid gap-12 md:grid-cols-3">
           {/* Brand Section */}
           <div className="space-y-6">
             <div className="flex items-center">
               <Link href="/" className="text-3xl font-black tracking-tighter uppercase group">
-                <span className="bg-black text-white px-1.5 py-0.5 mr-0.5 transform -skew-x-6">10X</span>
-                <span className="border-2 border-black px-1.5 py-0.5 ml-0.5 transform skew-x-6">BUILDER</span>
+                <span className="bg-black text-white px-1.5 py-0.5 me-0.5 transform -skew-x-6">10X</span>
+                <span className="border-2 border-black px-1.5 py-0.5 ms-0.5 transform skew-x-6">BUILDER</span>
               </Link>
             </div>
             <p className="text-gray-800 font-medium leading-relaxed">
-              Measuring the real impact of AI on productivity across 10 diverse projects.
+              {t("tagline")}
             </p>
           </div>
 
           {/* Quick Links */}
           <div className="space-y-6">
-            <h3 className="text-xs font-black uppercase tracking-widest border-b-2 border-black inline-block pb-1">Quick Links</h3>
+            <h3 className="text-xs font-black uppercase tracking-widest border-b-2 border-black inline-block pb-1">{t("quickLinks")}</h3>
             <ul className="space-y-3 font-bold uppercase tracking-tighter text-sm">
               <li>
-                <a href="#projects" className="hover:underline transition-all">
-                  View Projects
+                <a href="#projects" className="hover:underline transition-all text-start block">
+                  {t("viewProjects")}
                 </a>
               </li>
               <li>
-                <Link href="/progress" className="hover:underline transition-all">
-                  Progress Tracker
+                <Link href="/progress" className="hover:underline transition-all text-start block">
+                  {t("progressTracker")}
                 </Link>
               </li>
               <li>
-                <a href="#" className="hover:underline transition-all">
-                  Methodology
+                <a href="#" className="hover:underline transition-all text-start block">
+                  {t("methodology")}
                 </a>
               </li>
             </ul>
@@ -46,7 +55,7 @@ export function VibeFooter() {
 
           {/* Creator Section */}
           <div className="space-y-6">
-            <h3 className="text-xs font-black uppercase tracking-widest border-b-2 border-black inline-block pb-1">Connect</h3>
+            <h3 className="text-xs font-black uppercase tracking-widest border-b-2 border-black inline-block pb-1">{t("connect")}</h3>
             <div className="space-y-4">
               <div className="flex flex-col gap-3">
                 <a
@@ -70,8 +79,8 @@ export function VibeFooter() {
                   <ExternalLink className="h-3 w-3" />
                 </a>
               </div>
-              <p className="text-[10px] font-black uppercase tracking-widest text-gray-500">
-                Follow for real-time updates and insights from the experiment
+              <p className="text-[10px] font-black uppercase tracking-widest text-gray-500 text-start">
+                {t("follow")}
               </p>
             </div>
           </div>
@@ -80,10 +89,10 @@ export function VibeFooter() {
         <div className="mt-16 pt-8 border-t border-dashed border-gray-300">
           <div className="flex flex-col sm:flex-row justify-between items-center gap-6">
             <p className="text-[10px] font-black uppercase tracking-widest text-gray-500">
-              © 2026 10XBUILDER. NO RIGHTS RESERVED.
+              {t("rights")}
             </p>
             <div className="flex items-center gap-2 px-3 py-1 border-2 border-black text-[10px] font-black uppercase tracking-widest">
-              Built with AI assistance
+              {t("builtWith")}
             </div>
           </div>
         </div>
@@ -91,4 +100,3 @@ export function VibeFooter() {
     </footer>
   )
 }
-

@@ -6,36 +6,45 @@ import { VibeStatsSection } from "@/components/vibe-stats-section"
 import { VibeNewsletterSection } from "@/components/vibe-newsletter-section"
 import { VibeFooter } from "@/components/vibe-footer"
 import { fetchProjects } from "@/lib/data-fetching"
-import type { Metadata } from "next"
+import { getTranslations } from 'next-intl/server'
 
-export const metadata: Metadata = {
-  title: "10XBuilder.ai - Measuring AI Productivity Impact",
-  description: "Tracking the real impact of AI on productivity across 10 diverse projects. Can artificial intelligence truly deliver 10x improvements?",
-  alternates: {
-    canonical: "https://10xbuilder.ai",
-  },
-  openGraph: {
-    title: "10XBuilder.ai - Measuring AI Productivity Impact",
-    description: "Can AI deliver 10x improvements? We're tracking 10 projects to find out.",
-    url: "https://10xbuilder.ai",
-    siteName: "10XBuilder",
-    images: [
-      {
-        url: "/social-image.svg",
-        width: 1200,
-        height: 630,
-        alt: "10XBuilder.ai Experiment",
+export async function generateMetadata({params}: {params: Promise<{locale: string}>}) {
+  const { locale } = await params;
+  const t = await getTranslations({locale, namespace: 'HomePage'});
+
+  return {
+    title: t('title'),
+    description: t('description'),
+    alternates: {
+      canonical: `https://10xbuilder.ai/${locale}`,
+      languages: {
+        'en': 'https://10xbuilder.ai/en',
+        'ar': 'https://10xbuilder.ai/ar',
       },
-    ],
-    locale: "en_US",
-    type: "website",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "10XBuilder.ai - Measuring AI Productivity Impact",
-    description: "Tracking the real impact of AI on productivity across 10 diverse projects.",
-    images: ["/social-image.svg"],
-  },
+    },
+    openGraph: {
+      title: t('title'),
+      description: t('description'),
+      url: `https://10xbuilder.ai/${locale}`,
+      siteName: "10XBuilder",
+      images: [
+        {
+          url: "/social-image.svg",
+          width: 1200,
+          height: 630,
+          alt: "10XBuilder.ai Experiment",
+        },
+      ],
+      locale: locale === 'ar' ? 'ar_SA' : 'en_US',
+      type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: t('title'),
+      description: t('description'),
+      images: ["/social-image.svg"],
+    },
+  }
 }
 
 export default async function HomePage() {
