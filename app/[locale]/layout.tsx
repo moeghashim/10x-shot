@@ -16,6 +16,7 @@ const notoKufiArabic = Noto_Kufi_Arabic({ subsets: ["arabic"], weight: ["400", "
 const plexMono = IBM_Plex_Mono({ subsets: ["latin"], weight: ["400", "700"] })
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://10xbuilder.ai"),
   title: "10XBuilder.ai - Measuring AI Productivity Impact",
   description:
     "Tracking the real impact of AI on productivity across 10 diverse projects. Can artificial intelligence truly deliver 10x improvements?",
