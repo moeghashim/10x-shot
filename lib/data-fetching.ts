@@ -6,6 +6,19 @@
 import { supabase } from "@/lib/supabase"
 import { FALLBACK_PROJECTS, FALLBACK_GLOBAL_METRICS, mapDbProjectToApp } from "@/lib/constants"
 import type { Project, ProjectMetric, GlobalMetric, ProjectSummary, AdminUser, UserActivity } from "@/types/database"
+import { unstable_cache } from "next/cache"
+
+const fetchProjectsFromDbCached = unstable_cache(
+  async () => {
+    const { data, error } = await supabase.from("projects").select("*").order("id", { ascending: true })
+    return {
+      data: data ?? null,
+      errorMessage: error?.message ?? null,
+    }
+  },
+  ["projects:v1"],
+  { revalidate: 60 }
+)
 
 /**
  * Fetch all projects with optional fallback to hardcoded data
@@ -14,16 +27,13 @@ export async function fetchProjects(opts?: { allowFallback?: boolean }): Promise
   const allowFallback = opts?.allowFallback ?? true
   
   try {
-    const { data, error } = await supabase
-      .from('projects')
-      .select('*')
-      .order('id', { ascending: true })
+    const { data, errorMessage } = await fetchProjectsFromDbCached()
 
-    if (error) {
-      console.warn('Database error in fetchProjects:', error)
+    if (errorMessage) {
+      console.warn("Database error in fetchProjects:", errorMessage)
       return allowFallback
         ? { data: FALLBACK_PROJECTS, error: null }
-        : { data: [], error: error.message }
+        : { data: [], error: errorMessage }
     }
 
     // Map database fields to app format
@@ -363,4 +373,3 @@ export async function logActivity(
     console.warn('Failed to log activity:', error)
   }
 }
-

@@ -1,20 +1,11 @@
-"use client"
-
 import { Mail } from "lucide-react"
-import { IBM_Plex_Mono, Noto_Kufi_Arabic } from "next/font/google"
-import { useTranslations, useLocale } from "next-intl"
-
-const plexMono = IBM_Plex_Mono({ subsets: ["latin"], weight: ["400", "700"] })
-const notoKufiArabic = Noto_Kufi_Arabic({ subsets: ["arabic"], weight: ["400", "700"] })
+import { useTranslations } from "next-intl"
 
 export function VibeNewsletterSection() {
   const t = useTranslations("HomePage.newsletter")
-  const locale = useLocale()
-
-  const fontClass = locale === "ar" ? notoKufiArabic.className : plexMono.className
 
   return (
-    <section className={`${fontClass} px-6 py-12 bg-white border-b border-dashed border-gray-300`}>
+    <section className="vibe-font px-6 py-12 bg-white border-b border-dashed border-gray-300">
       <div className="mx-auto max-w-4xl text-center">
         <div className="mb-8 flex justify-center">
           <div className="flex items-center gap-2 border-2 border-dashed border-gray-300 px-4 py-1 text-xs font-black uppercase tracking-widest bg-white">
@@ -39,6 +30,7 @@ export function VibeNewsletterSection() {
               height="320" 
               className="max-w-full"
               style={{ background: "white", overflow: "hidden" }} 
+              loading="lazy"
               title={t("iframeTitle")}
             />
           </div>

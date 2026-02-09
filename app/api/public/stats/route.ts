@@ -64,16 +64,6 @@ export async function GET() {
       )
     ).length
 
-    // Debug logging (remove in production)
-    console.log('Stats calculation:', {
-      totalProjects,
-      allProjects: (projects || []).map(p => ({ id: p.id, status: p.status, productivity: p.productivity })),
-      activeProjectsCount: activeProjects.length,
-      activeProductivities: activeProjects.map(p => ({ id: p.id, status: p.status, productivity: p.productivity })),
-      avgProductivityGain,
-      currentProductivity
-    })
-
     return NextResponse.json({
       data: {
         projectsLaunched,
@@ -91,4 +81,3 @@ export async function GET() {
     )
   }
 }
-

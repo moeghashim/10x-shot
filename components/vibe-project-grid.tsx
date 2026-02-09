@@ -1,41 +1,16 @@
-"use client"
-
 import { VibeProjectCard } from "@/components/vibe-project-card"
-import { useProjects } from "@/hooks/use-projects"
-import { IBM_Plex_Mono, Noto_Kufi_Arabic } from "next/font/google"
 import type { Project } from "@/types/database"
-import { useTranslations, useLocale } from "next-intl"
-
-const plexMono = IBM_Plex_Mono({ subsets: ["latin"], weight: ["400", "700"] })
-const notoKufiArabic = Noto_Kufi_Arabic({ subsets: ["arabic"], weight: ["400", "700"] })
+import { useTranslations } from "next-intl"
 
 interface VibeProjectGridProps {
-  initialProjects?: Project[]
+  projects: Project[]
 }
 
-export function VibeProjectGrid({ initialProjects }: VibeProjectGridProps) {
+export function VibeProjectGrid({ projects }: VibeProjectGridProps) {
   const t = useTranslations("HomePage.projects")
-  const locale = useLocale()
-  const { projects: clientProjects, loading } = useProjects()
-  
-  const fontClass = locale === "ar" ? notoKufiArabic.className : plexMono.className
-
-  // Use initialProjects if available, otherwise use projects from the hook
-  const projects = initialProjects || clientProjects
-
-  // If we have initialProjects, we don't show the loading state even if the hook is still loading
-  if (loading && !initialProjects) {
-    return (
-      <section id="projects" className={`${fontClass} px-6 py-12 bg-white`}>
-        <div className="mx-auto max-w-7xl">
-          <div className="text-center font-black uppercase tracking-widest animate-pulse">{t("loading")}</div>
-        </div>
-      </section>
-    )
-  }
 
   return (
-    <section id="projects" className={`${fontClass} px-6 py-12 bg-white`}>
+    <section id="projects" className="vibe-font px-6 py-12 bg-white">
       <div className="mx-auto max-w-7xl">
         <div className="flex flex-col items-center mb-12 text-center">
           <div className="mb-4 px-4 py-1 border-2 border-black text-xs font-black uppercase tracking-widest bg-black text-white">

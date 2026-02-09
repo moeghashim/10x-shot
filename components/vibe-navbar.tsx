@@ -1,28 +1,14 @@
-"use client"
-
-import { Star, Moon, Languages } from "lucide-react"
-import { IBM_Plex_Mono, Noto_Kufi_Arabic } from "next/font/google"
-import { useTranslations, useLocale } from "next-intl"
-import { Link, useRouter, usePathname } from "@/i18n/routing"
-
-const plexMono = IBM_Plex_Mono({ subsets: ["latin"], weight: ["400", "700"] })
-const notoKufiArabic = Noto_Kufi_Arabic({ subsets: ["arabic"], weight: ["400", "700"] })
+import type React from "react"
+import { Star, Moon } from "lucide-react"
+import { useTranslations } from "next-intl"
+import { Link } from "@/i18n/routing"
+import { LocaleToggle } from "@/components/locale-toggle"
 
 export function VibeNavbar() {
   const t = useTranslations("HomePage.navbar")
-  const locale = useLocale()
-  const router = useRouter()
-  const pathname = usePathname()
-
-  const toggleLocale = () => {
-    const nextLocale = locale === "en" ? "ar" : "en"
-    router.replace(pathname, { locale: nextLocale })
-  }
-
-  const fontClass = locale === "ar" ? notoKufiArabic.className : plexMono.className
 
   return (
-    <nav className={`${fontClass} border-b border-dashed border-gray-300 bg-white`}>
+    <nav className="vibe-font border-b border-dashed border-gray-300 bg-white">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
         <div className="flex items-center">
           <Link href="/" className="text-4xl font-black tracking-tighter uppercase me-12 group">
@@ -43,15 +29,8 @@ export function VibeNavbar() {
             <Star className="h-4 w-4 me-2" />
             <span className="text-sm font-bold">10.6k</span>
           </div>
-          
-          <button 
-            onClick={toggleLocale}
-            className="p-4 border-s border-dashed border-gray-300 hover:bg-gray-50 transition-colors flex items-center gap-2"
-            title={locale === 'en' ? 'العربية' : 'English'}
-          >
-            <Languages className="h-5 w-5" />
-            <span className="text-xs font-bold uppercase">{locale === 'en' ? 'ar' : 'en'}</span>
-          </button>
+
+          <LocaleToggle />
 
           <button className="p-4 border-s border-dashed border-gray-300 hover:bg-gray-50 transition-colors">
             <Moon className="h-5 w-5" />

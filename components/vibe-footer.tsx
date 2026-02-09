@@ -1,21 +1,12 @@
-"use client"
-
 import { ExternalLink, Twitter, Github } from "lucide-react"
-import { IBM_Plex_Mono, Noto_Kufi_Arabic } from "next/font/google"
-import { useTranslations, useLocale } from "next-intl"
+import { useTranslations } from "next-intl"
 import { Link } from "@/i18n/routing"
-
-const plexMono = IBM_Plex_Mono({ subsets: ["latin"], weight: ["400", "700"] })
-const notoKufiArabic = Noto_Kufi_Arabic({ subsets: ["arabic"], weight: ["400", "700"] })
 
 export function VibeFooter() {
   const t = useTranslations("HomePage.footer")
-  const locale = useLocale()
-
-  const fontClass = locale === "ar" ? notoKufiArabic.className : plexMono.className
 
   return (
-    <footer className={`${fontClass} bg-white text-black border-t-2 border-black`}>
+    <footer className="vibe-font bg-white text-black border-t-2 border-black">
       <div className="mx-auto max-w-7xl px-6 py-8">
         <div className="grid gap-12 md:grid-cols-3">
           {/* Brand Section */}

@@ -1,13 +1,7 @@
-"use client"
-
 import { SkillsDisplay } from "@/components/skills-display"
 import { Clock, TrendingUp, Play, Pause, ExternalLink } from "lucide-react"
-import { IBM_Plex_Mono, Noto_Kufi_Arabic } from "next/font/google"
 import type { Project } from "@/types/database"
-import { useTranslations, useLocale } from "next-intl"
-
-const plexMono = IBM_Plex_Mono({ subsets: ["latin"], weight: ["400", "700"] })
-const notoKufiArabic = Noto_Kufi_Arabic({ subsets: ["arabic"], weight: ["400", "700"] })
+import { useTranslations } from "next-intl"
 
 interface VibeProjectCardProps {
   project: Project
@@ -15,7 +9,6 @@ interface VibeProjectCardProps {
 
 export function VibeProjectCard({ project }: VibeProjectCardProps) {
   const t = useTranslations("HomePage.projects")
-  const locale = useLocale()
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -30,10 +23,8 @@ export function VibeProjectCard({ project }: VibeProjectCardProps) {
     }
   }
 
-  const fontClass = locale === "ar" ? notoKufiArabic.className : plexMono.className
-
   return (
-    <div className={`${fontClass} bg-white border-2 border-dashed border-gray-300 p-6 transition-all hover:border-black text-start`}>
+    <div className="vibe-font bg-white border-2 border-dashed border-gray-300 p-6 transition-all hover:border-black text-start">
       <div className="flex items-start justify-between mb-4">
         <div className="flex-1">
           <h3 className="text-xl font-black uppercase tracking-tighter mb-2">{project.title}</h3>

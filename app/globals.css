@@ -121,3 +121,11 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Use mono vibe font in LTR; prefer Arabic body font in RTL. */
+.vibe-font {
+  font-family: var(--font-geist-mono);
+}
+html[dir="rtl"] .vibe-font {
+  font-family: inherit;
+}

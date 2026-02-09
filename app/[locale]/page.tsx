@@ -49,6 +49,8 @@ export async function generateMetadata({params}: {params: Promise<{locale: strin
 
 export default async function HomePage() {
   const { data: projects } = await fetchProjects()
+  const tTechStack = await getTranslations("HomePage.techStack")
+  const techProjects = projects.map(({ id, title, tools, aiSkills }) => ({ id, title, tools, aiSkills }))
 
   // Prepare structured data for SEO
   const jsonLd = {
@@ -82,9 +84,18 @@ export default async function HomePage() {
       />
       <VibeNavbar />
       <VibeHero />
-      <VibeCodingAgents />
-      <VibeStatsSection />
-      <VibeProjectGrid initialProjects={projects} />
+      <VibeCodingAgents
+        projects={techProjects}
+        strings={{
+          title: tTechStack("title"),
+          description: tTechStack("description"),
+          selectProject: tTechStack("selectProject"),
+          placeholder: tTechStack("placeholder"),
+          noData: tTechStack("noData"),
+        }}
+      />
+      <VibeStatsSection projects={projects} />
+      <VibeProjectGrid projects={projects} />
       <VibeNewsletterSection />
       <VibeFooter />
     </div>

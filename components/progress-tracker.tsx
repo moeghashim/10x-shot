@@ -1,5 +1,3 @@
-"use client"
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import {
@@ -133,6 +131,7 @@ const skillIcons = {
 export function ProgressTracker() {
   const latestData = progressData[progressData.length - 1]
   const firstData = progressData[0]
+  const months = [...progressData].reverse()
 
   const calculateGrowth = (current: number, initial: number) => {
     return (((current - initial) / initial) * 100).toFixed(1)
@@ -209,7 +208,7 @@ export function ProgressTracker() {
       <div className="space-y-6">
         <h2 className="text-2xl font-bold text-black">Monthly Progress</h2>
 
-        {progressData.reverse().map((monthData, index) => (
+        {months.map((monthData, index) => (
           <Card key={monthData.date} className="bg-white border-gray-200">
             <CardHeader>
               <div className="flex items-center justify-between">
