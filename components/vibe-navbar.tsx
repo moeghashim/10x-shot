@@ -1,5 +1,5 @@
 import type React from "react"
-import { Star, Moon } from "lucide-react"
+import { Moon } from "lucide-react"
 import { Link } from "@/i18n/routing"
 import { LocaleToggle } from "@/components/locale-toggle"
 import { getTranslations } from "next-intl/server"
@@ -20,15 +20,8 @@ export async function VibeNavbar() {
         </div>
 
         <div className="hidden md:flex items-center space-x-0">
-          <NavLink href="#">{t("vibeGuide")}</NavLink>
           <NavLink href="#">{t("events")}</NavLink>
           <NavLink href="#">{t("blog")}</NavLink>
-          <NavLink href="#">{t("docs")}</NavLink>
-          
-          <div className="flex items-center px-4 py-2 border-s border-dashed border-gray-300">
-            <Star className="h-4 w-4 me-2" />
-            <span className="text-sm font-bold">10.6k</span>
-          </div>
 
           <LocaleToggle />
 
