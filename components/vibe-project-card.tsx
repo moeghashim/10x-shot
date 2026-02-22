@@ -11,6 +11,10 @@ export async function VibeProjectCard({ project }: VibeProjectCardProps) {
   const t = await getTranslations("HomePage.projects")
   const tSkills = await getTranslations("HomePage.skills")
 
+  const status = ["active", "planning", "completed"].includes(project.status)
+    ? project.status
+    : "planning"
+
   const getStatusIcon = (status: string) => {
     switch (status) {
       case "active":
@@ -34,8 +38,8 @@ export async function VibeProjectCard({ project }: VibeProjectCardProps) {
           </span>
         </div>
         <div className="flex items-center gap-1 px-2 py-1 border-2 border-black text-[10px] font-black uppercase tracking-widest bg-white whitespace-nowrap">
-          {getStatusIcon(project.status)}
-          {t(`status.${project.status}`)}
+          {getStatusIcon(status)}
+          {t(`status.${status}`)}
         </div>
       </div>
 

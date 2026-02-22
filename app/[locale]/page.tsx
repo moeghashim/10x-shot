@@ -50,7 +50,8 @@ export async function generateMetadata({params}: {params: Promise<{locale: strin
 export default async function HomePage() {
   const { data: projects } = await fetchProjects()
   const tTechStack = await getTranslations("HomePage.techStack")
-  const techProjects = projects.map(({ id, title, tools, aiSkills }) => ({ id, title, tools, aiSkills }))
+  const safeProjects = projects || []
+  const techProjects = safeProjects.map(({ id, title, tools, aiSkills }) => ({ id, title, tools, aiSkills }))
 
   // Prepare structured data for SEO
   const jsonLd = {
@@ -60,9 +61,9 @@ export default async function HomePage() {
     "url": "https://10xbuilder.ai",
     "description": "Measuring AI Productivity Impact across 10 diverse projects.",
     "mainEntity": {
-      "@type": "ItemList",
-      "numberOfItems": projects.length,
-      "itemListElement": projects.map((project, index) => ({
+    "@type": "ItemList",
+    "numberOfItems": safeProjects.length,
+    "itemListElement": safeProjects.map((project, index) => ({
         "@type": "ListItem",
         "position": index + 1,
         "item": {
@@ -94,8 +95,8 @@ export default async function HomePage() {
           noData: tTechStack("noData"),
         }}
       />
-      <VibeStatsSection projects={projects} />
-      <VibeProjectGrid projects={projects} />
+      <VibeStatsSection projects={safeProjects} />
+      <VibeProjectGrid projects={safeProjects} />
       <VibeNewsletterSection />
       <VibeFooter />
     </div>
