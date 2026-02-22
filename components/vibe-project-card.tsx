@@ -15,14 +15,34 @@ export async function VibeProjectCard({ project }: VibeProjectCardProps) {
     ? project.status
     : "planning"
 
+  const statusStyles = {
+    active: {
+      border: "border-emerald-600",
+      text: "text-emerald-600",
+      icon: "text-emerald-600",
+    },
+    planning: {
+      border: "border-amber-500",
+      text: "text-amber-600",
+      icon: "text-amber-600",
+    },
+    completed: {
+      border: "border-black",
+      text: "text-black",
+      icon: "text-black",
+    },
+  } as const
+
+  const statusStyle = statusStyles[status as keyof typeof statusStyles]
+
   const getStatusIcon = (status: string) => {
     switch (status) {
       case "active":
-        return <Play className="h-3 w-3" />
+        return <Play className={`h-3 w-3 ${statusStyle.icon}`} />
       case "planning":
-        return <Pause className="h-3 w-3" />
+        return <Pause className={`h-3 w-3 ${statusStyle.icon}`} />
       case "completed":
-        return <TrendingUp className="h-3 w-3" />
+        return <TrendingUp className={`h-3 w-3 ${statusStyle.icon}`} />
       default:
         return null
     }
@@ -37,7 +57,7 @@ export async function VibeProjectCard({ project }: VibeProjectCardProps) {
             {project.domain}
           </span>
         </div>
-        <div className="flex items-center gap-1 px-2 py-1 border-2 border-black text-[10px] font-black uppercase tracking-widest bg-white whitespace-nowrap">
+        <div className={`flex items-center gap-1 px-2 py-1 border-2 ${statusStyle.border} text-[10px] font-black uppercase tracking-widest bg-white whitespace-nowrap ${statusStyle.text}`}>
           {getStatusIcon(status)}
           {t(`status.${status}`)}
         </div>
