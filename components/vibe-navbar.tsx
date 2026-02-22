@@ -1,11 +1,11 @@
 import type React from "react"
 import { Star, Moon } from "lucide-react"
-import { useTranslations } from "next-intl"
 import { Link } from "@/i18n/routing"
 import { LocaleToggle } from "@/components/locale-toggle"
+import { getTranslations } from "next-intl/server"
 
-export function VibeNavbar() {
-  const t = useTranslations("HomePage.navbar")
+export async function VibeNavbar() {
+  const t = await getTranslations("HomePage.navbar")
 
   return (
     <nav className="vibe-font border-b border-dashed border-gray-300 bg-white">

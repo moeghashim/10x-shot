@@ -1,9 +1,9 @@
 import { ExternalLink, Twitter, Github } from "lucide-react"
-import { useTranslations } from "next-intl"
 import { Link } from "@/i18n/routing"
+import { getTranslations } from "next-intl/server"
 
-export function VibeFooter() {
-  const t = useTranslations("HomePage.footer")
+export async function VibeFooter() {
+  const t = await getTranslations("HomePage.footer")
 
   return (
     <footer className="vibe-font bg-white text-black border-t-2 border-black">

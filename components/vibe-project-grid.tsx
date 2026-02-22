@@ -1,13 +1,13 @@
 import { VibeProjectCard } from "@/components/vibe-project-card"
 import type { Project } from "@/types/database"
-import { useTranslations } from "next-intl"
+import { getTranslations } from "next-intl/server"
 
 interface VibeProjectGridProps {
   projects: Project[]
 }
 
-export function VibeProjectGrid({ projects }: VibeProjectGridProps) {
-  const t = useTranslations("HomePage.projects")
+export async function VibeProjectGrid({ projects }: VibeProjectGridProps) {
+  const t = await getTranslations("HomePage.projects")
 
   return (
     <section id="projects" className="vibe-font px-6 py-12 bg-white">

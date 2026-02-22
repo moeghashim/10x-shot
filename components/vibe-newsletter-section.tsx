@@ -1,8 +1,8 @@
 import { Mail } from "lucide-react"
-import { useTranslations } from "next-intl"
+import { getTranslations } from "next-intl/server"
 
-export function VibeNewsletterSection() {
-  const t = useTranslations("HomePage.newsletter")
+export async function VibeNewsletterSection() {
+  const t = await getTranslations("HomePage.newsletter")
 
   return (
     <section className="vibe-font px-6 py-12 bg-white border-b border-dashed border-gray-300">

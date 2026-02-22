@@ -1,14 +1,14 @@
 import { SkillsDisplay } from "@/components/skills-display"
 import { Clock, TrendingUp, Play, Pause, ExternalLink } from "lucide-react"
 import type { Project } from "@/types/database"
-import { useTranslations } from "next-intl"
+import { getTranslations } from "next-intl/server"
 
 interface VibeProjectCardProps {
   project: Project
 }
 
-export function VibeProjectCard({ project }: VibeProjectCardProps) {
-  const t = useTranslations("HomePage.projects")
+export async function VibeProjectCard({ project }: VibeProjectCardProps) {
+  const t = await getTranslations("HomePage.projects")
 
   const getStatusIcon = (status: string) => {
     switch (status) {

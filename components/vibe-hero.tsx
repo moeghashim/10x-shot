@@ -1,8 +1,8 @@
-import { useTranslations } from "next-intl"
+import { getTranslations } from "next-intl/server"
 import { ToolTextLoop } from "@/components/tool-text-loop"
 
-export function VibeHero() {
-  const t = useTranslations("HomePage.hero")
+export async function VibeHero() {
+  const t = await getTranslations("HomePage.hero")
 
   const tools = [
     "AI Agents",

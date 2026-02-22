@@ -1,4 +1,4 @@
-import { useTranslations } from "next-intl"
+import { getTranslations } from "next-intl/server"
 import type { Project } from "@/types/database"
 
 type Stat = {
@@ -14,8 +14,8 @@ function clampPct(value: number, max: number) {
   return Math.min((value / max) * 100, 100)
 }
 
-export function VibeStatsSection({ projects }: { projects: Project[] }) {
-  const t = useTranslations("HomePage.stats")
+export async function VibeStatsSection({ projects }: { projects: Project[] }) {
+  const t = await getTranslations("HomePage.stats")
 
   const totalProjects = projects.length
   const activeProjects = projects.filter((p) => {
@@ -72,4 +72,3 @@ export function VibeStatsSection({ projects }: { projects: Project[] }) {
     </section>
   )
 }
-

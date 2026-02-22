@@ -1,6 +1,6 @@
 import { Badge } from "@/components/ui/badge"
 import { User, Bot, Wrench } from "lucide-react"
-import { useTranslations } from "next-intl"
+import { getTranslations } from "next-intl/server"
 
 interface SkillsDisplayProps {
   mySkills: string[]
@@ -8,8 +8,8 @@ interface SkillsDisplayProps {
   tools: string[]
 }
 
-export function SkillsDisplay({ mySkills, aiSkills, tools }: SkillsDisplayProps) {
-  const t = useTranslations("HomePage.skills")
+export async function SkillsDisplay({ mySkills, aiSkills, tools }: SkillsDisplayProps) {
+  const t = await getTranslations("HomePage.skills")
 
   return (
     <div className="space-y-3">
