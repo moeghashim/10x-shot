@@ -1,22 +1,34 @@
 import { Badge } from "@/components/ui/badge"
 import { User, Bot, Wrench } from "lucide-react"
-import { getTranslations } from "next-intl/server"
 
 interface SkillsDisplayProps {
   mySkills: string[]
   aiSkills: string[]
   tools: string[]
+  labels?: {
+    mySkills?: string
+    aiSkills?: string
+    toolsUsed?: string
+  }
 }
 
-export async function SkillsDisplay({ mySkills, aiSkills, tools }: SkillsDisplayProps) {
-  const t = await getTranslations("HomePage.skills")
-
+export function SkillsDisplay({
+  mySkills,
+  aiSkills,
+  tools,
+  labels = {},
+}: SkillsDisplayProps) {
+  const {
+    mySkills: mySkillsLabel = "My Skills",
+    aiSkills: aiSkillsLabel = "AI Skills",
+    toolsUsed: toolsUsedLabel = "Tools Used",
+  } = labels
   return (
     <div className="space-y-3">
       <div>
         <div className="flex items-center gap-2 mb-2">
           <User className="h-4 w-4 text-gray-600" />
-          <span className="text-sm font-medium text-gray-700">{t("mySkills")}</span>
+          <span className="text-sm font-medium text-gray-700">{mySkillsLabel}</span>
         </div>
         <div className="flex flex-wrap gap-1">
           {(mySkills || []).map((skill, index) => (
@@ -30,7 +42,7 @@ export async function SkillsDisplay({ mySkills, aiSkills, tools }: SkillsDisplay
       <div>
         <div className="flex items-center gap-2 mb-2">
           <Bot className="h-4 w-4 text-black" />
-          <span className="text-sm font-medium text-gray-700">{t("aiSkills")}</span>
+          <span className="text-sm font-medium text-gray-700">{aiSkillsLabel}</span>
         </div>
         <div className="flex flex-wrap gap-1">
           {(aiSkills || []).map((skill, index) => (
@@ -44,7 +56,7 @@ export async function SkillsDisplay({ mySkills, aiSkills, tools }: SkillsDisplay
       <div>
         <div className="flex items-center gap-2 mb-2">
           <Wrench className="h-4 w-4 text-gray-500" />
-          <span className="text-sm font-medium text-gray-700">{t("toolsUsed")}</span>
+          <span className="text-sm font-medium text-gray-700">{toolsUsedLabel}</span>
         </div>
         <div className="flex flex-wrap gap-1">
           {(tools || []).map((tool, index) => (

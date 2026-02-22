@@ -98,7 +98,11 @@ export function ProjectCard({ project }: ProjectCardProps) {
           </a>
         )}
 
-        <SkillsDisplay mySkills={project.mySkills} aiSkills={project.aiSkills} tools={project.tools} />
+        <SkillsDisplay
+          mySkills={project.mySkills}
+          aiSkills={project.aiSkills}
+          tools={project.tools}
+        />
       </CardContent>
     </Card>
   )
