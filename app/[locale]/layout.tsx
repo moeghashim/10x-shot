@@ -7,6 +7,8 @@ import { routing } from '@/i18n/routing';
 import Script from "next/script"
 import { GeistSans } from "geist/font/sans"
 import { GeistMono } from "geist/font/mono"
+import { NextIntlClientProvider } from "next-intl"
+import { getMessages } from "next-intl/server"
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://10xbuilder.ai"),
@@ -35,6 +37,7 @@ export default async function RootLayout({
   }
 
   const dir = locale === 'ar' ? 'rtl' : 'ltr';
+  const messages = await getMessages();
   const fontClass = GeistSans.className;
 
   return (
@@ -55,8 +58,10 @@ export default async function RootLayout({
         </Script>
       </head>
       <body className={fontClass}>
-        {children}
-        <Analytics />
+        <NextIntlClientProvider locale={locale} messages={messages}>
+          {children}
+          <Analytics />
+        </NextIntlClientProvider>
       </body>
     </html>
   )
