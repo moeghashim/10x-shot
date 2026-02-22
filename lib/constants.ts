@@ -247,6 +247,43 @@ export const DB_FIELD_MAPPING = {
   // Add more mappings as needed
 } as const
 
+function normalizeStringList(value: unknown): string[] {
+  if (Array.isArray(value)) {
+    return value
+      .filter((item): item is string => typeof item === "string")
+      .map((item) => item.trim())
+      .filter((item) => item.length > 0)
+  }
+
+  if (typeof value === "string") {
+    const trimmed = value.trim()
+    if (!trimmed) {
+      return []
+    }
+
+    if (trimmed.startsWith("[") && trimmed.endsWith("]")) {
+      try {
+        const parsed = JSON.parse(trimmed)
+        if (Array.isArray(parsed)) {
+          return parsed
+            .filter((item): item is string => typeof item === "string")
+            .map((item) => item.trim())
+            .filter((item) => item.length > 0)
+        }
+      } catch (_error) {
+        // Fall back to comma-split parsing below
+      }
+    }
+
+    return trimmed
+      .split(",")
+      .map((item) => item.trim())
+      .filter((item) => item.length > 0)
+  }
+
+  return []
+}
+
 /**
  * Transform database project to app project format
  */
@@ -259,9 +296,9 @@ export function mapDbProjectToApp(dbProject: any): Project {
     objectives: dbProject.objectives,
     progress: dbProject.progress,
     status: dbProject.status as "active" | "planning" | "completed",
-    mySkills: dbProject.my_skills || [],
-    aiSkills: dbProject.ai_skills || [],
-    tools: dbProject.tools || [],
+    mySkills: normalizeStringList(dbProject.my_skills),
+    aiSkills: normalizeStringList(dbProject.ai_skills),
+    tools: normalizeStringList(dbProject.tools),
     productivity: dbProject.productivity,
     timeframe: dbProject.timeframe,
     url: dbProject.url
@@ -287,4 +324,3 @@ export function mapAppProjectToDb(project: Omit<Project, 'id'> | Project) {
     url: project.url,
   }
 }
-
