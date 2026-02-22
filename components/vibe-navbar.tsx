@@ -1,5 +1,4 @@
 import type React from "react"
-import { Moon } from "lucide-react"
 import { Link } from "@/i18n/routing"
 import { LocaleToggle } from "@/components/locale-toggle"
 import { getTranslations } from "next-intl/server"
@@ -26,10 +25,6 @@ export async function VibeNavbar() {
           <NavLink href="#">{t("blog")}</NavLink>
 
           <LocaleToggle />
-
-          <button className="p-4 border-s border-dashed border-gray-300 hover:bg-gray-50 transition-colors">
-            <Moon className="h-5 w-5" />
-          </button>
         </div>
 
         {/* Mobile Menu */}

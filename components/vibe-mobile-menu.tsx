@@ -8,6 +8,8 @@ import { Button } from "@/components/ui/button"
 import {
   Sheet,
   SheetContent,
+  SheetHeader,
+  SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet"
 
@@ -28,12 +30,15 @@ export function VibeMobileMenu({ translations }: VibeMobileMenuProps) {
             <span className="sr-only">Toggle menu</span>
           </Button>
         </SheetTrigger>
-        <SheetContent side="right" className="vibe-font sm:max-w-sm border-l border-dashed border-gray-300">
-          <div className="flex flex-col space-y-4 mt-8">
+        <SheetContent side="right" className="vibe-font sm:max-w-sm p-0 border-l border-dashed border-gray-300">
+          <SheetHeader className="p-6 border-b border-dashed border-gray-300 text-left">
+            <SheetTitle className="text-2xl font-black tracking-tighter uppercase">Menu</SheetTitle>
+          </SheetHeader>
+          <div className="flex flex-col">
             <MobileNavLink href="#">{translations.events}</MobileNavLink>
             <MobileNavLink href="#">{translations.blog}</MobileNavLink>
-            <div className="py-4 border-t border-dashed border-gray-300 flex items-center justify-between">
-              <span className="text-sm font-bold">Language</span>
+            <div className="p-6 border-b border-dashed border-gray-300 flex items-center justify-between">
+              <span className="text-lg font-bold">Language</span>
               <LocaleToggle />
             </div>
           </div>
@@ -47,7 +52,7 @@ function MobileNavLink({ href, children }: { href: string; children: React.React
   return (
     <Link 
       href={href} 
-      className="text-lg font-bold py-2 hover:text-gray-600 transition-colors"
+      className="p-6 text-lg font-bold border-b border-dashed border-gray-300 hover:bg-gray-50 transition-colors block"
     >
       {children}
     </Link>
