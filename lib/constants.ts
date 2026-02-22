@@ -5,6 +5,17 @@
 
 import type { Project, GlobalMetric } from "@/types/database"
 
+type ProjectStatus = Project["status"]
+const VALID_PROJECT_STATUSES: ProjectStatus[] = ["active", "planning", "completed"]
+
+function normalizeProjectStatus(status: unknown): ProjectStatus {
+  if (typeof status === "string" && VALID_PROJECT_STATUSES.includes(status as ProjectStatus)) {
+    return status as ProjectStatus
+  }
+
+  return "planning"
+}
+
 /**
  * Fallback project data used when database is unavailable
  * Complete 10x experiment portfolio
@@ -295,7 +306,7 @@ export function mapDbProjectToApp(dbProject: any): Project {
     description: dbProject.description,
     objectives: dbProject.objectives,
     progress: dbProject.progress,
-    status: dbProject.status as "active" | "planning" | "completed",
+    status: normalizeProjectStatus(dbProject.status),
     mySkills: normalizeStringList(dbProject.my_skills),
     aiSkills: normalizeStringList(dbProject.ai_skills),
     tools: normalizeStringList(dbProject.tools),
