@@ -58,6 +58,7 @@
     "next-auth": "5.0.0-beta.29",
     "next-intl": "^4.7.0",
     "next-themes": "latest",
+    "radix-ui": "^1.4.3",
     "react": "^19",
     "react-day-picker": "latest",
     "react-dom": "^19",

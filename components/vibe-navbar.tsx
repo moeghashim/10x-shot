@@ -3,6 +3,7 @@ import { Moon } from "lucide-react"
 import { Link } from "@/i18n/routing"
 import { LocaleToggle } from "@/components/locale-toggle"
 import { getTranslations } from "next-intl/server"
+import { VibeMobileMenu } from "./vibe-mobile-menu"
 
 export async function VibeNavbar() {
   const t = await getTranslations("HomePage.navbar")
@@ -19,6 +20,7 @@ export async function VibeNavbar() {
           </Link>
         </div>
 
+        {/* Desktop Menu */}
         <div className="hidden md:flex items-center space-x-0">
           <NavLink href="#">{t("events")}</NavLink>
           <NavLink href="#">{t("blog")}</NavLink>
@@ -29,6 +31,14 @@ export async function VibeNavbar() {
             <Moon className="h-5 w-5" />
           </button>
         </div>
+
+        {/* Mobile Menu */}
+        <VibeMobileMenu 
+          translations={{
+            events: t("events"),
+            blog: t("blog")
+          }} 
+        />
       </div>
     </nav>
   )
