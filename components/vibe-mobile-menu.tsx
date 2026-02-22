@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { Menu, Moon } from "lucide-react"
+import { Menu } from "lucide-react"
 import { Link } from "@/i18n/routing"
 import { LocaleToggle } from "@/components/locale-toggle"
 import { Button } from "@/components/ui/button"
@@ -35,12 +35,6 @@ export function VibeMobileMenu({ translations }: VibeMobileMenuProps) {
             <div className="py-4 border-t border-dashed border-gray-300 flex items-center justify-between">
               <span className="text-sm font-bold">Language</span>
               <LocaleToggle />
-            </div>
-            <div className="py-4 border-t border-dashed border-gray-300 flex items-center justify-between">
-              <span className="text-sm font-bold">Dark Mode</span>
-              <button className="p-2 border border-dashed border-gray-300 hover:bg-gray-50 transition-colors rounded">
-                <Moon className="h-5 w-5" />
-              </button>
             </div>
           </div>
         </SheetContent>
