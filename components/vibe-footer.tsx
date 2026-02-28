@@ -1,4 +1,5 @@
 import { ExternalLink, Twitter, Github } from "lucide-react"
+import Image from "next/image"
 import { Link } from "@/i18n/routing"
 import { getTranslations } from "next-intl/server"
 
@@ -12,9 +13,14 @@ export async function VibeFooter() {
           {/* Brand Section */}
           <div className="space-y-6">
             <div className="flex items-center">
-              <Link href="/" className="text-3xl font-black tracking-tighter uppercase group">
-                <span className="bg-black text-white px-1.5 py-0.5 me-0.5 transform -skew-x-6">10X</span>
-                <span className="border-2 border-black px-1.5 py-0.5 ms-0.5 transform skew-x-6">BUILDER</span>
+              <Link href="/" className="group inline-flex items-center">
+                <Image
+                  src="/10claws.svg"
+                  alt="10xBuilder.ai logo"
+                  width={48}
+                  height={48}
+                  className="h-12 w-12"
+                />
               </Link>
             </div>
             <p className="text-gray-800 font-medium leading-relaxed">

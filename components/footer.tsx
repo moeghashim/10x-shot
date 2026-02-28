@@ -1,4 +1,5 @@
-import { ExternalLink, Twitter, Zap } from "lucide-react"
+import { ExternalLink, Twitter } from "lucide-react"
+import Image from "next/image"
 import Link from "next/link"
 
 export function Footer() {
@@ -9,7 +10,13 @@ export function Footer() {
           {/* Brand Section */}
           <div className="space-y-4">
             <div className="flex items-center gap-2">
-              <Zap className="h-6 w-6" />
+              <Image
+                src="/10claws.svg"
+                alt="10xBuilder.ai logo"
+                width={44}
+                height={44}
+                className="h-11 w-11 invert"
+              />
               <span className="text-xl font-bold">10xBuilder.ai</span>
             </div>
             <p className="text-gray-400 text-sm">

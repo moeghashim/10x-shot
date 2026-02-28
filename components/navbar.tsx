@@ -1,7 +1,8 @@
 "use client"
 
 import Link from "next/link"
-import { Zap, BarChart3, Github } from "lucide-react"
+import Image from "next/image"
+import { BarChart3, Github } from "lucide-react"
 import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
 
@@ -15,13 +16,14 @@ export function Navbar() {
         >
             <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
                 <Link href="/" className="flex items-center gap-2 group">
-                    <div className="relative flex h-8 w-8 items-center justify-center rounded-lg bg-primary/20 group-hover:bg-primary/30 transition-colors">
-                        <Zap className="h-5 w-5 text-primary group-hover:text-primary-foreground transition-colors" />
-                        <div className="absolute inset-0 rounded-lg ring-1 ring-inset ring-primary/50 group-hover:ring-primary transition-all" />
-                    </div>
-                    <span className="text-lg font-bold tracking-tight font-display">
-                        10x<span className="text-primary">Builder</span>.ai
-                    </span>
+                    <Image
+                        src="/10claws.svg"
+                        alt="10xBuilder.ai logo"
+                        width={36}
+                        height={36}
+                        className="h-9 w-9"
+                        priority
+                    />
                 </Link>
 
                 <div className="hidden md:flex items-center gap-6">

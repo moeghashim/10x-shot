@@ -1,4 +1,5 @@
 import type React from "react"
+import Image from "next/image"
 import { Link } from "@/i18n/routing"
 import { LocaleToggle } from "@/components/locale-toggle"
 import { getTranslations } from "next-intl/server"
@@ -11,11 +12,15 @@ export async function VibeNavbar() {
     <nav className="vibe-font border-b border-dashed border-gray-300 bg-white">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
         <div className="flex items-center">
-          <Link href="/" className="text-4xl font-black tracking-tighter uppercase me-12 group">
-            <span className="inline-flex items-center">
-              <span className="bg-black text-white px-2 py-0.5 transform -skew-x-6">10X</span>
-              <span className="text-black border-2 border-black px-2 py-0.5 ms-1 transform skew-x-6">BUILDER</span>
-            </span>
+          <Link href="/" className="me-12 group inline-flex items-center">
+            <Image
+              src="/10claws.svg"
+              alt="10xBuilder.ai logo"
+              width={44}
+              height={44}
+              className="h-11 w-11"
+              priority
+            />
           </Link>
         </div>
 
