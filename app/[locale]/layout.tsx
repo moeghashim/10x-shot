@@ -23,7 +23,9 @@ export const metadata: Metadata = {
     "Tracking the real impact of AI on productivity across 10 diverse projects. Can artificial intelligence truly deliver 10x improvements?",
   generator: "v0.dev",
   icons: {
-    icon: [{ url: "/favicon.svg", type: "image/svg+xml" }, { url: "/favicon-simple.svg", type: "image/svg+xml" }],
+    icon: [{ url: "/10claws.svg", type: "image/svg+xml" }],
+    shortcut: [{ url: "/10claws.svg", type: "image/svg+xml" }],
+    apple: [{ url: "/10claws.svg", type: "image/svg+xml" }],
   },
   manifest: "/site.webmanifest",
 }

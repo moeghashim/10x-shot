@@ -13,7 +13,7 @@ export async function VibeFooter() {
           {/* Brand Section */}
           <div className="space-y-6">
             <div className="flex items-center">
-              <Link href="/" className="group inline-flex items-center">
+              <Link href="/" className="group inline-flex items-center gap-3">
                 <Image
                   src="/10claws.svg"
                   alt="10xBuilder.ai logo"
@@ -21,6 +21,7 @@ export async function VibeFooter() {
                   height={48}
                   className="h-12 w-12"
                 />
+                <span className="text-2xl font-black tracking-tight">10x Claws</span>
               </Link>
             </div>
             <p className="text-gray-800 font-medium leading-relaxed">
@@ -88,7 +89,7 @@ export async function VibeFooter() {
             <p className="text-[10px] font-black uppercase tracking-widest text-gray-500">
               {t("rights")}
             </p>
-            <div className="flex items-center gap-2 px-3 py-1 border-2 border-black text-[10px] font-black uppercase tracking-widest">
+            <div className="flex items-center gap-2 px-3 py-1 border-2 border-black text-[10px] font-black tracking-widest">
               {t("builtWith")}
             </div>
           </div>

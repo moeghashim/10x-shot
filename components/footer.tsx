@@ -17,7 +17,7 @@ export function Footer() {
                 height={44}
                 className="h-11 w-11 invert"
               />
-              <span className="text-xl font-bold">10xBuilder.ai</span>
+              <span className="text-xl font-bold">10x Claws</span>
             </div>
             <p className="text-gray-400 text-sm">
               Measuring the real impact of AI on productivity across 10 diverse projects.
@@ -74,7 +74,7 @@ export function Footer() {
           <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
             <p className="text-xs text-gray-500">© 2024 10xBuilder.ai. All rights reserved.</p>
             <div className="flex items-center gap-4 text-xs text-gray-500">
-              <span>Built with AI assistance</span>
+              <span>Made by AI with human assistance</span>
             </div>
           </div>
         </div>
