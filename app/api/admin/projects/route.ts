@@ -6,7 +6,16 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { mapAppProjectToDb, mapDbProjectToApp } from '@/lib/constants'
+import { PROJECTS_CACHE_TAG } from '@/lib/cache-tags'
 import type { Project } from '@/types/database'
+import { revalidatePath, revalidateTag } from 'next/cache'
+
+function revalidateProjectViews() {
+  revalidateTag(PROJECTS_CACHE_TAG)
+  revalidatePath('/')
+  revalidatePath('/en')
+  revalidatePath('/ar')
+}
 
 /**
  * POST - Create or update a project
@@ -33,6 +42,7 @@ export async function POST(request: NextRequest) {
       }
 
       if (data && data[0]) {
+        revalidateProjectViews()
         return NextResponse.json({ data: mapDbProjectToApp(data[0]) })
       }
 
@@ -56,6 +66,7 @@ export async function POST(request: NextRequest) {
       }
 
       if (data && data[0]) {
+        revalidateProjectViews()
         return NextResponse.json({ data: mapDbProjectToApp(data[0]) })
       }
 
@@ -129,6 +140,7 @@ export async function DELETE(request: NextRequest) {
       )
     }
 
+    revalidateProjectViews()
     return NextResponse.json({ success: true })
   } catch (error: any) {
     console.error('Failed to delete project:', error)

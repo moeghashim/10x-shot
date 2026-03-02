@@ -5,6 +5,7 @@
 
 import { supabase } from "@/lib/supabase"
 import { FALLBACK_PROJECTS, FALLBACK_GLOBAL_METRICS, mapDbProjectToApp } from "@/lib/constants"
+import { PROJECTS_CACHE_TAG } from "@/lib/cache-tags"
 import type { Project, ProjectMetric, GlobalMetric, ProjectSummary, AdminUser, UserActivity } from "@/types/database"
 import { unstable_cache } from "next/cache"
 
@@ -17,7 +18,7 @@ const fetchProjectsFromDbCached = unstable_cache(
     }
   },
   ["projects:v1"],
-  { revalidate: 60 }
+  { revalidate: 60, tags: [PROJECTS_CACHE_TAG] }
 )
 
 /**
