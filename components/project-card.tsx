@@ -12,7 +12,6 @@ interface Project {
   objectives?: string
   progress: number
   status: "active" | "planning" | "completed"
-  mySkills: string[]
   aiSkills: string[]
   tools: string[]
   productivity: number
@@ -99,7 +98,6 @@ export function ProjectCard({ project }: ProjectCardProps) {
         )}
 
         <SkillsDisplay
-          mySkills={project.mySkills}
           aiSkills={project.aiSkills}
           tools={project.tools}
         />

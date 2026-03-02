@@ -10,7 +10,6 @@ CREATE TABLE IF NOT EXISTS projects (
   objectives VARCHAR(150),
   progress INTEGER DEFAULT 0 CHECK (progress >= 0 AND progress <= 100),
   status VARCHAR(20) DEFAULT 'planning' CHECK (status IN ('planning', 'active', 'completed')),
-  my_skills TEXT[] DEFAULT '{}',
   ai_skills TEXT[] DEFAULT '{}',
   tools TEXT[] DEFAULT '{}',
   productivity DECIMAL(3,1) DEFAULT 0 CHECK (productivity >= 0 AND productivity <= 10),
@@ -79,63 +78,53 @@ CREATE TRIGGER update_global_metrics_updated_at
   EXECUTE FUNCTION update_updated_at_column();
 
 -- Insert all projects (complete 10x experiment portfolio)
-INSERT INTO projects (id, title, domain, description, progress, status, my_skills, ai_skills, tools, productivity, timeframe, url) VALUES
+INSERT INTO projects (id, title, domain, description, progress, status, ai_skills, tools, productivity, timeframe, url) VALUES
 (1, 'AI E-commerce Platform', 'E-commerce', 'Automated product descriptions, pricing optimization, and customer service', 85, 'active', 
- ARRAY['React', 'Node.js', 'Database Design'], 
  ARRAY['Content Generation', 'Price Optimization', 'Customer Support'], 
  ARRAY['ChatGPT', 'Stripe', 'Vercel', 'Supabase', 'Midjourney'], 
  8.2, '3 months', 'https://ai-ecommerce-demo.vercel.app'),
 
 (2, 'Bannaa - Arabic AI School', 'Media & Content', 'AI‑focused school targeting the Arab world.', 2, 'active',
- ARRAY['Content Strategy', 'Management'], 
  ARRAY['Writing', 'Video Editing', 'Image Generation'], 
  ARRAY['ChatGPT', 'Claude', 'Runway ML', 'N8N', 'Airtable', 'VEO', 'Gemini', 'Midjourney'], 
  0.1, '2 months', 'https://bannaa.ai'),
 
 (3, 'Data Analytics Dashboard', 'Analytics', 'Automated data processing, visualization, and insight generation', 78, 'active',
- ARRAY['Data Analysis', 'Visualization', 'Statistics'], 
  ARRAY['Data Processing', 'Pattern Recognition', 'Report Generation'], 
  ARRAY['ChatGPT', 'Tableau', 'Python', 'Jupyter', 'AWS', 'MongoDB'], 
  6.8, '4 months', 'https://analytics-ai-dashboard.vercel.app'),
 
 (4, 'Mobile Fitness App', 'Health & Fitness', 'Personalized workout plans, nutrition tracking, and progress monitoring', 65, 'active',
- ARRAY['Mobile Development', 'UI/UX', 'Health Domain'], 
  ARRAY['Personalization', 'Computer Vision', 'Nutrition Analysis'], 
  ARRAY['ChatGPT', 'React Native', 'Firebase', 'TensorFlow', 'Figma'], 
  5.2, '5 months', 'https://fitness-ai-app.vercel.app'),
 
 (5, 'Legal Document Processor', 'Legal Tech', 'Contract analysis, document generation, and compliance checking', 45, 'active',
- ARRAY['Legal Research', 'Document Processing', 'Compliance'], 
  ARRAY['NLP', 'Document Analysis', 'Legal Reasoning'], 
  ARRAY['ChatGPT', 'Claude', 'LangChain', 'Pinecone', 'Notion', 'DocuSign'], 
  4.1, '6 months', 'https://legal-ai-processor.vercel.app'),
 
 (6, 'Educational Platform', 'EdTech', 'Personalized learning paths, automated grading, and content adaptation', 58, 'active',
- ARRAY['Education', 'Curriculum Design', 'Learning Theory'], 
  ARRAY['Personalization', 'Content Generation', 'Assessment'], 
  ARRAY['ChatGPT', 'Teachable Machine', 'Moodle', 'Zoom', 'Loom', 'Calendly'], 
  7.3, '4 months', 'https://edu-ai-platform.vercel.app'),
 
 (7, 'Financial Planning Tool', 'FinTech', 'Investment recommendations, risk assessment, and portfolio optimization', 72, 'active',
- ARRAY['Finance', 'Investment Strategy', 'Risk Management'], 
  ARRAY['Market Analysis', 'Risk Modeling', 'Optimization'], 
  ARRAY['ChatGPT', 'Alpha Vantage', 'Plaid', 'Chart.js', 'Vercel', 'PostgreSQL'], 
  9.1, '3 months', 'https://fintech-ai-planner.vercel.app'),
 
 (8, 'Smart Home Automation', 'IoT', 'Intelligent device control, energy optimization, and predictive maintenance', 25, 'planning',
- ARRAY['IoT', 'Hardware Integration', 'System Architecture'], 
  ARRAY['Predictive Analytics', 'Optimization', 'Pattern Recognition'], 
  ARRAY['ChatGPT', 'Arduino', 'Raspberry Pi', 'MQTT', 'InfluxDB', 'Grafana'], 
  3.2, '8 months', 'https://smarthome-ai-demo.vercel.app'),
 
 (9, 'Marketing Automation Suite', 'Marketing', 'Campaign optimization, lead scoring, and personalized messaging', 15, 'planning',
- ARRAY['Marketing Strategy', 'Campaign Management', 'Analytics'], 
  ARRAY['Personalization', 'Optimization', 'Predictive Modeling'], 
  ARRAY['ChatGPT', 'HubSpot', 'Mailchimp', 'Google Analytics', 'Zapier', 'Airtable'], 
  2.8, '6 months', 'https://marketing-ai-suite.vercel.app'),
 
 (10, 'Creative Design Studio', 'Design', 'Automated design generation, brand consistency, and creative workflows', 8, 'planning',
- ARRAY['Design Principles', 'Brand Strategy', 'Creative Direction'], 
  ARRAY['Image Generation', 'Design Automation', 'Style Transfer'], 
  ARRAY['ChatGPT', 'Midjourney', 'DALL-E', 'Figma', 'Adobe Creative Suite', 'Framer'], 
  1.9, '7 months', 'https://design-ai-studio.vercel.app')

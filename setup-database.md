@@ -56,7 +56,7 @@ Option B: Create admin user via the app
 ### Projects Table
 - Core project information (title, domain, description)
 - Progress tracking (0-100%)
-- Skills arrays (my_skills, ai_skills)
+- AI skills array (ai_skills)
 - Tools array
 - Productivity scoring (0-10)
 - Status (planning, active, completed)

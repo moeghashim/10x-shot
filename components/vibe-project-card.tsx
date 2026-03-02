@@ -103,11 +103,9 @@ export async function VibeProjectCard({ project }: VibeProjectCardProps) {
 
         <div className="pt-2 border-t border-dashed border-gray-200">
           <SkillsDisplay
-            mySkills={project.mySkills}
             aiSkills={project.aiSkills}
             tools={project.tools}
             labels={{
-              mySkills: tSkills("mySkills"),
               aiSkills: tSkills("aiSkills"),
               toolsUsed: tSkills("toolsUsed"),
             }}

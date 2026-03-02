@@ -24,7 +24,6 @@ export interface Project {
   objectives?: string
   progress: number
   status: ProjectStatus
-  mySkills: string[]
   aiSkills: string[]
   tools: string[]
   productivity: number
@@ -113,7 +112,6 @@ export interface DbProject {
   objectives?: string
   progress: number
   status: string
-  my_skills: string[]
   ai_skills: string[]
   tools: string[]
   productivity: number
@@ -144,4 +142,3 @@ export interface DataResult<T> {
   error: string | null
   isLoading: boolean
 }
-

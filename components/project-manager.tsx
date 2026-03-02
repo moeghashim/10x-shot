@@ -63,7 +63,6 @@ export function ProjectManager() {
       objectives: project?.objectives || "",
       progress: project?.progress || 0,
       status: project?.status || "planning",
-      mySkills: project?.mySkills || [],
       aiSkills: project?.aiSkills || [],
       tools: project?.tools || [],
       productivity: project?.productivity || 0,
@@ -71,7 +70,6 @@ export function ProjectManager() {
     })
 
     // Store string versions for editing
-    const [mySkillsInput, setMySkillsInput] = useState(project?.mySkills?.join(', ') || '')
     const [aiSkillsInput, setAiSkillsInput] = useState(project?.aiSkills?.join(', ') || '')
     const [toolsInput, setToolsInput] = useState(project?.tools?.join(', ') || '')
 
@@ -79,7 +77,6 @@ export function ProjectManager() {
       e.preventDefault()
       const projectData = {
         ...formData,
-        mySkills: mySkillsInput.split(',').map(item => item.trim()).filter(Boolean),
         aiSkills: aiSkillsInput.split(',').map(item => item.trim()).filter(Boolean),
         tools: toolsInput.split(',').map(item => item.trim()).filter(Boolean),
       }
@@ -176,15 +173,6 @@ export function ProjectManager() {
               placeholder="Project URL"
               value={formData.url}
               onChange={(e) => setFormData(prev => ({ ...prev, url: e.target.value }))}
-            />
-          </div>
-
-          <div>
-            <label className="text-sm font-medium">My Skills (comma-separated)</label>
-            <Input
-              placeholder="React, Node.js, Database Design"
-              value={mySkillsInput}
-              onChange={(e) => setMySkillsInput(e.target.value)}
             />
           </div>
 
@@ -293,15 +281,6 @@ export function ProjectManager() {
                 placeholder="Project URL"
                 value={formData.url}
                 onChange={(e) => setFormData(prev => ({ ...prev, url: e.target.value }))}
-              />
-            </div>
-
-            <div>
-              <label className="text-sm font-medium">My Skills (comma-separated)</label>
-              <Input
-                placeholder="React, Node.js, Database Design"
-                value={mySkillsInput}
-                onChange={(e) => setMySkillsInput(e.target.value)}
               />
             </div>
 
@@ -425,17 +404,6 @@ export function ProjectManager() {
                     </div>
 
                     <div className="space-y-2">
-                      <div>
-                        <span className="font-medium text-sm">My Skills: </span>
-                        <div className="flex flex-wrap gap-1 mt-1">
-                          {(project.mySkills || []).map((skill, index) => (
-                            <Badge key={index} variant="outline" className="text-xs">
-                              {skill}
-                            </Badge>
-                          ))}
-                        </div>
-                      </div>
-
                       <div>
                         <span className="font-medium text-sm">AI Skills: </span>
                         <div className="flex flex-wrap gap-1 mt-1">

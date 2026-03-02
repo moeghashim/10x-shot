@@ -71,7 +71,7 @@ export default async function HomePage() {
           "name": project.title,
           "description": project.description,
           "url": project.url || `https://10xbuilder.ai#projects`,
-          "keywords": [...project.mySkills, ...project.aiSkills].join(", ")
+          "keywords": [...project.aiSkills, ...project.tools].join(", ")
         }
       }))
     }
