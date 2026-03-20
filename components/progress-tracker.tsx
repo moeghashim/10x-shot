@@ -1,23 +1,16 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
 import {
-  Twitter,
-  Youtube,
+  ArrowUpRight,
+  Calendar,
+  DollarSign,
   Instagram,
   Mail,
-  DollarSign,
   TrendingUp,
-  Zap,
-  Calendar,
+  Twitter,
   Users,
   Video,
-  Heart,
-  Palette,
-  Settings,
-  Code,
+  Zap,
 } from "lucide-react"
 
-// Mock data - in a real app, this would come from your analytics APIs
 const progressData = [
   {
     month: "January 2024",
@@ -111,237 +104,212 @@ const progressData = [
   },
 ]
 
-const skillIcons = {
-  design: Palette,
-  management: Settings,
-  "vibe coding": Code,
-  "Basic Design Principles": Palette,
-  "Figma Basics": Palette,
-  "Team Management": Settings,
-  "Advanced Design Systems": Palette,
-  "Vibe Coding Fundamentals": Code,
-  "Project Management": Settings,
-  "Advanced Vibe Coding": Code,
-  "UI/UX Design": Palette,
-  "Team Leadership": Settings,
-  "Advanced Management": Settings,
-  "Full-Stack Vibe Coding": Code,
+type ProgressTrackerStrings = {
+  summary: {
+    audience: string
+    audienceHint: string
+    youtube: string
+    youtubeHint: string
+    revenue: string
+    revenueHint: string
+    productivity: string
+    productivityHint: string
+  }
+  timelineEyebrow: string
+  timelineTitle: string
+  timelineDescription: string
+  monthLabel: string
+  metrics: {
+    twitter: string
+    youtube: string
+    tiktok: string
+    instagram: string
+    newsletter: string
+    totalGmv: string
+    productivity: string
+    skills: string
+  }
+  skillsTitle: string
+  milestonesTitle: string
 }
 
-export function ProgressTracker() {
+function calculateGrowth(current: number, initial: number) {
+  if (!initial) return "0.0"
+  return (((current - initial) / initial) * 100).toFixed(1)
+}
+
+function formatMetricValue(label: string, value: number) {
+  if (label === "currency") {
+    return `$${value.toLocaleString()}`
+  }
+
+  if (label === "productivity") {
+    return `${value}x`
+  }
+
+  return value.toLocaleString()
+}
+
+export function ProgressTracker({ strings }: { strings: ProgressTrackerStrings }) {
   const latestData = progressData[progressData.length - 1]
   const firstData = progressData[0]
   const months = [...progressData].reverse()
 
-  const calculateGrowth = (current: number, initial: number) => {
-    return (((current - initial) / initial) * 100).toFixed(1)
-  }
+  const overviewCards = [
+    {
+      title: strings.summary.audience,
+      value: (
+        latestData.metrics.twitterFollowers +
+        latestData.metrics.instagramFollowers +
+        latestData.metrics.tiktokFollowers
+      ).toLocaleString(),
+      hint: strings.summary.audienceHint,
+      icon: Users,
+    },
+    {
+      title: strings.summary.youtube,
+      value: latestData.metrics.youtubeSubscribers.toLocaleString(),
+      hint: `${calculateGrowth(latestData.metrics.youtubeSubscribers, firstData.metrics.youtubeSubscribers)}% ${strings.summary.youtubeHint}`,
+      icon: Video,
+    },
+    {
+      title: strings.summary.revenue,
+      value: `$${latestData.metrics.totalGMV.toLocaleString()}`,
+      hint: strings.summary.revenueHint,
+      icon: DollarSign,
+    },
+    {
+      title: strings.summary.productivity,
+      value: `${latestData.metrics.productivityGain}x`,
+      hint: strings.summary.productivityHint,
+      icon: TrendingUp,
+    },
+  ]
 
   return (
-    <div className="space-y-8">
-      {/* Overview Cards */}
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-        <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
-          <CardHeader className="pb-3">
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-sm font-medium text-blue-700">Social Media</CardTitle>
-              <Users className="h-4 w-4 text-blue-600" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-blue-900">
-              {(
-                latestData.metrics.twitterFollowers +
-                latestData.metrics.instagramFollowers +
-                latestData.metrics.tiktokFollowers
-              ).toLocaleString()}
-            </div>
-            <p className="text-xs text-blue-600 mt-1">Total followers across platforms</p>
-          </CardContent>
-        </Card>
+    <div className="space-y-10 md:space-y-14">
+      <div className="grid gap-px border border-black/15 bg-black/15 md:grid-cols-2 xl:grid-cols-4">
+        {overviewCards.map((card) => {
+          const Icon = card.icon
 
-        <Card className="bg-gradient-to-br from-red-50 to-red-100 border-red-200">
-          <CardHeader className="pb-3">
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-sm font-medium text-red-700">YouTube</CardTitle>
-              <Video className="h-4 w-4 text-red-600" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-red-900">
-              {latestData.metrics.youtubeSubscribers.toLocaleString()}
-            </div>
-            <p className="text-xs text-red-600 mt-1">
-              +{calculateGrowth(latestData.metrics.youtubeSubscribers, firstData.metrics.youtubeSubscribers)}% growth
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200">
-          <CardHeader className="pb-3">
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-sm font-medium text-green-700">Revenue</CardTitle>
-              <DollarSign className="h-4 w-4 text-green-600" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-green-900">${latestData.metrics.totalGMV.toLocaleString()}</div>
-            <p className="text-xs text-green-600 mt-1">Total GMV this month</p>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200">
-          <CardHeader className="pb-3">
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-sm font-medium text-purple-700">Productivity</CardTitle>
-              <TrendingUp className="h-4 w-4 text-purple-600" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-purple-900">{latestData.metrics.productivityGain}x</div>
-            <p className="text-xs text-purple-600 mt-1">Current productivity gain</p>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Monthly Progress Timeline */}
-      <div className="space-y-6">
-        <h2 className="text-2xl font-bold text-black">Monthly Progress</h2>
-
-        {months.map((monthData, index) => (
-          <Card key={monthData.date} className="bg-white border-gray-200">
-            <CardHeader>
+          return (
+            <div key={card.title} className="bg-white px-5 py-6">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <Calendar className="h-5 w-5 text-gray-600" />
-                  <CardTitle className="text-xl text-black">{monthData.month}</CardTitle>
-                </div>
-                <Badge variant="outline" className="text-gray-600 border-gray-300">
-                  Month {progressData.length - index}
-                </Badge>
+                <p className="stitch-mono text-[10px] uppercase tracking-[0.3em] text-black/45">{card.title}</p>
+                <Icon className="h-4 w-4 text-black/70" />
               </div>
-            </CardHeader>
-
-            <CardContent className="space-y-6">
-              {/* Metrics Grid */}
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg">
-                  <Twitter className="h-5 w-5 text-blue-600" />
-                  <div>
-                    <div className="font-semibold text-blue-900">
-                      {monthData.metrics.twitterFollowers.toLocaleString()}
-                    </div>
-                    <div className="text-xs text-blue-600">Twitter</div>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-3 p-3 bg-red-50 rounded-lg">
-                  <Youtube className="h-5 w-5 text-red-600" />
-                  <div>
-                    <div className="font-semibold text-red-900">
-                      {monthData.metrics.youtubeSubscribers.toLocaleString()}
-                    </div>
-                    <div className="text-xs text-red-600">YouTube</div>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-3 p-3 bg-pink-50 rounded-lg">
-                  <Heart className="h-5 w-5 text-pink-600" />
-                  <div>
-                    <div className="font-semibold text-pink-900">
-                      {monthData.metrics.tiktokFollowers.toLocaleString()}
-                    </div>
-                    <div className="text-xs text-pink-600">TikTok</div>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-3 p-3 bg-purple-50 rounded-lg">
-                  <Instagram className="h-5 w-5 text-purple-600" />
-                  <div>
-                    <div className="font-semibold text-purple-900">
-                      {monthData.metrics.instagramFollowers.toLocaleString()}
-                    </div>
-                    <div className="text-xs text-purple-600">Instagram</div>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                  <Mail className="h-5 w-5 text-gray-600" />
-                  <div>
-                    <div className="font-semibold text-gray-900">
-                      {monthData.metrics.newsletterSubscribers.toLocaleString()}
-                    </div>
-                    <div className="text-xs text-gray-600">Newsletter</div>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-3 p-3 bg-green-50 rounded-lg">
-                  <DollarSign className="h-5 w-5 text-green-600" />
-                  <div>
-                    <div className="font-semibold text-green-900">${monthData.metrics.totalGMV.toLocaleString()}</div>
-                    <div className="text-xs text-green-600">Total GMV</div>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-3 p-3 bg-orange-50 rounded-lg">
-                  <TrendingUp className="h-5 w-5 text-orange-600" />
-                  <div>
-                    <div className="font-semibold text-orange-900">{monthData.metrics.productivityGain}x</div>
-                    <div className="text-xs text-orange-600">Productivity</div>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-3 p-3 bg-indigo-50 rounded-lg">
-                  <Zap className="h-5 w-5 text-indigo-600" />
-                  <div>
-                    <div className="font-semibold text-indigo-900">{monthData.skillsGained.length}</div>
-                    <div className="text-xs text-indigo-600">Skills Gained</div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Skills Gained */}
-              <div>
-                <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                  <Zap className="h-4 w-4" />
-                  Skills Gained This Month
-                </h4>
-                <div className="flex flex-wrap gap-2">
-                  {monthData.skillsGained.map((skill, skillIndex) => {
-                    const IconComponent = skillIcons[skill as keyof typeof skillIcons] || Code
-                    return (
-                      <Badge
-                        key={skillIndex}
-                        variant="outline"
-                        className="flex items-center gap-1 text-gray-700 border-gray-300"
-                      >
-                        <IconComponent className="h-3 w-3" />
-                        {skill}
-                      </Badge>
-                    )
-                  })}
-                </div>
-              </div>
-
-              {/* Milestones */}
-              <div>
-                <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                  <TrendingUp className="h-4 w-4" />
-                  Key Milestones
-                </h4>
-                <ul className="space-y-1">
-                  {monthData.milestones.map((milestone, milestoneIndex) => (
-                    <li key={milestoneIndex} className="flex items-center gap-2 text-sm text-gray-600">
-                      <div className="w-1.5 h-1.5 bg-gray-400 rounded-full"></div>
-                      {milestone}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+              <p className="stitch-display mt-5 text-4xl font-semibold uppercase tracking-[-0.08em] text-black">
+                {card.value}
+              </p>
+              <p className="mt-3 text-sm text-black/58">{card.hint}</p>
+            </div>
+          )
+        })}
       </div>
+
+      <section>
+        <div className="flex flex-col gap-4 border-b border-black/15 pb-6 md:flex-row md:items-end md:justify-between">
+          <div>
+            <p className="stitch-mono text-[10px] uppercase tracking-[0.35em] text-black/55">
+              {strings.timelineEyebrow}
+            </p>
+            <h2 className="stitch-display mt-3 text-4xl font-semibold uppercase tracking-[-0.08em] text-black md:text-6xl">
+              {strings.timelineTitle}
+            </h2>
+          </div>
+          <p className="max-w-2xl text-sm leading-6 text-black/65 md:text-base">
+            {strings.timelineDescription}
+          </p>
+        </div>
+
+        <div className="mt-8 space-y-8">
+          {months.map((monthData, index) => {
+            const metrics = [
+              { label: strings.metrics.twitter, value: monthData.metrics.twitterFollowers, kind: "count", icon: Twitter },
+              { label: strings.metrics.youtube, value: monthData.metrics.youtubeSubscribers, kind: "count", icon: Video },
+              { label: strings.metrics.tiktok, value: monthData.metrics.tiktokFollowers, kind: "count", icon: Zap },
+              { label: strings.metrics.instagram, value: monthData.metrics.instagramFollowers, kind: "count", icon: Instagram },
+              { label: strings.metrics.newsletter, value: monthData.metrics.newsletterSubscribers, kind: "count", icon: Mail },
+              { label: strings.metrics.totalGmv, value: monthData.metrics.totalGMV, kind: "currency", icon: DollarSign },
+              { label: strings.metrics.productivity, value: monthData.metrics.productivityGain, kind: "productivity", icon: TrendingUp },
+              { label: strings.metrics.skills, value: monthData.skillsGained.length, kind: "count", icon: ArrowUpRight },
+            ]
+
+            return (
+              <article key={monthData.date} className="border border-black/15 bg-white">
+                <div className="grid gap-px border-b border-black/15 bg-black/15 lg:grid-cols-[240px_minmax(0,1fr)]">
+                  <div className="bg-[#f7f5f1] px-5 py-6 md:px-6">
+                    <p className="stitch-mono text-[10px] uppercase tracking-[0.32em] text-black/45">
+                      {strings.monthLabel} {progressData.length - index}
+                    </p>
+                    <div className="mt-6 flex items-start justify-between gap-4">
+                      <div>
+                        <h3 className="stitch-display text-3xl font-semibold uppercase leading-none tracking-[-0.08em] text-black">
+                          {monthData.month}
+                        </h3>
+                        <p className="stitch-mono mt-3 text-[10px] uppercase tracking-[0.28em] text-black/45">
+                          {monthData.date}
+                        </p>
+                      </div>
+                      <Calendar className="h-5 w-5 text-black/55" />
+                    </div>
+                  </div>
+
+                  <div className="grid gap-px bg-black/15 md:grid-cols-2 xl:grid-cols-4">
+                    {metrics.map((metric) => {
+                      const Icon = metric.icon
+
+                      return (
+                        <div key={`${monthData.date}-${metric.label}`} className="bg-white px-5 py-5">
+                          <div className="flex items-center justify-between">
+                            <p className="stitch-mono text-[10px] uppercase tracking-[0.28em] text-black/45">{metric.label}</p>
+                            <Icon className="h-4 w-4 text-black/60" />
+                          </div>
+                          <p className="stitch-display mt-4 text-2xl font-semibold uppercase tracking-[-0.08em] text-black">
+                            {formatMetricValue(metric.kind, metric.value)}
+                          </p>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+
+                <div className="grid gap-8 px-5 py-6 md:px-6 lg:grid-cols-2">
+                  <div>
+                    <p className="stitch-mono text-[10px] uppercase tracking-[0.32em] text-black/45">
+                      {strings.skillsTitle}
+                    </p>
+                    <div className="mt-4 flex flex-wrap gap-2">
+                      {monthData.skillsGained.map((skill) => (
+                        <span
+                          key={`${monthData.date}-${skill}`}
+                          className="stitch-mono inline-flex items-center border border-black/15 px-3 py-2 text-[10px] uppercase tracking-[0.24em] text-black"
+                        >
+                          {skill}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div>
+                    <p className="stitch-mono text-[10px] uppercase tracking-[0.32em] text-black/45">
+                      {strings.milestonesTitle}
+                    </p>
+                    <ul className="mt-4 space-y-3">
+                      {monthData.milestones.map((milestone) => (
+                        <li key={`${monthData.date}-${milestone}`} className="flex items-start gap-3 text-sm leading-6 text-black/68">
+                          <span className="mt-2 h-1.5 w-1.5 shrink-0 bg-black" />
+                          <span>{milestone}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              </article>
+            )
+          })}
+        </div>
+      </section>
     </div>
   )
 }

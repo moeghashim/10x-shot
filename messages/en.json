@@ -14,6 +14,63 @@
       "with": "with",
       "tagline": "Tracking the real-world impact of AI on productivity across 10 diverse projects. Discover if artificial intelligence can truly deliver 10x improvements in modern software development."
     },
+    "stitch": {
+      "nav": {
+        "projects": "Projects",
+        "stack": "Stack",
+        "progress": "Progress",
+        "contact": "Contact"
+      },
+      "hero": {
+        "eyebrow": "Independent laboratory / AI productivity systems",
+        "title": "BUILDING\n10X FASTER.",
+        "description": "Tracking the real-world impact of AI on productivity across live experiments. Minimal interface, real metrics, practical systems.",
+        "primaryCta": "Launch Projects",
+        "secondaryCta": "View Progress",
+        "statusLabel": "System status",
+        "statusValue": "Live"
+      },
+      "overview": {
+        "totalProjects": "Total Projects",
+        "activeProjects": "Active Builds",
+        "averageGain": "Avg Productivity Gain",
+        "toolsIntegrated": "Tools Integrated"
+      },
+      "projects": {
+        "eyebrow": "Live system / Current state",
+        "title": "Current Projects",
+        "description": "Every project measures whether AI meaningfully amplifies execution speed, output quality, and operational leverage.",
+        "buildId": "Build ID:",
+        "domain": "Domain",
+        "timeframe": "Timeframe",
+        "progress": "Progress",
+        "productivity": "Productivity",
+        "launch": "Launch Project",
+        "status": {
+          "active": "Active",
+          "planning": "Planning",
+          "completed": "Completed"
+        }
+      },
+      "stack": {
+        "eyebrow": "System components / Tool lattice",
+        "title": "Tech Stack",
+        "description": "Explore the tools and AI skills behind each experiment. The active project selector drives the stack preview below.",
+        "noData": "No tech stack data available"
+      },
+      "cta": {
+        "eyebrow": "Operator channel / Open line",
+        "title": "Have a complex problem?",
+        "primary": "Enter newsletter",
+        "secondary": "Read progress"
+      },
+      "footer": {
+        "tagline": "Measuring the real impact of AI on productivity across 10 diverse projects.",
+        "projects": "Projects",
+        "stack": "Stack",
+        "progress": "Progress"
+      }
+    },
     "stats": {
       "title": "Impact Metrics",
       "projectsLaunched": "Projects Launched",
@@ -64,6 +121,56 @@
       "connect": "Connect",
       "follow": "Follow for real-time updates and insights from the experiment",
       "builtWith": "Made by AI with human assistance"
+    }
+  },
+  "ProgressPage": {
+    "nav": {
+      "home": "Home",
+      "progress": "Progress",
+      "newsletter": "Newsletter"
+    },
+    "back": "Back to Home",
+    "eyebrow": "Operational archive / Monthly telemetry",
+    "title": "Progress Tracker",
+    "description": "A stitched ledger of audience growth, revenue, milestones, and skill acquisition across the 10x experiment.",
+    "aside": {
+      "eyebrow": "Distribution line / Weekly dispatch",
+      "title": "Follow the build log",
+      "description": "Get new milestones, experiments, and lessons from the operating system behind these projects.",
+      "cta": "Enter newsletter"
+    },
+    "summary": {
+      "audience": "Audience",
+      "audienceHint": "Total followers across platforms",
+      "youtube": "YouTube",
+      "youtubeHint": "growth",
+      "revenue": "Revenue",
+      "revenueHint": "Latest monthly GMV",
+      "productivity": "Productivity",
+      "productivityHint": "Current productivity gain"
+    },
+    "timeline": {
+      "eyebrow": "Monthly telemetry / Archived states",
+      "title": "Monthly Log",
+      "description": "Month-by-month telemetry showing traction, leverage, and milestone progression.",
+      "monthLabel": "Month",
+      "skillsTitle": "Skills gained",
+      "milestonesTitle": "Key milestones"
+    },
+    "metrics": {
+      "twitter": "Twitter",
+      "youtube": "YouTube",
+      "tiktok": "TikTok",
+      "instagram": "Instagram",
+      "newsletter": "Newsletter",
+      "totalGmv": "Total GMV",
+      "productivity": "Productivity",
+      "skills": "Skills"
+    },
+    "footer": {
+      "tagline": "A running archive of the real AI productivity experiment.",
+      "home": "Home",
+      "progress": "Progress"
     }
   }
 }

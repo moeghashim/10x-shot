@@ -7,13 +7,18 @@ import { routing } from '@/i18n/routing';
 import Script from "next/script"
 import { GeistSans } from "geist/font/sans"
 import { GeistMono } from "geist/font/mono"
-import { Alexandria } from "next/font/google"
+import { Alexandria, Space_Grotesk } from "next/font/google"
 import { NextIntlClientProvider } from "next-intl"
 import { getMessages } from "next-intl/server"
 
 const alexandria = Alexandria({
   subsets: ["arabic"],
   variable: "--font-alexandria",
+})
+
+const spaceGrotesk = Space_Grotesk({
+  subsets: ["latin"],
+  variable: "--font-space-grotesk",
 })
 
 export const metadata: Metadata = {
@@ -52,7 +57,7 @@ export default async function RootLayout({
     <html
       lang={locale}
       dir={dir}
-      className={`scroll-smooth ${GeistSans.variable} ${GeistMono.variable} ${alexandria.variable}`}
+      className={`scroll-smooth ${GeistSans.variable} ${GeistMono.variable} ${alexandria.variable} ${spaceGrotesk.variable}`}
     >
       <head>
         <Script async src="https://www.googletagmanager.com/gtag/js?id=G-5E5WHH8QY0" strategy="lazyOnload" />

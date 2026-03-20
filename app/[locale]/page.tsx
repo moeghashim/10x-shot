@@ -1,11 +1,5 @@
-import { VibeNavbar } from "@/components/vibe-navbar"
-import { VibeHero } from "@/components/vibe-hero"
-import { VibeCodingAgents } from "@/components/vibe-coding-agents"
-import { VibeProjectGrid } from "@/components/vibe-project-grid"
-import { VibeStatsSection } from "@/components/vibe-stats-section"
-import { VibeNewsletterSection } from "@/components/vibe-newsletter-section"
-import { VibeFooter } from "@/components/vibe-footer"
-import { fetchProjects } from "@/lib/data-fetching"
+import { StitchHomepage } from "@/components/stitch-homepage"
+import { FALLBACK_PROJECTS } from "@/lib/constants"
 import { getTranslations } from 'next-intl/server'
 
 export async function generateMetadata({params}: {params: Promise<{locale: string}>}) {
@@ -48,10 +42,17 @@ export async function generateMetadata({params}: {params: Promise<{locale: strin
 }
 
 export default async function HomePage() {
-  const { data: projects } = await fetchProjects()
-  const tTechStack = await getTranslations("HomePage.techStack")
-  const safeProjects = projects || []
-  const techProjects = safeProjects.map(({ id, title, tools, aiSkills }) => ({ id, title, tools, aiSkills }))
+  const hasSupabaseEnv =
+    Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL) &&
+    Boolean(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
+
+  let safeProjects = FALLBACK_PROJECTS
+
+  if (hasSupabaseEnv) {
+    const { fetchProjects } = await import("@/lib/data-fetching")
+    const { data: projects } = await fetchProjects()
+    safeProjects = projects || FALLBACK_PROJECTS
+  }
 
   // Prepare structured data for SEO
   const jsonLd = {
@@ -78,27 +79,12 @@ export default async function HomePage() {
   }
 
   return (
-    <div className="min-h-screen bg-white selection:bg-black selection:text-white">
+    <div className="selection:bg-black selection:text-white">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <VibeNavbar />
-      <VibeHero />
-      <VibeCodingAgents
-        projects={techProjects}
-        strings={{
-          title: tTechStack("title"),
-          description: tTechStack("description"),
-          selectProject: tTechStack("selectProject"),
-          placeholder: tTechStack("placeholder"),
-          noData: tTechStack("noData"),
-        }}
-      />
-      <VibeStatsSection projects={safeProjects} />
-      <VibeProjectGrid projects={safeProjects} />
-      <VibeNewsletterSection />
-      <VibeFooter />
+      {await StitchHomepage({ projects: safeProjects })}
     </div>
   )
 }
