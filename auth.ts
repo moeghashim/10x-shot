@@ -6,6 +6,13 @@ import { createClient } from "@supabase/supabase-js"
 let supabaseAdmin: ReturnType<typeof createClient> | null = null
 let supabaseAuth: ReturnType<typeof createClient> | null = null
 
+type AdminAuthUser = {
+  id: string
+  email: string
+  full_name?: string | null
+  role: string
+}
+
 function getSupabaseAdmin() {
   if (!supabaseAdmin) {
     supabaseAdmin = createClient(
@@ -53,7 +60,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             .eq('is_active', true)
             .single()
 
-          if (error || !adminUser) {
+          const adminUserRecord = adminUser as AdminAuthUser | null
+
+          if (error || !adminUserRecord) {
             console.error('Admin user not found:', error)
             return null
           }
@@ -71,10 +80,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
           // Return user object for NextAuth session
           return {
-            id: adminUser.id,
-            email: adminUser.email,
-            name: adminUser.full_name || adminUser.email,
-            role: adminUser.role,
+            id: adminUserRecord.id,
+            email: adminUserRecord.email,
+            name: adminUserRecord.full_name || adminUserRecord.email,
+            role: adminUserRecord.role,
           }
         } catch (error) {
           console.error('Authorization error:', error)

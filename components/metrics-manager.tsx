@@ -12,6 +12,8 @@ import { useProjectMetrics } from "@/hooks/use-metrics"
 import { fetchProjectSummaries } from "@/lib/data-fetching"
 import type { ProjectMetric, ProjectSummary } from "@/types/database"
 
+type TrendField = "progress" | "productivity_score" | "hours_worked" | "ai_assistance_hours" | "manual_hours"
+
 export function MetricsManager() {
   const [projects, setProjects] = useState<ProjectSummary[]>([])
   const [selectedProject, setSelectedProject] = useState<number | null>(null)
@@ -28,23 +30,23 @@ export function MetricsManager() {
   })
 
   useEffect(() => {
-    loadProjects()
-  }, [])
-
-  useEffect(() => {
     if (selectedProject) {
       setNewMetric(prev => ({ ...prev, project_id: selectedProject }))
     }
   }, [selectedProject])
 
-  const loadProjects = async () => {
-    const { data } = await fetchProjectSummaries()
-    setProjects(data || [])
-    
-    if (data && data.length > 0 && !selectedProject) {
-      setSelectedProject(data[0].id)
+  useEffect(() => {
+    async function loadProjects() {
+      const { data } = await fetchProjectSummaries()
+      setProjects(data || [])
+
+      if (data && data.length > 0) {
+        setSelectedProject((current) => current ?? data[0].id)
+      }
     }
-  }
+
+    void loadProjects()
+  }, [])
 
   const handleSaveMetric = async () => {
     const result = await saveMetricDb(newMetric)
@@ -68,14 +70,14 @@ export function MetricsManager() {
     return metrics.filter(m => m.project_id === projectId)
   }
 
-  const calculateTrend = (projectId: number, field: keyof Metric) => {
+  const calculateTrend = (projectId: number, field: TrendField) => {
     const projectMetrics = getProjectMetrics(projectId)
       .sort((a, b) => new Date(b.month).getTime() - new Date(a.month).getTime())
     
     if (projectMetrics.length < 2) return null
     
-    const current = projectMetrics[0][field] as number
-    const previous = projectMetrics[1][field] as number
+    const current = Number(projectMetrics[0][field] ?? 0)
+    const previous = Number(projectMetrics[1][field] ?? 0)
     
     if (current > previous) return 'up'
     if (current < previous) return 'down'

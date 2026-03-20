@@ -8,7 +8,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const { data: projects } = await fetchProjects()
   
   const projectUrls = projects
-    .filter(p => p.url && p.url.startsWith(baseUrl))
+    .filter((project): project is typeof project & { url: string } => Boolean(project.url && project.url.startsWith(baseUrl)))
     .map(p => ({
       url: p.url,
       lastModified: new Date(),
@@ -32,4 +32,3 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...projectUrls,
   ]
 }
-

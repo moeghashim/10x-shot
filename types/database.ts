@@ -28,7 +28,7 @@ export interface Project {
   tools: string[]
   productivity: number
   timeframe?: string
-  url: string
+  url?: string | null
 }
 
 /**
@@ -116,7 +116,7 @@ export interface DbProject {
   tools: string[]
   productivity: number
   timeframe?: string
-  url: string
+  url?: string | null
 }
 
 /**

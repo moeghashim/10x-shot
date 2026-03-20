@@ -205,7 +205,7 @@ export function UserManager() {
                   <div className="flex items-center gap-4 mt-2 text-sm text-gray-500">
                     <span className="flex items-center gap-1">
                       <Calendar className="h-3 w-3" />
-                      Created {format(new Date(user.created_at), 'MMM dd, yyyy')}
+                      Created {user.created_at ? format(new Date(user.created_at), 'MMM dd, yyyy') : 'Unknown'}
                     </span>
                     {user.last_login && (
                       <span className="flex items-center gap-1">

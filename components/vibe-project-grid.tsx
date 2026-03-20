@@ -8,6 +8,7 @@ interface VibeProjectGridProps {
 
 export async function VibeProjectGrid({ projects }: VibeProjectGridProps) {
   const t = await getTranslations("HomePage.projects")
+  const tSkills = await getTranslations("HomePage.skills")
 
   return (
     <section id="projects" className="vibe-font px-6 py-12 bg-white">
@@ -26,7 +27,25 @@ export async function VibeProjectGrid({ projects }: VibeProjectGridProps) {
 
         <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-3">
           {(projects || []).map((project) => (
-            <VibeProjectCard key={project.id} project={project} />
+            <VibeProjectCard
+              key={project.id}
+              project={project}
+              labels={{
+                objectives: t("objectives"),
+                progress: t("progress"),
+                productivityGain: t("productivityGain"),
+                launch: t("launch"),
+                status: {
+                  active: t("status.active"),
+                  planning: t("status.planning"),
+                  completed: t("status.completed"),
+                },
+              }}
+              skillLabels={{
+                aiSkills: tSkills("aiSkills"),
+                toolsUsed: tSkills("toolsUsed"),
+              }}
+            />
           ))}
         </div>
       </div>

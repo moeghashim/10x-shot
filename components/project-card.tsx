@@ -3,21 +3,7 @@ import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
 import { SkillsDisplay } from "@/components/skills-display"
 import { Clock, TrendingUp, Play, Pause, ExternalLink } from "lucide-react"
-
-interface Project {
-  id: number
-  title: string
-  domain: string
-  description: string
-  objectives?: string
-  progress: number
-  status: "active" | "planning" | "completed"
-  aiSkills: string[]
-  tools: string[]
-  productivity: number
-  timeframe: string
-  url: string | null
-}
+import type { Project } from "@/types/database"
 
 interface ProjectCardProps {
   project: Project

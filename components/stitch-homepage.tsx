@@ -269,15 +269,17 @@ export async function StitchHomepage({ projects }: { projects: Project[] }) {
                       ))}
                     </div>
 
-                    <a
-                      href={project.url}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="stitch-mono inline-flex h-11 w-full items-center justify-between bg-black px-4 text-[10px] uppercase tracking-[0.3em] text-white transition-transform hover:-translate-y-0.5"
-                    >
-                      <span>{t("projects.launch")}</span>
-                      <ArrowUpRight className="h-3.5 w-3.5" />
-                    </a>
+                    {project.url ? (
+                      <a
+                        href={project.url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="stitch-mono inline-flex h-11 w-full items-center justify-between bg-black px-4 text-[10px] uppercase tracking-[0.3em] text-white transition-transform hover:-translate-y-0.5"
+                      >
+                        <span>{t("projects.launch")}</span>
+                        <ArrowUpRight className="h-3.5 w-3.5" />
+                      </a>
+                    ) : null}
                   </div>
                 </article>
               ))}

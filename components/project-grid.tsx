@@ -22,7 +22,7 @@ export function ProjectGrid() {
         <div className="mb-12 text-center">
           <h2 className="mb-4 text-3xl font-bold text-black">The 10x Experiment Projects</h2>
           <p className="text-lg text-gray-600">
-            Each project tests AI's ability to amplify human capabilities across different domains
+            Each project tests AI&apos;s ability to amplify human capabilities across different domains
           </p>
         </div>
 

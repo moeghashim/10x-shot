@@ -1,16 +1,23 @@
 import { SkillsDisplay } from "@/components/skills-display"
 import { Clock, TrendingUp, Play, Pause, ExternalLink } from "lucide-react"
 import type { Project } from "@/types/database"
-import { getTranslations } from "next-intl/server"
 
 interface VibeProjectCardProps {
   project: Project
+  labels: {
+    objectives: string
+    progress: string
+    productivityGain: string
+    launch: string
+    status: Record<"active" | "planning" | "completed", string>
+  }
+  skillLabels: {
+    aiSkills: string
+    toolsUsed: string
+  }
 }
 
-export async function VibeProjectCard({ project }: VibeProjectCardProps) {
-  const t = await getTranslations("HomePage.projects")
-  const tSkills = await getTranslations("HomePage.skills")
-
+export function VibeProjectCard({ project, labels, skillLabels }: VibeProjectCardProps) {
   const status = ["active", "planning", "completed"].includes(project.status)
     ? project.status
     : "planning"
@@ -59,7 +66,7 @@ export async function VibeProjectCard({ project }: VibeProjectCardProps) {
         </div>
         <div className={`flex items-center gap-1 px-2 py-1 border-2 ${statusStyle.border} text-[10px] font-black uppercase tracking-widest bg-white whitespace-nowrap ${statusStyle.text}`}>
           {getStatusIcon(status)}
-          {t(`status.${status}`)}
+          {labels.status[status]}
         </div>
       </div>
 
@@ -68,14 +75,14 @@ export async function VibeProjectCard({ project }: VibeProjectCardProps) {
         
         {project.objectives && (
           <div className="p-3 border border-dashed border-gray-300 bg-gray-50/50">
-            <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">{t("objectives")}</p>
+            <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">{labels.objectives}</p>
             <p className="text-sm font-bold text-gray-900 leading-tight">{project.objectives}</p>
           </div>
         )}
 
         <div className="space-y-2">
           <div className="flex justify-between text-[10px] font-black uppercase tracking-widest">
-            <span>{t("progress")}</span>
+            <span>{labels.progress}</span>
             <span>{project.progress}%</span>
           </div>
           <div className="h-3 border border-dashed border-gray-300 bg-gray-50 p-0.5 overflow-hidden">
@@ -89,7 +96,7 @@ export async function VibeProjectCard({ project }: VibeProjectCardProps) {
         <div className="flex items-center justify-between p-3 border-2 border-dashed border-gray-300 bg-white group hover:border-black transition-colors">
           <div className="flex items-center gap-2">
             <TrendingUp className="h-4 w-4" />
-            <span className="text-xs font-black uppercase tracking-widest">{t("productivityGain")}</span>
+            <span className="text-xs font-black uppercase tracking-widest">{labels.productivityGain}</span>
           </div>
           <span className="text-xl font-black">{project.productivity}x</span>
         </div>
@@ -106,8 +113,8 @@ export async function VibeProjectCard({ project }: VibeProjectCardProps) {
             aiSkills={project.aiSkills}
             tools={project.tools}
             labels={{
-              aiSkills: tSkills("aiSkills"),
-              toolsUsed: tSkills("toolsUsed"),
+              aiSkills: skillLabels.aiSkills,
+              toolsUsed: skillLabels.toolsUsed,
             }}
           />
         </div>
@@ -119,7 +126,7 @@ export async function VibeProjectCard({ project }: VibeProjectCardProps) {
             rel="noopener noreferrer"
             className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 text-sm font-black uppercase tracking-tighter text-black border-2 border-black hover:bg-black hover:text-white transition-colors"
           >
-            {t("launch")}
+            {labels.launch}
             <ExternalLink className="h-4 w-4" />
           </a>
         )}

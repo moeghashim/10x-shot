@@ -1,8 +1,22 @@
 import { NextResponse } from 'next/server'
-import { supabaseAdmin } from '@/lib/supabase-admin'
+import { hasSupabaseAdminEnv, supabaseAdmin } from '@/lib/supabase-admin'
+
+function getFallbackStats() {
+  return {
+    projectsLaunched: 0,
+    totalProjects: 0,
+    avgProductivityGain: 0,
+    aiToolsIntegrated: 0,
+    currentProductivity: 0
+  }
+}
 
 export async function GET() {
   try {
+    if (!hasSupabaseAdminEnv()) {
+      return NextResponse.json({ data: getFallbackStats() })
+    }
+
     const [{ data: projects, error: projectsError }, { data: globalMetrics, error: metricsError }] =
       await Promise.all([
         supabaseAdmin
@@ -75,9 +89,6 @@ export async function GET() {
     })
   } catch (error: any) {
     console.error('Unexpected error computing stats:', error)
-    return NextResponse.json(
-      { error: error.message || 'Failed to compute stats' },
-      { status: 500 }
-    )
+    return NextResponse.json({ data: getFallbackStats() })
   }
 }

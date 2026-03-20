@@ -171,7 +171,7 @@ export function ProjectManager() {
           <div>
             <Input
               placeholder="Project URL"
-              value={formData.url}
+              value={formData.url ?? ""}
               onChange={(e) => setFormData(prev => ({ ...prev, url: e.target.value }))}
             />
           </div>
@@ -279,7 +279,7 @@ export function ProjectManager() {
             <div>
               <Input
                 placeholder="Project URL"
-                value={formData.url}
+                value={formData.url ?? ""}
                 onChange={(e) => setFormData(prev => ({ ...prev, url: e.target.value }))}
               />
             </div>
