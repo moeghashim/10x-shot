@@ -1,4 +1,4 @@
-import { ArrowUpRight, Dot, MoveRight } from "lucide-react"
+import { ArrowUpRight, Dot } from "lucide-react"
 import { getTranslations } from "next-intl/server"
 import { Link } from "@/i18n/routing"
 import type { Project } from "@/types/database"
@@ -84,26 +84,10 @@ export async function StitchHomepage({ projects }: { projects: Project[] }) {
                   ))}
                 </h1>
 
-                <div className="mt-8 grid gap-10 lg:grid-cols-[minmax(0,1fr)_260px] lg:items-start">
+                <div className="mt-8">
                   <p className="max-w-2xl text-base leading-7 text-black/68 md:text-lg">
                     {t("hero.description")}
                   </p>
-
-                  <div className="space-y-3">
-                    <a
-                      href="#projects"
-                      className="stitch-mono inline-flex h-12 w-full items-center justify-between bg-black px-5 text-[10px] uppercase tracking-[0.32em] text-white transition-transform hover:-translate-y-0.5"
-                    >
-                      <span>{t("hero.primaryCta")}</span>
-                      <MoveRight className="h-3.5 w-3.5" />
-                    </a>
-                    <Link
-                      href="/progress"
-                      className="stitch-mono inline-flex h-12 w-full items-center justify-center border border-black/15 bg-white px-5 text-[10px] uppercase tracking-[0.32em] text-black transition-colors hover:border-black"
-                    >
-                      {t("hero.secondaryCta")}
-                    </Link>
-                  </div>
                 </div>
               </div>
 
