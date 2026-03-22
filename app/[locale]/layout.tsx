@@ -10,6 +10,7 @@ import { GeistMono } from "geist/font/mono"
 import { Alexandria, Space_Grotesk } from "next/font/google"
 import { NextIntlClientProvider } from "next-intl"
 import { getMessages } from "next-intl/server"
+import { AgentationToolbar } from "@/components/dev/agentation-toolbar"
 
 const alexandria = Alexandria({
   subsets: ["arabic"],
@@ -73,6 +74,7 @@ export default async function RootLayout({
       <body className={fontClass}>
         <NextIntlClientProvider locale={locale} messages={messages}>
           {children}
+          <AgentationToolbar />
           <Analytics />
         </NextIntlClientProvider>
       </body>
