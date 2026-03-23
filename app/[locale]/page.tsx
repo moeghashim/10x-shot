@@ -20,13 +20,13 @@ export async function generateMetadata({params}: {params: Promise<{locale: strin
       title: t('title'),
       description: t('description'),
       url: `https://www.10claws.com/${locale}`,
-      siteName: "10XBuilder",
+      siteName: "10claws",
       images: [
         {
           url: "/social-image.svg",
           width: 1200,
           height: 630,
-          alt: "10XBuilder.ai Experiment",
+          alt: "10claws Experiment",
         },
       ],
       locale: locale === 'ar' ? 'ar_SA' : 'en_US',
@@ -50,7 +50,7 @@ export default async function HomePage() {
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    "name": "10XBuilder.ai",
+    "name": "10claws",
     "url": "https://www.10claws.com",
     "description": "Measuring AI Productivity Impact across 10 diverse projects.",
     "mainEntity": {

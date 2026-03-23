@@ -1,4 +1,5 @@
 import { ArrowUpRight, Dot } from "lucide-react"
+import Image from "next/image"
 import { getTranslations } from "next-intl/server"
 import { Link } from "@/i18n/routing"
 import type { Project } from "@/types/database"
@@ -33,8 +34,18 @@ export async function StitchHomepage({ projects }: { projects: Project[] }) {
     <div className="min-h-screen bg-[#f7f5f1] text-black selection:bg-black selection:text-white">
       <header className="sticky top-0 z-50 border-b border-black/15 bg-[#f7f5f1]/90 backdrop-blur-xl">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-4 md:px-10">
-          <Link href="/" className="stitch-display text-lg font-semibold uppercase tracking-[-0.08em] text-black md:text-xl">
-            10xclaws
+          <Link href="/" className="group inline-flex items-center gap-3">
+            <Image
+              src="/10claws.svg"
+              alt="10claws logo"
+              width={42}
+              height={42}
+              className="h-10 w-10"
+              priority
+            />
+            <span className="stitch-display text-lg font-semibold uppercase tracking-[-0.08em] text-black md:text-xl">
+              10claws
+            </span>
           </Link>
 
           <nav className="hidden items-center gap-8 md:flex">
@@ -316,9 +327,18 @@ export async function StitchHomepage({ projects }: { projects: Project[] }) {
 
       <footer className="border-t border-black/15 bg-[#f7f5f1]">
         <div className="mx-auto flex max-w-7xl flex-col gap-5 px-6 py-6 md:flex-row md:items-center md:justify-between md:px-10">
-          <div>
-            <p className="stitch-display text-xl font-semibold uppercase tracking-[-0.08em] text-black">10xclaws</p>
-            <p className="mt-2 text-sm text-black/62">{t("footer.tagline")}</p>
+          <div className="flex items-center gap-3">
+            <Image
+              src="/10claws.svg"
+              alt="10claws logo"
+              width={40}
+              height={40}
+              className="h-10 w-10"
+            />
+            <div>
+              <p className="stitch-display text-xl font-semibold uppercase tracking-[-0.08em] text-black">10claws</p>
+              <p className="mt-2 text-sm text-black/62">{t("footer.tagline")}</p>
+            </div>
           </div>
           <div className="flex flex-wrap items-center gap-5">
             <a className="stitch-mono text-[10px] uppercase tracking-[0.28em] text-black/55 transition-colors hover:text-black" href="#projects">

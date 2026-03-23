@@ -12,12 +12,12 @@ export function Footer() {
             <div className="flex items-center gap-2">
               <Image
                 src="/10claws.svg"
-                alt="10xBuilder.ai logo"
+                alt="10claws logo"
                 width={44}
                 height={44}
                 className="h-11 w-11 invert"
               />
-              <span className="text-xl font-bold">10x Claws</span>
+              <span className="text-xl font-bold">10claws</span>
             </div>
             <p className="text-gray-400 text-sm">
               Measuring the real impact of AI on productivity across 10 diverse projects.
@@ -72,7 +72,7 @@ export function Footer() {
 
         <div className="mt-8 pt-8 border-t border-gray-800">
           <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-            <p className="text-xs text-gray-500">© 2024 10xBuilder.ai. All rights reserved.</p>
+            <p className="text-xs text-gray-500">© 2024 10claws. All rights reserved.</p>
             <div className="flex items-center gap-4 text-xs text-gray-500">
               <span>Made by AI with human assistance</span>
             </div>
