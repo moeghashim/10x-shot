@@ -61,13 +61,13 @@ export default async function RootLayout({
       className={`scroll-smooth ${GeistSans.variable} ${GeistMono.variable} ${alexandria.variable} ${spaceGrotesk.variable}`}
     >
       <head>
-        <Script async src="https://www.googletagmanager.com/gtag/js?id=G-5E5WHH8QY0" strategy="lazyOnload" />
+        <Script async src="https://www.googletagmanager.com/gtag/js?id=G-Y3NM6KM0TR" strategy="lazyOnload" />
         <Script id="ga4" strategy="lazyOnload">
           {`
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
-            gtag('config', 'G-5E5WHH8QY0');
+            gtag('config', 'G-Y3NM6KM0TR');
           `}
         </Script>
       </head>
