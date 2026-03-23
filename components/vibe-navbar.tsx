@@ -15,13 +15,13 @@ export async function VibeNavbar() {
           <Link href="/" className="me-12 group inline-flex items-center">
             <Image
               src="/10claws.svg"
-              alt="10claws logo"
+              alt="10 Claws logo"
               width={44}
               height={44}
               className="h-11 w-11"
               priority
             />
-            <span className="ms-3 text-xl font-black tracking-tight text-black">10claws</span>
+            <span className="ms-3 text-xl font-black tracking-tight text-black">10 Claws</span>
           </Link>
         </div>
 

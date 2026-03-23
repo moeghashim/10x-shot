@@ -18,6 +18,10 @@ function formatProjectStatus(status: Project["status"], t: Awaited<ReturnType<ty
   return t("projects.status.planning")
 }
 
+function isProjectLaunchingSoon(project: Project) {
+  return project.status === "planning" || !project.url
+}
+
 export async function StitchHomepage({ projects }: { projects: Project[] }) {
   const t = await getTranslations("HomePage.stitch")
   const totalProjects = projects.length
@@ -37,14 +41,14 @@ export async function StitchHomepage({ projects }: { projects: Project[] }) {
           <Link href="/" className="group inline-flex items-center gap-3">
             <Image
               src="/10claws.svg"
-              alt="10claws logo"
+              alt="10 Claws logo"
               width={42}
               height={42}
               className="h-10 w-10"
               priority
             />
             <span className="stitch-display text-lg font-semibold uppercase tracking-[-0.08em] text-black md:text-xl">
-              10claws
+              10 Claws
             </span>
           </Link>
 
@@ -184,7 +188,10 @@ export async function StitchHomepage({ projects }: { projects: Project[] }) {
             </div>
 
             <div className="mt-8 grid gap-px border border-black/15 bg-black/15 lg:grid-cols-2">
-              {projects.map((project) => (
+              {projects.map((project) => {
+                const launchingSoon = isProjectLaunchingSoon(project)
+
+                return (
                 <article key={project.id} className="flex h-full flex-col bg-white p-6 md:p-8">
                   <div className="flex items-start justify-between gap-4">
                     <div>
@@ -200,73 +207,94 @@ export async function StitchHomepage({ projects }: { projects: Project[] }) {
                     </span>
                   </div>
 
-                  <div className="mt-8 grid gap-6 md:grid-cols-[110px_minmax(0,1fr)]">
-                    <div className="space-y-5">
-                      <div>
-                        <p className="stitch-mono text-[10px] uppercase tracking-[0.28em] text-black/38">
-                          {t("projects.domain")}
-                        </p>
-                        <p className="stitch-mono mt-2 text-xs uppercase tracking-[0.18em] text-black">{project.domain}</p>
-                      </div>
-                      {project.timeframe ? (
+                  <div className="relative mt-8">
+                    <div className={launchingSoon ? "select-none blur-[3px] opacity-45" : ""}>
+                      <div className="grid gap-6 md:grid-cols-[110px_minmax(0,1fr)]">
+                        <div className="space-y-5">
+                          <div>
+                            <p className="stitch-mono text-[10px] uppercase tracking-[0.28em] text-black/38">
+                              {t("projects.domain")}
+                            </p>
+                            <p className="stitch-mono mt-2 text-xs uppercase tracking-[0.18em] text-black">{project.domain}</p>
+                          </div>
+                          {project.timeframe ? (
+                            <div>
+                              <p className="stitch-mono text-[10px] uppercase tracking-[0.28em] text-black/38">
+                                {t("projects.timeframe")}
+                              </p>
+                              <p className="stitch-mono mt-2 text-xs uppercase tracking-[0.18em] text-black">{project.timeframe}</p>
+                            </div>
+                          ) : null}
+                        </div>
+
                         <div>
-                          <p className="stitch-mono text-[10px] uppercase tracking-[0.28em] text-black/38">
-                            {t("projects.timeframe")}
-                          </p>
-                          <p className="stitch-mono mt-2 text-xs uppercase tracking-[0.18em] text-black">{project.timeframe}</p>
-                        </div>
-                      ) : null}
-                    </div>
+                          <p className="text-sm leading-6 text-black/68">{project.description}</p>
 
-                    <div>
-                      <p className="text-sm leading-6 text-black/68">{project.description}</p>
+                          <div className="mt-6">
+                            <div className="mb-2 flex items-center justify-between">
+                              <p className="stitch-mono text-[10px] uppercase tracking-[0.28em] text-black/38">
+                                {t("projects.progress")}
+                              </p>
+                              <p className="stitch-mono text-[10px] uppercase tracking-[0.24em] text-black">
+                                {project.progress}%
+                              </p>
+                            </div>
+                            <div className="h-1 bg-black/8">
+                              <div className="h-full bg-black" style={{ width: `${project.progress}%` }} />
+                            </div>
+                          </div>
 
-                      <div className="mt-6">
-                        <div className="mb-2 flex items-center justify-between">
-                          <p className="stitch-mono text-[10px] uppercase tracking-[0.28em] text-black/38">
-                            {t("projects.progress")}
-                          </p>
-                          <p className="stitch-mono text-[10px] uppercase tracking-[0.24em] text-black">
-                            {project.progress}%
-                          </p>
-                        </div>
-                        <div className="h-1 bg-black/8">
-                          <div className="h-full bg-black" style={{ width: `${project.progress}%` }} />
+                          <div className="mt-6 flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-black/10 pt-5">
+                            <span className="stitch-mono text-[10px] uppercase tracking-[0.28em] text-black/38">
+                              {t("projects.productivity")}
+                            </span>
+                            <span className="stitch-display text-2xl font-semibold uppercase tracking-[-0.08em] text-black">
+                              {project.productivity}x
+                            </span>
+                            {project.aiSkills.slice(0, 2).map((skill) => (
+                              <span key={`${project.id}-${skill}`} className="stitch-mono inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.24em] text-black/62">
+                                <Dot className="h-3 w-3" />
+                                {skill}
+                              </span>
+                            ))}
+                          </div>
                         </div>
                       </div>
 
-                      <div className="mt-6 flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-black/10 pt-5">
-                        <span className="stitch-mono text-[10px] uppercase tracking-[0.28em] text-black/38">
-                          {t("projects.productivity")}
-                        </span>
-                        <span className="stitch-display text-2xl font-semibold uppercase tracking-[-0.08em] text-black">
-                          {project.productivity}x
-                        </span>
-                        {project.aiSkills.slice(0, 2).map((skill) => (
-                          <span key={`${project.id}-${skill}`} className="stitch-mono inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.24em] text-black/62">
-                            <Dot className="h-3 w-3" />
-                            {skill}
-                          </span>
-                        ))}
+                      <div className="mt-6 border-t border-black/10 pt-6">
+                        <div className="flex flex-wrap gap-2">
+                          {project.tools.slice(0, 4).map((tool) => (
+                            <span
+                              key={`${project.id}-${tool}`}
+                              className="stitch-mono border border-black/15 px-3 py-2 text-[10px] uppercase tracking-[0.24em] text-black/70"
+                            >
+                              {tool}
+                            </span>
+                          ))}
+                        </div>
                       </div>
                     </div>
+
+                    {launchingSoon ? (
+                      <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+                        <span className="stitch-mono border border-black/15 bg-[#f7f5f1]/95 px-4 py-3 text-[10px] uppercase tracking-[0.34em] text-black shadow-[0_10px_30px_rgba(0,0,0,0.08)]">
+                          {t("projects.launchingSoon")}
+                        </span>
+                      </div>
+                    ) : null}
                   </div>
 
                   <div className="mt-auto border-t border-black/10 pt-6">
-                    <div className="mb-5 flex flex-wrap gap-2">
-                      {project.tools.slice(0, 4).map((tool) => (
-                        <span
-                          key={`${project.id}-${tool}`}
-                          className="stitch-mono border border-black/15 px-3 py-2 text-[10px] uppercase tracking-[0.24em] text-black/70"
-                        >
-                          {tool}
-                        </span>
-                      ))}
-                    </div>
-
-                    {project.url ? (
+                    {launchingSoon ? (
+                      <div
+                        aria-disabled="true"
+                        className="stitch-mono inline-flex h-11 w-full items-center justify-between border border-black/15 bg-black/5 px-4 text-[10px] uppercase tracking-[0.3em] text-black/40"
+                      >
+                        <span>{t("projects.launchingSoon")}</span>
+                      </div>
+                    ) : (
                       <a
-                        href={project.url}
+                        href={project.url!}
                         target="_blank"
                         rel="noreferrer"
                         className="stitch-mono inline-flex h-11 w-full items-center justify-between bg-black px-4 text-[10px] uppercase tracking-[0.3em] text-white transition-transform hover:-translate-y-0.5"
@@ -274,10 +302,11 @@ export async function StitchHomepage({ projects }: { projects: Project[] }) {
                         <span>{t("projects.launch")}</span>
                         <ArrowUpRight className="h-3.5 w-3.5" />
                       </a>
-                    ) : null}
+                    )}
                   </div>
                 </article>
-              ))}
+                )
+              })}
             </div>
           </div>
         </section>
@@ -330,13 +359,13 @@ export async function StitchHomepage({ projects }: { projects: Project[] }) {
           <div className="flex items-center gap-3">
             <Image
               src="/10claws.svg"
-              alt="10claws logo"
+              alt="10 Claws logo"
               width={40}
               height={40}
               className="h-10 w-10"
             />
             <div>
-              <p className="stitch-display text-xl font-semibold uppercase tracking-[-0.08em] text-black">10claws</p>
+              <p className="stitch-display text-xl font-semibold uppercase tracking-[-0.08em] text-black">10 Claws</p>
               <p className="mt-2 text-sm text-black/62">{t("footer.tagline")}</p>
             </div>
           </div>

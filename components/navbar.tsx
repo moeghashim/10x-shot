@@ -18,7 +18,7 @@ export function Navbar() {
                 <Link href="/" className="flex items-center gap-2 group">
                     <Image
                         src="/10claws.svg"
-                        alt="10claws logo"
+                        alt="10 Claws logo"
                         width={36}
                         height={36}
                         className="h-9 w-9"

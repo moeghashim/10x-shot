@@ -16,12 +16,12 @@ export async function VibeFooter() {
               <Link href="/" className="group inline-flex items-center gap-3">
                 <Image
                   src="/10claws.svg"
-                  alt="10claws logo"
+                  alt="10 Claws logo"
                   width={48}
                   height={48}
                   className="h-12 w-12"
                 />
-                <span className="text-2xl font-black tracking-tight">10claws</span>
+                <span className="text-2xl font-black tracking-tight">10 Claws</span>
               </Link>
             </div>
             <p className="text-gray-800 font-medium leading-relaxed">

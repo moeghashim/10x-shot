@@ -46,6 +46,7 @@
         "progress": "Progress",
         "productivity": "Productivity",
         "launch": "Launch Project",
+        "launchingSoon": "Launching Soon",
         "status": {
           "active": "Active",
           "planning": "Planning",
@@ -94,6 +95,7 @@
       "progress": "Progress",
       "productivityGain": "Productivity Gain",
       "launch": "Launch Project",
+      "launchingSoon": "Launching Soon",
       "status": {
         "active": "Active",
         "planning": "Planning",
@@ -112,7 +114,7 @@
       "iframeTitle": "Subscribe to Building in Public Newsletter"
     },
     "footer": {
-      "rights": "© 2026 10CLAWS. NO RIGHTS RESERVED.",
+      "rights": "© 2026 10 CLAWS. NO RIGHTS RESERVED.",
       "tagline": "Measuring the real impact of AI on productivity across 10 diverse projects.",
       "quickLinks": "Quick Links",
       "viewProjects": "View Projects",

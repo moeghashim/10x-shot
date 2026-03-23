@@ -46,6 +46,7 @@
         "progress": "التقدم",
         "productivity": "الإنتاجية",
         "launch": "فتح المشروع",
+        "launchingSoon": "الإطلاق قريباً",
         "status": {
           "active": "نشط",
           "planning": "قيد التخطيط",
@@ -94,6 +95,7 @@
       "progress": "التقدم",
       "productivityGain": "زيادة الإنتاجية",
       "launch": "إطلاق المشروع",
+      "launchingSoon": "الإطلاق قريباً",
       "status": {
         "active": "نشط",
         "planning": "تخطيط",
@@ -112,7 +114,7 @@
       "iframeTitle": "الاشتراك في نشرة البناء في العلن"
     },
     "footer": {
-      "rights": "© 2026 10CLAWS. جميع الحقوق غير محفوظة.",
+      "rights": "© 2026 10 CLAWS. جميع الحقوق غير محفوظة.",
       "tagline": "قياس التأثير الحقيقي للذكاء الاصطناعي على الإنتاجية عبر 10 مشاريع متنوعة.",
       "quickLinks": "روابط سريعة",
       "viewProjects": "عرض المشاريع",
