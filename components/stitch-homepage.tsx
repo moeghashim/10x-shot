@@ -1,4 +1,4 @@
-import { ArrowUpRight, Dot } from "lucide-react"
+import { ArrowUpRight, Dot, Mail } from "lucide-react"
 import Image from "next/image"
 import { getTranslations } from "next-intl/server"
 import { Link } from "@/i18n/routing"
@@ -24,6 +24,7 @@ function isProjectLaunchingSoon(project: Project) {
 
 export async function StitchHomepage({ projects }: { projects: Project[] }) {
   const t = await getTranslations("HomePage.stitch")
+  const tNewsletter = await getTranslations("HomePage.newsletter")
   const totalProjects = projects.length
   const activeProjects = projects.filter((project) => project.status === "active" || project.status === "completed").length
   const toolCount = new Set(projects.flatMap((project) => project.tools ?? [])).size
@@ -328,28 +329,32 @@ export async function StitchHomepage({ projects }: { projects: Project[] }) {
 
         <section id="contact" className="border-t border-black/15 bg-white">
           <div className="mx-auto max-w-5xl px-6 py-16 text-center md:px-10 md:py-20">
-            <p className="stitch-mono text-[10px] uppercase tracking-[0.35em] text-black/55">
-              {t("cta.eyebrow")}
-            </p>
-            <h2 className="stitch-display mx-auto mt-5 max-w-3xl text-4xl font-semibold uppercase leading-[0.92] tracking-[-0.09em] text-black md:text-6xl">
-              {t("cta.title")}
-            </h2>
-            <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
-              <a
-                href="https://buildinpublic.substack.com/"
-                target="_blank"
-                rel="noreferrer"
-                className="stitch-mono inline-flex h-12 items-center justify-center bg-black px-6 text-[10px] uppercase tracking-[0.32em] text-white transition-transform hover:-translate-y-0.5"
-              >
-                {t("cta.primary")}
-              </a>
-              <Link
-                href="/progress"
-                className="stitch-mono inline-flex h-12 items-center justify-center border border-black/15 bg-[#f7f5f1] px-6 text-[10px] uppercase tracking-[0.32em] text-black transition-colors hover:border-black"
-              >
-                {t("cta.secondary")}
-              </Link>
+            <div className="inline-flex items-center gap-2 border border-black/15 bg-[#f7f5f1] px-4 py-2">
+              <Mail className="h-4 w-4" />
+              <span className="stitch-mono text-[10px] uppercase tracking-[0.35em] text-black/75">
+                {tNewsletter("stayUpdated")}
+              </span>
             </div>
+            <h2 className="stitch-display mx-auto mt-5 max-w-3xl text-4xl font-semibold uppercase leading-[0.92] tracking-[-0.09em] text-black md:text-6xl">
+              {tNewsletter("title")}
+            </h2>
+            <p className="mx-auto mt-5 max-w-2xl text-sm leading-6 text-black/65 md:text-base">
+              {tNewsletter("description")}
+            </p>
+            <div className="mt-10 flex justify-center overflow-x-auto">
+              <iframe
+                src="https://buildinpublic.substack.com/embed"
+                width="480"
+                height="320"
+                style={{ border: "1px solid #EEE", background: "white" }}
+                frameBorder="0"
+                scrolling="no"
+                title={tNewsletter("iframeTitle")}
+              />
+            </div>
+            <p className="stitch-mono mt-5 text-[10px] uppercase tracking-[0.32em] text-black/45">
+              {tNewsletter("noSpam")}
+            </p>
           </div>
         </section>
       </main>
