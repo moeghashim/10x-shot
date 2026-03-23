@@ -4,15 +4,16 @@
 - `app/` is the Next.js App Router; localized routes live under `app/[locale]/`, and API routes under `app/api/`.
 - `components/` holds React UI, with shared primitives in `components/ui/` (shadcn/ui).
 - `lib/`, `hooks/`, and `types/` contain utilities, data access, and shared types.
+- `convex/` contains the Convex schema, queries, mutations, auth integration, and generated bindings.
 - `i18n/` and `messages/` power `next-intl` translations; `public/` hosts static assets; `styles/` contains global styling.
-- `migrations/` and `setup-database.md` document Supabase database setup and changes.
 
 ## Build, Test, and Development Commands
 - `pnpm dev` starts the local Next.js dev server.
 - `pnpm build` produces a production build.
 - `pnpm start` serves the production build.
 - `pnpm lint` runs Next.js ESLint checks.
-- `pnpm diagnose-rls` runs `scripts/diagnose-and-fix-rls.js` to inspect Supabase RLS issues.
+- `npx convex dev` pushes Convex changes to the configured dev deployment.
+- `npx convex deploy` pushes Convex changes to the production deployment.
 
 ## Coding Style & Naming Conventions
 - TypeScript + React (App Router). Follow existing 2-space indentation and double-quote style in TS/TSX.
@@ -21,7 +22,7 @@
 
 ## Testing Guidelines
 - No `test` script is defined; tests are standalone scripts in `tests/`.
-- Example: `tests/project-update.test.ts` checks Supabase persistence and requires `.env.local`. Run via a TS-capable runner.
+- Example: `tests/project-update.test.ts` checks persisted project updates and requires `.env.local`. Run via a TS-capable runner.
 
 ## Commit & Pull Request Guidelines
 - Recent commits use short, imperative subjects with optional prefixes (e.g., `feat: add RTL support`). Keep messages concise.
@@ -29,5 +30,7 @@
 - The repo syncs with v0.dev deployments; coordinate changes there when necessary to avoid drift.
 
 ## Configuration & Security Notes
-- Store secrets only in `.env.local` (do not commit). Document schema changes in `migrations/` and `setup-database.md`.
+- Store secrets only in `.env.local` (do not commit).
+- The app runtime envs currently point at production Convex URLs, while the Convex CLI defaults to the dev deployment for local iteration.
+- Use `npx convex deploy` and `npx convex env set --prod ...` for production backend changes.
 - Builds ignore ESLint/TS errors (see `next.config.mjs`), so run `pnpm lint` and fix issues before merging.

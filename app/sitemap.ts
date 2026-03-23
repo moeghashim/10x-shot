@@ -2,7 +2,7 @@ import { MetadataRoute } from 'next'
 import { fetchProjects } from '@/lib/data-fetching'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = 'https://10xbuilder.ai'
+  const baseUrl = 'https://www.10claws.com'
   
   // Fetch projects to include them in sitemap if they have unique URLs or to just ensure visibility
   const { data: projects } = await fetchProjects()

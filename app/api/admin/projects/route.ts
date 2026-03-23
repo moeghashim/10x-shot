@@ -1,152 +1,85 @@
-/**
- * API route for admin project operations
- * Handles create, update, and delete operations using service role key
- */
-
-import { NextRequest, NextResponse } from 'next/server'
-import { supabaseAdmin } from '@/lib/supabase-admin'
-import { mapAppProjectToDb, mapDbProjectToApp } from '@/lib/constants'
-import { PROJECTS_CACHE_TAG } from '@/lib/cache-tags'
-import type { Project } from '@/types/database'
-import { revalidatePath, revalidateTag } from 'next/cache'
+import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath, revalidateTag } from "next/cache";
+import { api } from "@/convex/_generated/api";
+import {
+  fetchConvexAuthMutation,
+  fetchConvexAuthQuery,
+  isAuthError,
+} from "@/lib/auth-server";
+import { PROJECTS_CACHE_TAG } from "@/lib/cache-tags";
+import type { Project } from "@/types/database";
 
 function revalidateProjectViews() {
-  revalidateTag(PROJECTS_CACHE_TAG)
-  revalidatePath('/')
-  revalidatePath('/en')
-  revalidatePath('/ar')
+  revalidateTag(PROJECTS_CACHE_TAG);
+  revalidatePath("/");
+  revalidatePath("/en");
+  revalidatePath("/ar");
 }
 
-/**
- * POST - Create or update a project
- */
-export async function POST(request: NextRequest) {
-  try {
-    const project: Omit<Project, 'id'> | Project = await request.json()
-    const dbProject = mapAppProjectToDb(project)
+function toProjectInput(project: Omit<Project, "id"> | Project) {
+  return {
+    title: project.title,
+    domain: project.domain,
+    description: project.description,
+    objectives: project.objectives,
+    progress: project.progress,
+    status: project.status,
+    aiSkills: project.aiSkills,
+    tools: project.tools,
+    productivity: project.productivity,
+    timeframe: project.timeframe,
+    url: project.url ?? null,
+  };
+}
 
-    if ('id' in project && project.id) {
-      // Update existing project
-      const { data, error } = await supabaseAdmin
-        .from('projects')
-        .update(dbProject)
-        .eq('id', project.id)
-        .select()
-
-      if (error) {
-        console.error("Database error:", error)
-        return NextResponse.json(
-          { error: error.message },
-          { status: 400 }
-        )
-      }
-
-      if (data && data[0]) {
-        revalidateProjectViews()
-        return NextResponse.json({ data: mapDbProjectToApp(data[0]) })
-      }
-
-      return NextResponse.json(
-        { error: 'Failed to update project' },
-        { status: 400 }
-      )
-    } else {
-      // Create new project
-      const { data, error } = await supabaseAdmin
-        .from('projects')
-        .insert([dbProject])
-        .select()
-
-      if (error) {
-        console.error("Database error:", error)
-        return NextResponse.json(
-          { error: error.message },
-          { status: 400 }
-        )
-      }
-
-      if (data && data[0]) {
-        revalidateProjectViews()
-        return NextResponse.json({ data: mapDbProjectToApp(data[0]) })
-      }
-
-      return NextResponse.json(
-        { error: 'Failed to create project' },
-        { status: 400 }
-      )
-    }
-  } catch (error: any) {
-    console.error("Failed to save project:", error)
-    return NextResponse.json(
-      { error: error.message || 'Failed to save project' },
-      { status: 500 }
-    )
+function handleRouteError(error: unknown) {
+  if (isAuthError(error)) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+
+  return NextResponse.json(
+    {
+      error: error instanceof Error ? error.message : "Unexpected server error",
+    },
+    { status: 500 }
+  );
 }
 
-/**
- * GET - Fetch all projects (no fallback)
- */
 export async function GET() {
   try {
-    const { data, error } = await supabaseAdmin
-      .from('projects')
-      .select('*')
-      .order('id', { ascending: true })
-
-    if (error) {
-      console.error('Database error in fetchProjects:', error)
-      return NextResponse.json(
-        { error: error.message },
-        { status: 400 }
-      )
-    }
-
-    const mappedProjects = (data || []).map(mapDbProjectToApp)
-    return NextResponse.json({ data: mappedProjects })
-  } catch (error: any) {
-    console.error('Database connection failed:', error)
-    return NextResponse.json(
-      { error: error.message || 'Database connection failed' },
-      { status: 500 }
-    )
+    const data = await fetchConvexAuthQuery(api.projects.listAdmin, {});
+    return NextResponse.json({ data });
+  } catch (error) {
+    return handleRouteError(error);
   }
 }
 
-/**
- * DELETE - Remove a project by id
- */
+export async function POST(request: NextRequest) {
+  try {
+    const project: Omit<Project, "id"> | Project = await request.json();
+    const data = await fetchConvexAuthMutation(api.projects.save, {
+      id: "id" in project ? project.id : undefined,
+      project: toProjectInput(project),
+    });
+
+    revalidateProjectViews();
+    return NextResponse.json({ data });
+  } catch (error) {
+    return handleRouteError(error);
+  }
+}
+
 export async function DELETE(request: NextRequest) {
   try {
-    const { id } = await request.json()
-
+    const { id } = await request.json();
     if (!id) {
-      return NextResponse.json(
-        { error: 'Project id is required' },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: "Project id is required" }, { status: 400 });
     }
 
-    const { error } = await supabaseAdmin
-      .from('projects')
-      .delete()
-      .eq('id', id)
-
-    if (error) {
-      console.error('Database error deleting project:', error)
-      return NextResponse.json(
-        { error: error.message },
-        { status: 400 }
-      )
-    }
-
-    revalidateProjectViews()
-    return NextResponse.json({ success: true })
-  } catch (error: any) {
-    console.error('Failed to delete project:', error)
-    return NextResponse.json(
-      { error: error.message || 'Failed to delete project' },
-      { status: 500 }
-    )
+    await fetchConvexAuthMutation(api.projects.remove, { id });
+    revalidateProjectViews();
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    return handleRouteError(error);
   }
 }

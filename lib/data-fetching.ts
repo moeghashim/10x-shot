@@ -1,376 +1,308 @@
-/**
- * Centralized data fetching layer
- * Single source of truth for all database operations with consistent error handling
- */
+import "server-only";
 
-import { supabase } from "@/lib/supabase"
-import { FALLBACK_PROJECTS, FALLBACK_GLOBAL_METRICS, mapDbProjectToApp } from "@/lib/constants"
-import { PROJECTS_CACHE_TAG } from "@/lib/cache-tags"
-import type { Project, ProjectMetric, GlobalMetric, ProjectSummary, AdminUser, UserActivity } from "@/types/database"
-import { unstable_cache } from "next/cache"
+import { unstable_cache } from "next/cache";
+import { api } from "@/convex/_generated/api";
+import { PROJECTS_CACHE_TAG } from "@/lib/cache-tags";
+import { FALLBACK_GLOBAL_METRICS, FALLBACK_PROJECTS } from "@/lib/constants";
+import {
+  fetchConvexAuthMutation,
+  fetchConvexAuthQuery,
+  fetchConvexQuery,
+  hasConvexEnv,
+} from "@/lib/auth-server";
+import type {
+  AdminUser,
+  GlobalMetric,
+  Project,
+  ProjectMetric,
+  ProjectSummary,
+  UserActivity,
+} from "@/types/database";
 
 const fetchProjectsFromDbCached = unstable_cache(
   async () => {
-    const { data, error } = await supabase.from("projects").select("*").order("id", { ascending: true })
-    return {
-      data: data ?? null,
-      errorMessage: error?.message ?? null,
+    if (!hasConvexEnv()) {
+      return {
+        data: null,
+        errorMessage: "Convex is not configured",
+      };
+    }
+
+    try {
+      const data = await fetchConvexQuery(api.projects.listPublic, {});
+      return {
+        data,
+        errorMessage: null,
+      };
+    } catch (error) {
+      return {
+        data: null,
+        errorMessage: error instanceof Error ? error.message : "Failed to fetch projects",
+      };
     }
   },
-  ["projects:v1"],
+  ["projects:v2"],
   { revalidate: 60, tags: [PROJECTS_CACHE_TAG] }
-)
+);
 
-/**
- * Fetch all projects with optional fallback to hardcoded data
- */
-export async function fetchProjects(opts?: { allowFallback?: boolean }): Promise<{ data: Project[], error: string | null }> {
-  const allowFallback = opts?.allowFallback ?? true
-  
-  try {
-    const { data, errorMessage } = await fetchProjectsFromDbCached()
+export async function fetchProjects(opts?: {
+  allowFallback?: boolean;
+}): Promise<{ data: Project[]; error: string | null }> {
+  const allowFallback = opts?.allowFallback ?? true;
 
-    if (errorMessage) {
-      console.warn("Database error in fetchProjects:", errorMessage)
-      return allowFallback
-        ? { data: FALLBACK_PROJECTS, error: null }
-        : { data: [], error: errorMessage }
-    }
-
-    // Map database fields to app format
-    const mappedProjects = (data || []).map(mapDbProjectToApp)
-    return { data: mappedProjects, error: null }
-  } catch (error: any) {
-    console.warn('Database connection failed in fetchProjects:', error)
-    return allowFallback
-      ? { data: FALLBACK_PROJECTS, error: null }
-      : { data: [], error: error.message || 'Database connection failed' }
+  const { data, errorMessage } = await fetchProjectsFromDbCached();
+  if (data) {
+    return { data, error: null };
   }
+
+  if (allowFallback) {
+    return { data: FALLBACK_PROJECTS, error: null };
+  }
+
+  return { data: [], error: errorMessage };
 }
 
-/**
- * Fetch project summaries (id, title, domain only) for dropdowns
- */
-export async function fetchProjectSummaries(): Promise<{ data: ProjectSummary[], error: string | null }> {
+export async function fetchProjectSummaries(): Promise<{
+  data: ProjectSummary[];
+  error: string | null;
+}> {
+  if (!hasConvexEnv()) {
+    return {
+      data: FALLBACK_PROJECTS.map(({ id, title, domain }) => ({ id, title, domain })),
+      error: null,
+    };
+  }
+
   try {
-    const { data, error } = await supabase
-      .from('projects')
-      .select('id, title, domain')
-      .order('title')
-
-    if (error) {
-      console.warn('Database not ready for projects, using fallback:', error)
-      const fallbackSummaries = FALLBACK_PROJECTS.map(p => ({
-        id: p.id,
-        title: p.title,
-        domain: p.domain
-      }))
-      return { data: fallbackSummaries, error: null }
-    }
-
-    return { data: data || [], error: null }
+    const data = await fetchConvexQuery(api.projects.listSummaries, {});
+    return { data, error: null };
   } catch (error) {
-    console.warn('Failed to load project summaries, using fallback:', error)
-    const fallbackSummaries = FALLBACK_PROJECTS.map(p => ({
-      id: p.id,
-      title: p.title,
-      domain: p.domain
-    }))
-    return { data: fallbackSummaries, error: null }
+    return {
+      data: FALLBACK_PROJECTS.map(({ id, title, domain }) => ({ id, title, domain })),
+      error: error instanceof Error ? error.message : "Failed to fetch project summaries",
+    };
   }
 }
 
-/**
- * Fetch project metrics
- */
-export async function fetchProjectMetrics(projectId?: number): Promise<{ data: ProjectMetric[], error: string | null }> {
+export async function fetchProjectMetrics(projectId?: number): Promise<{
+  data: ProjectMetric[];
+  error: string | null;
+}> {
+  if (!hasConvexEnv()) {
+    return { data: [], error: null };
+  }
+
   try {
-    let query = supabase
-      .from('project_metrics')
-      .select(`
-        *,
-        projects:project_id (title, domain)
-      `)
-      .order('month', { ascending: false })
-
-    if (projectId) {
-      query = query.eq('project_id', projectId)
-    }
-
-    const { data, error } = await query
-
-    if (error) {
-      console.warn('Database error loading metrics:', error)
-      return { data: [], error: error.message }
-    }
-
-    return { data: data || [], error: null }
+    const data = await fetchConvexAuthQuery(api.projectMetrics.list, {
+      projectId,
+    });
+    return { data, error: null };
   } catch (error) {
-    console.warn('Failed to load metrics:', error)
-    return { data: [], error: 'Failed to load metrics' }
+    return {
+      data: [],
+      error: error instanceof Error ? error.message : "Failed to load metrics",
+    };
   }
 }
 
-/**
- * Fetch global metrics with fallback
- */
-export async function fetchGlobalMetrics(): Promise<{ data: GlobalMetric[], error: string | null }> {
+export async function fetchGlobalMetrics(): Promise<{
+  data: GlobalMetric[];
+  error: string | null;
+}> {
+  if (!hasConvexEnv()) {
+    return { data: FALLBACK_GLOBAL_METRICS, error: null };
+  }
+
   try {
-    const { data, error } = await supabase
-      .from('global_metrics')
-      .select('*')
-      .order('month', { ascending: false })
-
-    if (error) {
-      console.warn('Database not ready for global metrics, using fallback:', error)
-      return { data: FALLBACK_GLOBAL_METRICS, error: null }
-    }
-
-    return { data: data || [], error: null }
+    const data = await fetchConvexQuery(api.globalMetrics.list, {});
+    return { data, error: null };
   } catch (error) {
-    console.warn('Error loading global metrics, using fallback:', error)
-    return { data: FALLBACK_GLOBAL_METRICS, error: null }
+    return {
+      data: FALLBACK_GLOBAL_METRICS,
+      error: error instanceof Error ? error.message : "Failed to load global metrics",
+    };
   }
 }
 
-/**
- * Fetch latest global metric
- */
-export async function fetchLatestGlobalMetric(): Promise<{ data: GlobalMetric | null, error: string | null }> {
+export async function fetchLatestGlobalMetric(): Promise<{
+  data: GlobalMetric | null;
+  error: string | null;
+}> {
+  if (!hasConvexEnv()) {
+    return { data: FALLBACK_GLOBAL_METRICS[0] ?? null, error: null };
+  }
+
   try {
-    const { data, error } = await supabase
-      .from('global_metrics')
-      .select('*')
-      .order('month', { ascending: false })
-      .limit(1)
-
-    if (error) {
-      console.warn('Global metrics not ready, using fallback:', error)
-      return { data: FALLBACK_GLOBAL_METRICS[0] || null, error: null }
-    }
-
-    return { data: data?.[0] || null, error: null }
+    const data = await fetchConvexQuery(api.globalMetrics.latest, {});
+    return { data, error: null };
   } catch (error) {
-    console.warn('Failed to load latest metric:', error)
-    return { data: FALLBACK_GLOBAL_METRICS[0] || null, error: null }
+    return {
+      data: FALLBACK_GLOBAL_METRICS[0] ?? null,
+      error: error instanceof Error ? error.message : "Failed to load latest metric",
+    };
   }
 }
 
-/**
- * Fetch admin users
- */
-export async function fetchAdminUsers(): Promise<{ data: AdminUser[], error: string | null }> {
+export async function fetchAdminUsers(): Promise<{
+  data: AdminUser[];
+  error: string | null;
+}> {
+  if (!hasConvexEnv()) {
+    return { data: [], error: "Convex is not configured" };
+  }
+
   try {
-    const { data, error } = await supabase
-      .from('admin_users')
-      .select('*')
-      .order('created_at', { ascending: false })
-
-    if (error) {
-      console.warn('Database not ready for users, using fallback:', error)
-      const fallbackUsers: AdminUser[] = [
-        {
-          id: 'fallback-1',
-          email: 'admin@example.com',
-          full_name: 'System Admin',
-          role: 'super_admin',
-          is_active: true,
-          last_login: new Date().toISOString(),
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        }
-      ]
-      return { data: fallbackUsers, error: null }
-    }
-
-    return { data: data || [], error: null }
+    const data = await fetchConvexAuthQuery(api.adminUsers.list, {});
+    return { data, error: null };
   } catch (error) {
-    console.warn('Failed to load users:', error)
-    return { data: [], error: 'Failed to load users' }
+    return {
+      data: [],
+      error: error instanceof Error ? error.message : "Failed to load admin users",
+    };
   }
 }
 
-/**
- * Fetch user activity logs
- */
-export async function fetchUserActivity(limit: number = 50): Promise<{ data: UserActivity[], error: string | null }> {
+export async function fetchUserActivity(limit = 50): Promise<{
+  data: UserActivity[];
+  error: string | null;
+}> {
+  if (!hasConvexEnv()) {
+    return { data: [], error: "Convex is not configured" };
+  }
+
   try {
-    const { data, error } = await supabase
-      .from('admin_activity')
-      .select('*')
-      .order('created_at', { ascending: false })
-      .limit(limit)
-
-    if (error) {
-      console.warn('Failed to load activity:', error)
-      return { data: [], error: error.message }
-    }
-
-    return { data: data || [], error: null }
+    const data = await fetchConvexAuthQuery(api.adminUsers.activity, { limit });
+    return { data, error: null };
   } catch (error) {
-    console.warn('Failed to load activity:', error)
-    return { data: [], error: 'Failed to load activity' }
+    return {
+      data: [],
+      error: error instanceof Error ? error.message : "Failed to load activity",
+    };
   }
 }
 
-/**
- * Save or update a project (deprecated - use API route /api/admin/projects for admin operations)
- * This function uses the anon key and may fail due to RLS policies
- */
-export async function saveProject(project: Omit<Project, 'id'> | Project): Promise<{ data: Project | null, error: string | null }> {
-  console.warn('saveProject is deprecated for admin operations. Use /api/admin/projects API route instead.')
-  
+export async function saveProject(
+  project: Omit<Project, "id"> | Project
+): Promise<{ data: Project | null; error: string | null }> {
+  if (!hasConvexEnv()) {
+    return { data: null, error: "Convex is not configured" };
+  }
+
   try {
-    const { mapAppProjectToDb } = await import('@/lib/constants')
-    const dbProject = mapAppProjectToDb(project)
-
-    if ('id' in project && project.id) {
-      // Update existing project
-      const { data, error } = await supabase
-        .from('projects')
-        .update(dbProject)
-        .eq('id', project.id)
-        .select()
-
-      if (error) {
-        console.error("Database error:", error)
-        return { data: null, error: error.message }
-      }
-      
-      if (data && data[0]) {
-        return { data: mapDbProjectToApp(data[0]), error: null }
-      }
-      
-      return { data: null, error: 'No data returned from update' }
-    } else {
-      // Create new project
-      const { data, error } = await supabase
-        .from('projects')
-        .insert([dbProject])
-        .select()
-
-      if (error) {
-        console.error("Database error:", error)
-        return { data: null, error: error.message }
-      }
-      
-      if (data && data[0]) {
-        return { data: mapDbProjectToApp(data[0]), error: null }
-      }
-      
-      return { data: null, error: 'Failed to create project' }
-    }
-  } catch (error: any) {
-    console.warn("Failed to save project:", error)
-    return { data: null, error: error.message || 'Failed to save project' }
+    const data = await fetchConvexAuthMutation(api.projects.save, {
+      id: "id" in project ? project.id : undefined,
+      project: {
+        title: project.title,
+        domain: project.domain,
+        description: project.description,
+        objectives: project.objectives,
+        progress: project.progress,
+        status: project.status,
+        aiSkills: project.aiSkills,
+        tools: project.tools,
+        productivity: project.productivity,
+        timeframe: project.timeframe,
+        url: project.url ?? null,
+      },
+    });
+    return { data, error: null };
+  } catch (error) {
+    return {
+      data: null,
+      error: error instanceof Error ? error.message : "Failed to save project",
+    };
   }
 }
 
-/**
- * Delete a project by id
- */
 export async function deleteProject(projectId: number): Promise<{ error: string | null }> {
+  if (!hasConvexEnv()) {
+    return { error: "Convex is not configured" };
+  }
+
   try {
-    const { error } = await supabase
-      .from('projects')
-      .delete()
-      .eq('id', projectId)
-
-    if (error) {
-      console.warn('Failed to delete project:', error)
-      return { error: error.message }
-    }
-
-    return { error: null }
-  } catch (error: any) {
-    console.warn('Failed to delete project:', error)
-    return { error: error.message || 'Failed to delete project' }
+    await fetchConvexAuthMutation(api.projects.remove, { id: projectId });
+    return { error: null };
+  } catch (error) {
+    return {
+      error: error instanceof Error ? error.message : "Failed to delete project",
+    };
   }
 }
 
-/**
- * Save a project metric
- */
-export async function saveProjectMetric(metric: Omit<ProjectMetric, 'id' | 'created_at'>): Promise<{ error: string | null }> {
+export async function saveProjectMetric(
+  metric: Omit<ProjectMetric, "id" | "created_at">
+): Promise<{ error: string | null }> {
+  if (!hasConvexEnv()) {
+    return { error: "Convex is not configured" };
+  }
+
   try {
-    const { error } = await supabase
-      .from('project_metrics')
-      .insert([metric])
-
-    if (error) {
-      console.warn("Database error:", error)
-      return { error: error.message }
-    }
-
-    return { error: null }
-  } catch (error: any) {
-    console.warn("Failed to save metric:", error)
-    return { error: error.message || 'Failed to save metric' }
+    await fetchConvexAuthMutation(api.projectMetrics.save, { metric });
+    return { error: null };
+  } catch (error) {
+    return {
+      error: error instanceof Error ? error.message : "Failed to save metric",
+    };
   }
 }
 
-/**
- * Save or upsert a global metric
- */
-export async function saveGlobalMetric(metric: Omit<GlobalMetric, 'id' | 'created_at'>): Promise<{ error: string | null }> {
+export async function saveGlobalMetric(
+  metric: Omit<GlobalMetric, "id" | "created_at">
+): Promise<{ error: string | null }> {
+  if (!hasConvexEnv()) {
+    return { error: "Convex is not configured" };
+  }
+
   try {
-    const { error } = await supabase
-      .from('global_metrics')
-      .upsert([metric])
-
-    if (error) {
-      console.warn('Error saving metric:', error)
-      return { error: error.message }
-    }
-
-    return { error: null }
-  } catch (error: any) {
-    console.warn('Error saving metric:', error)
-    return { error: error.message || 'Failed to save metric' }
+    await fetchConvexAuthMutation(api.globalMetrics.save, { metric });
+    return { error: null };
+  } catch (error) {
+    return {
+      error: error instanceof Error ? error.message : "Failed to save global metric",
+    };
   }
 }
 
-/**
- * Update admin user
- */
-export async function updateAdminUser(userId: string, updates: Partial<AdminUser>): Promise<{ error: string | null }> {
+export async function updateAdminUser(
+  userId: string,
+  updates: Partial<AdminUser>
+): Promise<{ error: string | null }> {
+  if (!hasConvexEnv()) {
+    return { error: "Convex is not configured" };
+  }
+
   try {
-    const { error } = await supabase
-      .from('admin_users')
-      .update(updates)
-      .eq('id', userId)
-
-    if (error) {
-      console.warn('Failed to update user:', error)
-      return { error: error.message }
-    }
-
-    return { error: null }
-  } catch (error: any) {
-    console.warn('Failed to update user:', error)
-    return { error: error.message || 'Failed to update user' }
+    await fetchConvexAuthMutation(api.adminUsers.updateProfile, {
+      userId,
+      fullName: updates.full_name,
+      isActive: updates.is_active ?? true,
+    });
+    return { error: null };
+  } catch (error) {
+    return {
+      error: error instanceof Error ? error.message : "Failed to update admin user",
+    };
   }
 }
 
-/**
- * Log user activity
- */
 export async function logActivity(
   action: string,
   resourceType?: string,
   resourceId?: number,
   details?: string
 ): Promise<void> {
+  if (!hasConvexEnv()) {
+    return;
+  }
+
   try {
-    await supabase
-      .from('admin_activity')
-      .insert([{
-        action,
-        resource_type: resourceType,
-        resource_id: resourceId,
-        details
-      }])
+    await fetchConvexAuthMutation(api.adminUsers.logActivity, {
+      action,
+      resourceType,
+      resourceId,
+      details,
+    });
   } catch (error) {
-    console.warn('Failed to log activity:', error)
+    console.warn("Failed to log activity:", error);
   }
 }

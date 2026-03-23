@@ -1,11 +1,13 @@
 import { ProgressTracker } from "@/components/progress-tracker"
 import { StitchLocaleToggle } from "@/components/stitch-locale-toggle"
+import { fetchGlobalMetrics } from "@/lib/data-fetching"
 import { Link } from "@/i18n/routing"
 import { ArrowLeft } from "lucide-react"
 import { getTranslations } from "next-intl/server"
 
 export default async function ProgressPage() {
   const t = await getTranslations("ProgressPage")
+  const { data: metrics } = await fetchGlobalMetrics()
 
   return (
     <div className="min-h-screen bg-[#f7f5f1] text-black">
@@ -79,6 +81,7 @@ export default async function ProgressPage() {
         <section className="bg-[#f7f5f1]">
           <div className="mx-auto max-w-7xl px-6 py-12 md:px-10 md:py-16">
             <ProgressTracker
+              metrics={metrics}
               strings={{
                 summary: {
                   audience: t("summary.audience"),

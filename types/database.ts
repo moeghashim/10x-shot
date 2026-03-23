@@ -11,7 +11,7 @@ export type ProjectStatus = "active" | "planning" | "completed"
 /**
  * User role types
  */
-export type UserRole = "admin" | "super_admin"
+export type UserRole = "admin"
 
 /**
  * Project interface - used across the application
@@ -126,7 +126,7 @@ export interface CreateAdminUserInput {
   email: string
   password: string
   full_name?: string
-  role: UserRole
+  role?: UserRole
 }
 
 export interface AuthResult {

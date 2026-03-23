@@ -10,16 +10,16 @@ export async function generateMetadata({params}: {params: Promise<{locale: strin
     title: t('title'),
     description: t('description'),
     alternates: {
-      canonical: `https://10xbuilder.ai/${locale}`,
+      canonical: `https://www.10claws.com/${locale}`,
       languages: {
-        'en': 'https://10xbuilder.ai/en',
-        'ar': 'https://10xbuilder.ai/ar',
+        'en': 'https://www.10claws.com/en',
+        'ar': 'https://www.10claws.com/ar',
       },
     },
     openGraph: {
       title: t('title'),
       description: t('description'),
-      url: `https://10xbuilder.ai/${locale}`,
+      url: `https://www.10claws.com/${locale}`,
       siteName: "10XBuilder",
       images: [
         {
@@ -42,24 +42,16 @@ export async function generateMetadata({params}: {params: Promise<{locale: strin
 }
 
 export default async function HomePage() {
-  const hasSupabaseEnv =
-    Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL) &&
-    Boolean(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
-
-  let safeProjects = FALLBACK_PROJECTS
-
-  if (hasSupabaseEnv) {
-    const { fetchProjects } = await import("@/lib/data-fetching")
-    const { data: projects } = await fetchProjects()
-    safeProjects = projects || FALLBACK_PROJECTS
-  }
+  const { fetchProjects } = await import("@/lib/data-fetching")
+  const { data: projects } = await fetchProjects()
+  const safeProjects = projects || FALLBACK_PROJECTS
 
   // Prepare structured data for SEO
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "WebSite",
     "name": "10XBuilder.ai",
-    "url": "https://10xbuilder.ai",
+    "url": "https://www.10claws.com",
     "description": "Measuring AI Productivity Impact across 10 diverse projects.",
     "mainEntity": {
     "@type": "ItemList",
@@ -71,7 +63,7 @@ export default async function HomePage() {
           "@type": "CreativeWork",
           "name": project.title,
           "description": project.description,
-          "url": project.url || `https://10xbuilder.ai#projects`,
+          "url": project.url || `https://www.10claws.com#projects`,
           "keywords": [...project.aiSkills, ...project.tools].join(", ")
         }
       }))

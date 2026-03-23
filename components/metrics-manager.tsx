@@ -9,7 +9,6 @@ import { Badge } from "@/components/ui/badge"
 import { Calendar, Plus, Save, TrendingUp, TrendingDown, Minus } from "lucide-react"
 import { format, parseISO } from "date-fns"
 import { useProjectMetrics } from "@/hooks/use-metrics"
-import { fetchProjectSummaries } from "@/lib/data-fetching"
 import type { ProjectMetric, ProjectSummary } from "@/types/database"
 
 type TrendField = "progress" | "productivity_score" | "hours_worked" | "ai_assistance_hours" | "manual_hours"
@@ -37,10 +36,22 @@ export function MetricsManager() {
 
   useEffect(() => {
     async function loadProjects() {
-      const { data } = await fetchProjectSummaries()
-      setProjects(data || [])
+      const response = await fetch("/api/admin/projects")
+      const result = await response.json()
 
-      if (data && data.length > 0) {
+      if (!response.ok) {
+        return
+      }
+
+      const data = (result.data || []).map((project: ProjectSummary) => ({
+        id: project.id,
+        title: project.title,
+        domain: project.domain,
+      }))
+
+      setProjects(data)
+
+      if (data.length > 0) {
         setSelectedProject((current) => current ?? data[0].id)
       }
     }

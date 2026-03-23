@@ -54,21 +54,21 @@ The app follows a section-based layout pattern:
 - Strict TypeScript mode enabled
 
 ### Database & Backend
-- **Database**: Supabase PostgreSQL with Row Level Security
-- **Authentication**: Supabase Auth for admin access
+- **Database**: Convex
+- **Authentication**: Better Auth with Convex-backed sessions
 - **Admin System**: Full CRUD operations for projects and metrics
-- **Schema**: See `lib/database-schema.sql` for complete setup
 - **Environment**: All credentials configured in `.env.local`
 
 ### Admin Features
 - **Admin Dashboard**: `/admin` route with authentication
 - **Project Management**: Add, edit, update project details and progress
 - **Metrics Tracking**: Month-over-month productivity and progress tracking
-- **Database Setup**: Run `lib/database-schema.sql` in Supabase to set up tables
 
 ### Development Notes
 - Project syncs automatically with v0.dev deployments
+- App runtime envs point at the production Convex deployment
+- Convex CLI defaults to the dev deployment for local backend iteration
 - Uses Geist font family
 - Form handling with react-hook-form and zod validation
 - Includes various chart libraries (recharts) and UI enhancements
-- Admin system requires authenticated Supabase session
+- Admin system requires an authenticated Better Auth session

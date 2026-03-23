@@ -1,26 +1,26 @@
-"use client"
+"use client";
 
-import { useSession, signOut } from "next-auth/react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { AdminAuth } from "@/components/admin-auth"
-import { ProjectManager } from "@/components/project-manager"
-import { MetricsManager } from "@/components/metrics-manager"
-import { GlobalMetricsManager } from "@/components/global-metrics-manager"
-import { UserManager } from "@/components/user-manager"
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { AdminAuth } from "@/components/admin-auth";
+import { ProjectManager } from "@/components/project-manager";
+import { MetricsManager } from "@/components/metrics-manager";
+import { GlobalMetricsManager } from "@/components/global-metrics-manager";
+import { UserManager } from "@/components/user-manager";
+import { authClient } from "@/lib/auth-client";
 
 export default function AdminPage() {
-  const { data: session, status } = useSession()
-  const loading = status === "loading"
-  const isAuthenticated = !!session
+  const router = useRouter();
+  const { data, isPending } = authClient.useSession();
+  const isAuthenticated = Boolean(data?.session);
 
   const handleSignOut = async () => {
-    await signOut({ callbackUrl: '/admin' })
-  }
+    await authClient.signOut();
+    router.refresh();
+  };
 
-  if (loading) {
+  if (isPending) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
@@ -28,11 +28,11 @@ export default function AdminPage() {
           <p className="text-gray-600">Loading...</p>
         </div>
       </div>
-    )
+    );
   }
 
   if (!isAuthenticated) {
-    return <AdminAuth />
+    return <AdminAuth />;
   }
 
   return (
@@ -59,24 +59,24 @@ export default function AdminPage() {
             <TabsTrigger value="global-metrics">Global Metrics</TabsTrigger>
             <TabsTrigger value="users">Users</TabsTrigger>
           </TabsList>
-          
+
           <TabsContent value="projects" className="mt-6">
             <ProjectManager />
           </TabsContent>
-          
+
           <TabsContent value="project-metrics" className="mt-6">
             <MetricsManager />
           </TabsContent>
-          
+
           <TabsContent value="global-metrics" className="mt-6">
             <GlobalMetricsManager />
           </TabsContent>
-          
+
           <TabsContent value="users" className="mt-6">
             <UserManager />
           </TabsContent>
         </Tabs>
       </main>
     </div>
-  )
+  );
 }

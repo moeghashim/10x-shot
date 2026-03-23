@@ -7,7 +7,6 @@ export default function robots(): MetadataRoute.Robots {
       allow: '/',
       disallow: '/admin/',
     },
-    sitemap: 'https://10xbuilder.ai/sitemap.xml',
+    sitemap: 'https://www.10claws.com/sitemap.xml',
   }
 }
-
