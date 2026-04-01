@@ -15,6 +15,7 @@ import type * as http from "../http.js";
 import type * as lib from "../lib.js";
 import type * as projectMetrics from "../projectMetrics.js";
 import type * as projects from "../projects.js";
+import type * as siteContent from "../siteContent.js";
 import type * as stats from "../stats.js";
 import type * as validators from "../validators.js";
 
@@ -32,6 +33,7 @@ declare const fullApi: ApiFromModules<{
   lib: typeof lib;
   projectMetrics: typeof projectMetrics;
   projects: typeof projects;
+  siteContent: typeof siteContent;
   stats: typeof stats;
   validators: typeof validators;
 }>;

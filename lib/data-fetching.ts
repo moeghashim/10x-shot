@@ -10,17 +10,19 @@ import {
   fetchConvexQuery,
   hasConvexEnv,
 } from "@/lib/auth-server";
+import { localizeGlobalMetricContent, localizeProjectContent } from "@/lib/translation";
 import type {
   AdminUser,
   GlobalMetric,
   Project,
   ProjectMetric,
   ProjectSummary,
+  SupportedLocale,
   UserActivity,
 } from "@/types/database";
 
 const fetchProjectsFromDbCached = unstable_cache(
-  async () => {
+  async (locale: SupportedLocale) => {
     if (!hasConvexEnv()) {
       return {
         data: null,
@@ -29,7 +31,7 @@ const fetchProjectsFromDbCached = unstable_cache(
     }
 
     try {
-      const data = await fetchConvexQuery(api.projects.listPublic, {});
+      const data = await fetchConvexQuery(api.projects.listPublic, { locale });
       return {
         data,
         errorMessage: null,
@@ -41,16 +43,18 @@ const fetchProjectsFromDbCached = unstable_cache(
       };
     }
   },
-  ["projects:v2"],
+  ["projects:v3"],
   { revalidate: 60, tags: [PROJECTS_CACHE_TAG] }
 );
 
 export async function fetchProjects(opts?: {
   allowFallback?: boolean;
+  locale?: SupportedLocale;
 }): Promise<{ data: Project[]; error: string | null }> {
   const allowFallback = opts?.allowFallback ?? true;
+  const locale = opts?.locale ?? "en";
 
-  const { data, errorMessage } = await fetchProjectsFromDbCached();
+  const { data, errorMessage } = await fetchProjectsFromDbCached(locale);
   if (data) {
     return { data, error: null };
   }
@@ -105,7 +109,7 @@ export async function fetchProjectMetrics(projectId?: number): Promise<{
   }
 }
 
-export async function fetchGlobalMetrics(): Promise<{
+export async function fetchGlobalMetrics(locale: SupportedLocale = "en"): Promise<{
   data: GlobalMetric[];
   error: string | null;
 }> {
@@ -114,7 +118,7 @@ export async function fetchGlobalMetrics(): Promise<{
   }
 
   try {
-    const data = await fetchConvexQuery(api.globalMetrics.list, {});
+    const data = await fetchConvexQuery(api.globalMetrics.list, { locale });
     return { data, error: null };
   } catch (error) {
     return {
@@ -124,7 +128,7 @@ export async function fetchGlobalMetrics(): Promise<{
   }
 }
 
-export async function fetchLatestGlobalMetric(): Promise<{
+export async function fetchLatestGlobalMetric(locale: SupportedLocale = "en"): Promise<{
   data: GlobalMetric | null;
   error: string | null;
 }> {
@@ -133,7 +137,7 @@ export async function fetchLatestGlobalMetric(): Promise<{
   }
 
   try {
-    const data = await fetchConvexQuery(api.globalMetrics.latest, {});
+    const data = await fetchConvexQuery(api.globalMetrics.latest, { locale });
     return { data, error: null };
   } catch (error) {
     return {
@@ -189,6 +193,13 @@ export async function saveProject(
   }
 
   try {
+    const previous =
+      "id" in project && project.id
+        ? await fetchConvexAuthQuery(api.projects.getAdminById, {
+            id: project.id,
+          })
+        : null;
+    const { localized } = await localizeProjectContent(project, previous?.localization);
     const data = await fetchConvexAuthMutation(api.projects.save, {
       id: "id" in project ? project.id : undefined,
       project: {
@@ -202,6 +213,7 @@ export async function saveProject(
         timeframe: project.timeframe,
         url: project.url ?? null,
       },
+      localized,
     });
     return { data, error: null };
   } catch (error) {
@@ -252,7 +264,11 @@ export async function saveGlobalMetric(
   }
 
   try {
-    await fetchConvexAuthMutation(api.globalMetrics.save, { metric });
+    const previous = await fetchConvexAuthQuery(api.globalMetrics.getAdminByMonth, {
+      month: metric.month,
+    });
+    const { localized } = await localizeGlobalMetricContent(metric, previous?.localization);
+    await fetchConvexAuthMutation(api.globalMetrics.save, { metric, localized });
     return { error: null };
   } catch (error) {
     return {

@@ -1,14 +1,18 @@
 import { StitchHomepage } from "@/components/stitch-homepage"
 import { FALLBACK_PROJECTS } from "@/lib/constants"
-import { getTranslations } from 'next-intl/server'
+import { fetchPublicSiteCopy, getSiteCopyText } from "@/lib/site-content"
+import type { SupportedLocale } from "@/types/database"
 
 export async function generateMetadata({params}: {params: Promise<{locale: string}>}) {
   const { locale } = await params;
-  const t = await getTranslations({locale, namespace: 'HomePage'});
+  const normalizedLocale = (locale === "ar" ? "ar" : "en") as SupportedLocale
+  const { data: siteCopy } = await fetchPublicSiteCopy()
+  const title = getSiteCopyText(siteCopy, normalizedLocale, "HomePage.title")
+  const description = getSiteCopyText(siteCopy, normalizedLocale, "HomePage.description")
 
   return {
-    title: t('title'),
-    description: t('description'),
+    title,
+    description,
     alternates: {
       canonical: `https://www.10claws.com/${locale}`,
       languages: {
@@ -17,8 +21,8 @@ export async function generateMetadata({params}: {params: Promise<{locale: strin
       },
     },
     openGraph: {
-      title: t('title'),
-      description: t('description'),
+      title,
+      description,
       url: `https://www.10claws.com/${locale}`,
       siteName: "10claws",
       images: [
@@ -34,16 +38,23 @@ export async function generateMetadata({params}: {params: Promise<{locale: strin
     },
     twitter: {
       card: "summary_large_image",
-      title: t('title'),
-      description: t('description'),
+      title,
+      description,
       images: ["/social-image.svg"],
     },
   }
 }
 
-export default async function HomePage() {
+export default async function HomePage({
+  params,
+}: {
+  params: Promise<{ locale: string }>
+}) {
+  const { locale: routeLocale } = await params
+  const locale = (routeLocale === "ar" ? "ar" : "en") as SupportedLocale
   const { fetchProjects } = await import("@/lib/data-fetching")
-  const { data: projects } = await fetchProjects()
+  const { data: projects } = await fetchProjects({ locale })
+  const { data: siteCopy } = await fetchPublicSiteCopy()
   const safeProjects = projects || FALLBACK_PROJECTS
 
   // Prepare structured data for SEO
@@ -52,7 +63,7 @@ export default async function HomePage() {
     "@type": "WebSite",
     "name": "10claws",
     "url": "https://www.10claws.com",
-    "description": "Measuring AI Productivity Impact across 10 diverse projects.",
+    "description": getSiteCopyText(siteCopy, locale, "HomePage.description"),
     "mainEntity": {
     "@type": "ItemList",
     "numberOfItems": safeProjects.length,
@@ -76,7 +87,7 @@ export default async function HomePage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      {await StitchHomepage({ projects: safeProjects })}
+      <StitchHomepage projects={safeProjects} locale={locale} copy={siteCopy} />
     </div>
   )
 }

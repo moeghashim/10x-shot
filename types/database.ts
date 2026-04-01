@@ -8,10 +8,45 @@
  */
 export type ProjectStatus = "active" | "planning" | "completed"
 
+export type SupportedLocale = "en" | "ar"
+export type TranslationStatus = "synced" | "failed" | "pending"
+
 /**
  * User role types
  */
 export type UserRole = "admin"
+
+export interface LocalizedTextValue {
+  en: string
+  ar: string
+  source_hash?: string
+  translated_at?: string
+  translation_model?: string
+  translation_status?: TranslationStatus
+}
+
+export interface LocalizedStringListValue {
+  en: string[]
+  ar: string[]
+  source_hash?: string
+  translated_at?: string
+  translation_model?: string
+  translation_status?: TranslationStatus
+}
+
+export interface ProjectLocalizationBundle {
+  title: LocalizedTextValue
+  description: LocalizedTextValue
+  objectives?: LocalizedTextValue
+  timeframe?: LocalizedTextValue
+  aiSkills: LocalizedStringListValue
+  tools: LocalizedStringListValue
+}
+
+export interface GlobalMetricLocalizationBundle {
+  skillsGained: LocalizedStringListValue
+  milestones: LocalizedStringListValue
+}
 
 /**
  * Project interface - used across the application
@@ -60,6 +95,18 @@ export interface GlobalMetric {
   skills_gained: string[]
   milestones: string[]
   created_at?: string
+}
+
+export interface SiteContentEntry {
+  key: string
+  en: string
+  ar: string
+  source_hash?: string
+  translated_at?: string
+  translation_model?: string
+  translation_status?: TranslationStatus
+  created_at?: string
+  updated_at?: string
 }
 
 /**

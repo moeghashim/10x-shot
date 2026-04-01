@@ -1,7 +1,12 @@
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 import betterAuthSchema from "./betterAuth/schema";
-import { projectStatusValidator } from "./validators";
+import {
+  localizedStringListValidator,
+  localizedTextValidator,
+  projectStatusValidator,
+  translationStatusValidator,
+} from "./validators";
 
 export default defineSchema({
   ...betterAuthSchema.tables,
@@ -10,11 +15,17 @@ export default defineSchema({
     title: v.string(),
     description: v.string(),
     objectives: v.optional(v.string()),
+    localizedTitle: v.optional(localizedTextValidator),
+    localizedDescription: v.optional(localizedTextValidator),
+    localizedObjectives: v.optional(localizedTextValidator),
     progress: v.number(),
     status: projectStatusValidator,
     aiSkills: v.array(v.string()),
+    localizedAiSkills: v.optional(localizedStringListValidator),
     tools: v.array(v.string()),
+    localizedTools: v.optional(localizedStringListValidator),
     timeframe: v.optional(v.string()),
+    localizedTimeframe: v.optional(localizedTextValidator),
     url: v.optional(v.union(v.null(), v.string())),
     createdAt: v.number(),
     updatedAt: v.number(),
@@ -46,10 +57,23 @@ export default defineSchema({
     newsletterSubscribers: v.number(),
     totalGmv: v.number(),
     skillsGained: v.array(v.string()),
+    localizedSkillsGained: v.optional(localizedStringListValidator),
     milestones: v.array(v.string()),
+    localizedMilestones: v.optional(localizedStringListValidator),
     createdAt: v.number(),
     updatedAt: v.number(),
   }).index("by_month", ["month"]),
+  siteContent: defineTable({
+    key: v.string(),
+    en: v.string(),
+    ar: v.string(),
+    sourceHash: v.optional(v.string()),
+    translatedAt: v.optional(v.number()),
+    translationModel: v.optional(v.string()),
+    translationStatus: v.optional(translationStatusValidator),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  }).index("by_key", ["key"]),
   adminProfiles: defineTable({
     userId: v.string(),
     email: v.string(),

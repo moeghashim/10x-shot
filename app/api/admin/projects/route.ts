@@ -7,6 +7,7 @@ import {
   isAuthError,
 } from "@/lib/auth-server";
 import { PROJECTS_CACHE_TAG } from "@/lib/cache-tags";
+import { localizeProjectContent } from "@/lib/translation";
 import type { Project } from "@/types/database";
 
 function revalidateProjectViews() {
@@ -55,10 +56,27 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const project: Omit<Project, "id"> | Project = await request.json();
+    const previous =
+      "id" in project && project.id
+        ? await fetchConvexAuthQuery(api.projects.getAdminById, {
+            id: project.id,
+          })
+        : null;
+    const { localized, hadFailures } = await localizeProjectContent(project, previous?.localization);
     const data = await fetchConvexAuthMutation(api.projects.save, {
       id: "id" in project ? project.id : undefined,
       project: toProjectInput(project),
+      localized,
     });
+
+    if (hadFailures) {
+      await fetchConvexAuthMutation(api.adminUsers.logActivity, {
+        action: "PROJECT_TRANSLATION_FAILED",
+        resourceType: "project",
+        resourceId: data.id,
+        details: `Arabic translation fallback was used for project ${data.title}`,
+      });
+    }
 
     revalidateProjectViews();
     return NextResponse.json({ data });

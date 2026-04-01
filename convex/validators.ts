@@ -6,6 +6,32 @@ export const projectStatusValidator = v.union(
   v.literal("completed")
 );
 
+export const supportedLocaleValidator = v.union(v.literal("en"), v.literal("ar"));
+
+export const translationStatusValidator = v.union(
+  v.literal("synced"),
+  v.literal("failed"),
+  v.literal("pending")
+);
+
+export const localizedTextValidator = v.object({
+  en: v.string(),
+  ar: v.string(),
+  sourceHash: v.optional(v.string()),
+  translatedAt: v.optional(v.number()),
+  translationModel: v.optional(v.string()),
+  translationStatus: v.optional(translationStatusValidator),
+});
+
+export const localizedStringListValidator = v.object({
+  en: v.array(v.string()),
+  ar: v.array(v.string()),
+  sourceHash: v.optional(v.string()),
+  translatedAt: v.optional(v.number()),
+  translationModel: v.optional(v.string()),
+  translationStatus: v.optional(translationStatusValidator),
+});
+
 export const projectFields = {
   title: v.string(),
   description: v.string(),
@@ -19,6 +45,15 @@ export const projectFields = {
 } as const;
 
 export const projectInputValidator = v.object(projectFields);
+
+export const projectLocalizationValidator = v.object({
+  title: localizedTextValidator,
+  description: localizedTextValidator,
+  objectives: v.optional(localizedTextValidator),
+  timeframe: v.optional(localizedTextValidator),
+  aiSkills: localizedStringListValidator,
+  tools: localizedStringListValidator,
+});
 
 export const projectMetricFields = {
   project_id: v.number(),
@@ -46,3 +81,13 @@ export const globalMetricFields = {
 } as const;
 
 export const globalMetricInputValidator = v.object(globalMetricFields);
+
+export const globalMetricLocalizationValidator = v.object({
+  skillsGained: localizedStringListValidator,
+  milestones: localizedStringListValidator,
+});
+
+export const siteContentEntryValidator = v.object({
+  key: v.string(),
+  content: localizedTextValidator,
+});

@@ -1,0 +1,80 @@
+import Image from "next/image"
+import { Link } from "@/i18n/routing"
+import { StitchLocaleToggle } from "@/components/stitch-locale-toggle"
+import type { SupportedLocale } from "@/types/database"
+
+type StitchPublicHeaderProps = {
+  locale: SupportedLocale
+  labels: {
+    projects: string
+    stack: string
+    contact: string
+    progress: string
+  }
+  isHomepage?: boolean
+}
+
+function getSectionHref(locale: SupportedLocale, section: "projects" | "stack" | "contact", isHomepage: boolean) {
+  if (isHomepage) {
+    return `#${section}`
+  }
+
+  return `/${locale}#${section}`
+}
+
+export function StitchPublicHeader({
+  locale,
+  labels,
+  isHomepage = false,
+}: StitchPublicHeaderProps) {
+  return (
+    <header className="sticky top-0 z-50 border-b border-black/15 bg-[#f7f5f1]/90 backdrop-blur-xl">
+      <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-4 md:px-10">
+        <Link href="/" className="group inline-flex items-center gap-3">
+          <Image
+            src="/10claws.svg"
+            alt="10 Claws logo"
+            width={42}
+            height={42}
+            className="h-10 w-10"
+            priority
+          />
+          <span className="stitch-display text-lg font-semibold uppercase tracking-[-0.08em] text-black md:text-xl">
+            10 Claws
+          </span>
+        </Link>
+
+        <nav className="hidden items-center gap-8 md:flex">
+          <a
+            className="stitch-mono text-[10px] uppercase tracking-[0.3em] text-black/65 transition-colors hover:text-black"
+            href={getSectionHref(locale, "projects", isHomepage)}
+          >
+            {labels.projects}
+          </a>
+          <a
+            className="stitch-mono text-[10px] uppercase tracking-[0.3em] text-black/65 transition-colors hover:text-black"
+            href={getSectionHref(locale, "stack", isHomepage)}
+          >
+            {labels.stack}
+          </a>
+          <a
+            className="stitch-mono text-[10px] uppercase tracking-[0.3em] text-black/65 transition-colors hover:text-black"
+            href={getSectionHref(locale, "contact", isHomepage)}
+          >
+            {labels.contact}
+          </a>
+        </nav>
+
+        <div className="flex items-center gap-3">
+          <Link
+            href="/progress"
+            className="stitch-mono hidden border border-black/15 bg-white px-4 py-2 text-[10px] uppercase tracking-[0.28em] text-black transition-colors hover:border-black md:inline-flex"
+          >
+            {labels.progress}
+          </Link>
+          <StitchLocaleToggle />
+        </div>
+      </div>
+    </header>
+  )
+}
