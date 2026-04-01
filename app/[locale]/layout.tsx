@@ -24,7 +24,7 @@ const spaceGrotesk = Space_Grotesk({
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.10claws.com"),
-  title: "10claws - Measuring AI Productivity Impact",
+  title: "10 Claws | Building with AI, Measuring What Works",
   description:
     "Tracking the real impact of AI on productivity across 10 diverse projects. Can artificial intelligence truly deliver 10x improvements?",
   generator: "v0.dev",

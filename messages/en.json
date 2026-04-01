@@ -1,6 +1,6 @@
 {
   "HomePage": {
-    "title": "10claws - Measuring AI Productivity Impact",
+    "title": "10 Claws | Building with AI, Measuring What Works",
     "description": "Tracking the real impact of AI on productivity across 10 diverse projects. Can artificial intelligence truly deliver 10x improvements?",
     "navbar": {
       "vibeGuide": "Vibe Guide",
@@ -38,7 +38,7 @@
       "projects": {
         "eyebrow": "Live system / Current state",
         "title": "Current Projects",
-        "description": "Every project measures whether AI meaningfully amplifies execution speed, output quality, and operational leverage.",
+        "description": "Putting AI tools to work in real operations, not just demos. That's the best way to understand their true potential.",
         "buildId": "Build ID:",
         "timeframe": "Timeframe",
         "progress": "Progress",

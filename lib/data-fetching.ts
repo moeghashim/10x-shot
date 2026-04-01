@@ -60,7 +60,8 @@ export async function fetchProjects(opts?: {
   }
 
   if (allowFallback) {
-    return { data: FALLBACK_PROJECTS, error: null };
+    console.warn("Falling back to local project data:", errorMessage ?? "Unknown project fetch failure");
+    return { data: FALLBACK_PROJECTS, error: errorMessage };
   }
 
   return { data: [], error: errorMessage };
