@@ -19,14 +19,12 @@ export type UserRole = "admin"
 export interface Project {
   id: number
   title: string
-  domain: string
   description: string
   objectives?: string
   progress: number
   status: ProjectStatus
   aiSkills: string[]
   tools: string[]
-  productivity: number
   timeframe?: string
   url?: string | null
 }
@@ -59,7 +57,6 @@ export interface GlobalMetric {
   instagram_followers: number
   newsletter_subscribers: number
   total_gmv: number
-  productivity_gain: number
   skills_gained: string[]
   milestones: string[]
   created_at?: string
@@ -98,7 +95,6 @@ export interface UserActivity {
 export interface ProjectSummary {
   id: number
   title: string
-  domain: string
 }
 
 /**
@@ -107,14 +103,12 @@ export interface ProjectSummary {
 export interface DbProject {
   id: number
   title: string
-  domain: string
   description: string
   objectives?: string
   progress: number
   status: string
   ai_skills: string[]
   tools: string[]
-  productivity: number
   timeframe?: string
   url?: string | null
 }

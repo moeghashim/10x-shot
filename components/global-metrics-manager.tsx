@@ -24,7 +24,7 @@ import { useGlobalMetrics } from "@/hooks/use-global-metrics"
 import type { GlobalMetric } from "@/types/database"
 
 export function GlobalMetricsManager() {
-  const { metrics, loading, saveMetric, reload } = useGlobalMetrics()
+  const { metrics, loading, saveMetric } = useGlobalMetrics()
   const [newMetric, setNewMetric] = useState<Omit<GlobalMetric, 'id' | 'created_at'>>({
     month: format(new Date(), 'yyyy-MM-01'),
     twitter_followers: 0,
@@ -33,7 +33,6 @@ export function GlobalMetricsManager() {
     instagram_followers: 0,
     newsletter_subscribers: 0,
     total_gmv: 0,
-    productivity_gain: 0,
     skills_gained: [],
     milestones: []
   })
@@ -59,7 +58,6 @@ export function GlobalMetricsManager() {
         instagram_followers: 0,
         newsletter_subscribers: 0,
         total_gmv: 0,
-        productivity_gain: 0,
         skills_gained: [],
         milestones: []
       })
@@ -159,15 +157,6 @@ export function GlobalMetricsManager() {
                 type="number"
                 value={newMetric.total_gmv}
                 onChange={(e) => setNewMetric({...newMetric, total_gmv: parseFloat(e.target.value) || 0})}
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1">Productivity Gain (x)</label>
-              <Input
-                type="number"
-                step="0.1"
-                value={newMetric.productivity_gain}
-                onChange={(e) => setNewMetric({...newMetric, productivity_gain: parseFloat(e.target.value) || 0})}
               />
             </div>
           </div>
@@ -317,22 +306,6 @@ export function GlobalMetricsManager() {
                         <div className="text-xs text-green-500">
                           {calculateChange(metric.total_gmv, previousMetric.total_gmv).change > 0 ? '+' : ''}
                           ${formatNumber(calculateChange(metric.total_gmv, previousMetric.total_gmv).change)}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-3 p-3 bg-orange-50 rounded-lg">
-                    <TrendingUp className="h-5 w-5 text-orange-600" />
-                    <div>
-                      <div className="font-semibold text-orange-900">
-                        {metric.productivity_gain}x
-                      </div>
-                      <div className="text-xs text-orange-600">Productivity</div>
-                      {previousMetric && (
-                        <div className="text-xs text-orange-500">
-                          {calculateChange(metric.productivity_gain, previousMetric.productivity_gain).change > 0 ? '+' : ''}
-                          {calculateChange(metric.productivity_gain, previousMetric.productivity_gain).change.toFixed(1)}x
                         </div>
                       )}
                     </div>

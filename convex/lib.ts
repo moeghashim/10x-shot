@@ -22,13 +22,9 @@ export async function requireAdmin(ctx: QueryCtx | MutationCtx) {
 
 export function assertProjectInput(input: {
   progress: number;
-  productivity: number;
 }) {
   if (input.progress < 0 || input.progress > 100) {
     throw new ConvexError("Project progress must be between 0 and 100");
-  }
-  if (input.productivity < 0 || input.productivity > 10) {
-    throw new ConvexError("Project productivity must be between 0 and 10");
   }
 }
 

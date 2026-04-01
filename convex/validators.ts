@@ -8,14 +8,12 @@ export const projectStatusValidator = v.union(
 
 export const projectFields = {
   title: v.string(),
-  domain: v.string(),
   description: v.string(),
   objectives: v.optional(v.string()),
   progress: v.number(),
   status: projectStatusValidator,
   aiSkills: v.array(v.string()),
   tools: v.array(v.string()),
-  productivity: v.number(),
   timeframe: v.optional(v.string()),
   url: v.optional(v.union(v.null(), v.string())),
 } as const;
@@ -43,7 +41,6 @@ export const globalMetricFields = {
   instagram_followers: v.number(),
   newsletter_subscribers: v.number(),
   total_gmv: v.number(),
-  productivity_gain: v.number(),
   skills_gained: v.array(v.string()),
   milestones: v.array(v.string()),
 } as const;

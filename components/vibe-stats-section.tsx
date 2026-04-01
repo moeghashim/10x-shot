@@ -24,18 +24,10 @@ export async function VibeStatsSection({ projects }: { projects: Project[] }) {
   })
   const projectsLaunched = activeProjects.length
 
-  const avgProductivityGain =
-    totalProjects > 0
-      ? Math.round(
-          (projects.reduce((sum, p) => sum + (Number(p.productivity) || 0), 0) / totalProjects) * 10
-        ) / 10
-      : 0
-
   const aiToolsIntegrated = new Set(projects.flatMap((p) => p.tools ?? [])).size
 
   const stats: Stat[] = [
     { label: t("projectsLaunched"), value: projectsLaunched, max: totalProjects > 0 ? totalProjects : 10, showMax: true },
-    { label: t("productivityGain"), value: avgProductivityGain, max: 10, suffix: "x", showMax: true },
     { label: t("toolsIntegrated"), value: aiToolsIntegrated, max: 50, showMax: true },
   ]
 
@@ -48,7 +40,7 @@ export async function VibeStatsSection({ projects }: { projects: Project[] }) {
           <div className="h-[1px] flex-1 bg-gray-300 border-t border-dashed border-gray-300"></div>
         </div>
 
-        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-8 sm:grid-cols-2">
           {stats.map((stat, index) => (
             <div
               key={index}

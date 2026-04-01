@@ -19,14 +19,12 @@ function revalidateProjectViews() {
 function toProjectInput(project: Omit<Project, "id"> | Project) {
   return {
     title: project.title,
-    domain: project.domain,
     description: project.description,
     objectives: project.objectives,
     progress: project.progress,
     status: project.status,
     aiSkills: project.aiSkills,
     tools: project.tools,
-    productivity: project.productivity,
     timeframe: project.timeframe,
     url: project.url ?? null,
   };

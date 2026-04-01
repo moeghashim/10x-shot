@@ -4,7 +4,7 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -58,14 +58,13 @@ export function ProjectManager() {
   }) => {
     const [formData, setFormData] = useState<Omit<Project, 'id'>>({
       title: project?.title || "",
-      domain: project?.domain || "",
       description: project?.description || "",
       objectives: project?.objectives || "",
       progress: project?.progress || 0,
       status: project?.status || "planning",
       aiSkills: project?.aiSkills || [],
       tools: project?.tools || [],
-      productivity: project?.productivity || 0,
+      timeframe: project?.timeframe || "",
       url: project?.url || "",
     })
 
@@ -90,17 +89,11 @@ export function ProjectManager() {
     if (isInline) {
       return (
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4">
             <Input
               placeholder="Project Title"
               value={formData.title}
               onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
-              required
-            />
-            <Input
-              placeholder="Domain"
-              value={formData.domain}
-              onChange={(e) => setFormData(prev => ({ ...prev, domain: e.target.value }))}
               required
             />
           </div>
@@ -129,7 +122,7 @@ export function ProjectManager() {
             </p>
           </div>
 
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="text-sm font-medium">Progress (%)</label>
               <Input
@@ -155,17 +148,14 @@ export function ProjectManager() {
                 </SelectContent>
               </Select>
             </div>
-            <div>
-              <label className="text-sm font-medium">Productivity Score</label>
-              <Input
-                type="number"
-                step="0.1"
-                min="0"
-                max="10"
-                value={formData.productivity}
-                onChange={(e) => setFormData(prev => ({ ...prev, productivity: Number(e.target.value) }))}
-              />
-            </div>
+          </div>
+
+          <div>
+            <Input
+              placeholder="Timeframe"
+              value={formData.timeframe || ""}
+              onChange={(e) => setFormData(prev => ({ ...prev, timeframe: e.target.value }))}
+            />
           </div>
 
           <div>
@@ -215,17 +205,11 @@ export function ProjectManager() {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4">
               <Input
                 placeholder="Project Title"
                 value={formData.title}
                 onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
-                required
-              />
-              <Input
-                placeholder="Domain"
-                value={formData.domain}
-                onChange={(e) => setFormData(prev => ({ ...prev, domain: e.target.value }))}
                 required
               />
             </div>
@@ -237,7 +221,7 @@ export function ProjectManager() {
               required
             />
 
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="text-sm font-medium">Progress (%)</label>
                 <Input
@@ -263,17 +247,14 @@ export function ProjectManager() {
                   </SelectContent>
                 </Select>
               </div>
-              <div>
-                <label className="text-sm font-medium">Productivity Score</label>
-                <Input
-                  type="number"
-                  step="0.1"
-                  min="0"
-                  max="10"
-                  value={formData.productivity}
-                  onChange={(e) => setFormData(prev => ({ ...prev, productivity: Number(e.target.value) }))}
-                />
-              </div>
+            </div>
+
+            <div>
+              <Input
+                placeholder="Timeframe"
+                value={formData.timeframe || ""}
+                onChange={(e) => setFormData(prev => ({ ...prev, timeframe: e.target.value }))}
+              />
             </div>
 
             <div>
@@ -364,7 +345,6 @@ export function ProjectManager() {
                           {project.status}
                         </Badge>
                       </CardTitle>
-                      <CardDescription>{project.domain}</CardDescription>
                     </div>
                     <div className="flex items-center gap-2">
                       <Button
@@ -396,11 +376,6 @@ export function ProjectManager() {
                         <span>{project.progress}%</span>
                       </div>
                       <Progress value={project.progress} />
-                    </div>
-
-                    <div className="text-sm">
-                      <span className="font-medium">Productivity: </span>
-                      <span>{project.productivity}/10</span>
                     </div>
 
                     <div className="space-y-2">

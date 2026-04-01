@@ -33,7 +33,6 @@
       "overview": {
         "totalProjects": "Total Projects",
         "activeProjects": "Active Builds",
-        "averageGain": "Avg Productivity Gain",
         "toolsIntegrated": "Tools Integrated"
       },
       "projects": {
@@ -41,10 +40,8 @@
         "title": "Current Projects",
         "description": "Every project measures whether AI meaningfully amplifies execution speed, output quality, and operational leverage.",
         "buildId": "Build ID:",
-        "domain": "Domain",
         "timeframe": "Timeframe",
         "progress": "Progress",
-        "productivity": "Productivity",
         "launch": "Launch Project",
         "launchingSoon": "Launching Soon",
         "status": {
@@ -75,7 +72,6 @@
     "stats": {
       "title": "Impact Metrics",
       "projectsLaunched": "Projects Launched",
-      "productivityGain": "Avg Productivity Gain",
       "toolsIntegrated": "AI Tools Integrated"
     },
     "techStack": {
@@ -89,11 +85,10 @@
     "projects": {
       "experiment": "The Experiment",
       "title": "Current Projects",
-      "description": "Each project tests AI's ability to amplify human capabilities across different domains.",
+      "description": "Each project tracks real build progress across a live set of experiments.",
       "loading": "Loading Projects...",
       "objectives": "Objectives",
       "progress": "Progress",
-      "productivityGain": "Productivity Gain",
       "launch": "Launch Project",
       "launchingSoon": "Launching Soon",
       "status": {
@@ -148,8 +143,8 @@
       "youtubeHint": "growth",
       "revenue": "Revenue",
       "revenueHint": "Latest monthly GMV",
-      "productivity": "Productivity",
-      "productivityHint": "Current productivity gain"
+      "pendingValue": "Pending",
+      "pendingHint": "No real numbers published yet"
     },
     "timeline": {
       "eyebrow": "Monthly telemetry / Archived states",
@@ -166,8 +161,16 @@
       "instagram": "Instagram",
       "newsletter": "Newsletter",
       "totalGmv": "Total GMV",
-      "productivity": "Productivity",
       "skills": "Skills"
+    },
+    "launch": {
+      "month": "April 2026",
+      "date": "2026-04-01",
+      "summaryHint": "Starting April 1, 2026",
+      "title": "Starting tomorrow",
+      "description": "The public tracker starts on April 1, 2026. Until then, every metric stays at zero and the log reflects setup mode.",
+      "skill": "Tracking setup",
+      "milestone": "Public tracking starts April 1, 2026"
     },
     "footer": {
       "tagline": "A running archive of the real AI productivity experiment.",

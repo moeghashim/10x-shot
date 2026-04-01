@@ -33,7 +33,6 @@ export async function VibeProjectGrid({ projects }: VibeProjectGridProps) {
               labels={{
                 objectives: t("objectives"),
                 progress: t("progress"),
-                productivityGain: t("productivityGain"),
                 launch: t("launch"),
                 launchingSoon: t("launchingSoon"),
                 status: {

@@ -46,7 +46,6 @@ export function MetricsManager() {
       const data = (result.data || []).map((project: ProjectSummary) => ({
         id: project.id,
         title: project.title,
-        domain: project.domain,
       }))
 
       setProjects(data)

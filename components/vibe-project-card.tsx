@@ -7,7 +7,6 @@ interface VibeProjectCardProps {
   labels: {
     objectives: string
     progress: string
-    productivityGain: string
     launch: string
     launchingSoon: string
     status: Record<"active" | "planning" | "completed", string>
@@ -64,12 +63,7 @@ export function VibeProjectCard({ project, labels, skillLabels }: VibeProjectCar
   return (
     <div className="vibe-font bg-white border-2 border-dashed border-gray-300 p-6 transition-all hover:border-black text-start">
       <div className="flex items-start justify-between mb-4">
-        <div className="flex-1">
-          <h3 className="text-xl font-black uppercase tracking-tighter mb-2">{project.title}</h3>
-          <span className="inline-block px-2 py-0.5 border border-dashed border-gray-300 text-[10px] font-bold uppercase tracking-widest text-gray-500">
-            {project.domain}
-          </span>
-        </div>
+        <h3 className="text-xl font-black uppercase tracking-tighter mb-2">{project.title}</h3>
         <div className={`flex items-center gap-1 px-2 py-1 border-2 ${statusStyle.border} text-[10px] font-black uppercase tracking-widest bg-white whitespace-nowrap ${statusStyle.text}`}>
           {getStatusIcon(status)}
           {labels.status[status]}
@@ -98,14 +92,6 @@ export function VibeProjectCard({ project, labels, skillLabels }: VibeProjectCar
                 style={{ width: `${project.progress}%` }}
               />
             </div>
-          </div>
-
-          <div className="flex items-center justify-between p-3 border-2 border-dashed border-gray-300 bg-white group hover:border-black transition-colors">
-            <div className="flex items-center gap-2">
-              <TrendingUp className="h-4 w-4" />
-              <span className="text-xs font-black uppercase tracking-widest">{labels.productivityGain}</span>
-            </div>
-            <span className="text-xl font-black">{project.productivity}x</span>
           </div>
 
           {project.timeframe && (

@@ -4,7 +4,6 @@ import {
   DollarSign,
   Instagram,
   Mail,
-  TrendingUp,
   Twitter,
   Users,
   Video,
@@ -21,8 +20,8 @@ type ProgressTrackerStrings = {
     youtubeHint: string;
     revenue: string;
     revenueHint: string;
-    productivity: string;
-    productivityHint: string;
+    pendingValue: string;
+    pendingHint: string;
   };
   timelineEyebrow: string;
   timelineTitle: string;
@@ -35,11 +34,19 @@ type ProgressTrackerStrings = {
     instagram: string;
     newsletter: string;
     totalGmv: string;
-    productivity: string;
     skills: string;
   };
   skillsTitle: string;
   milestonesTitle: string;
+  launch: {
+    month: string;
+    date: string;
+    summaryHint: string;
+    title: string;
+    description: string;
+    skill: string;
+    milestone: string;
+  };
 };
 
 type ProgressEntry = {
@@ -52,7 +59,6 @@ type ProgressEntry = {
     instagramFollowers: number;
     newsletterSubscribers: number;
     totalGMV: number;
-    productivityGain: number;
   };
   skillsGained: string[];
   milestones: string[];
@@ -76,7 +82,6 @@ function toProgressData(metrics: GlobalMetric[]): ProgressEntry[] {
         instagramFollowers: metric.instagram_followers,
         newsletterSubscribers: metric.newsletter_subscribers,
         totalGMV: metric.total_gmv,
-        productivityGain: metric.productivity_gain,
       },
       skillsGained: metric.skills_gained,
       milestones: metric.milestones,
@@ -93,46 +98,73 @@ export function ProgressTracker({
   const progressData = toProgressData(metrics);
   const latestData = progressData[progressData.length - 1];
   const firstData = progressData[0];
-  const months = [...progressData].reverse();
+  const hasMetrics = progressData.length > 0 && latestData !== undefined && firstData !== undefined;
+  const launchEntry: ProgressEntry = {
+    month: strings.launch.month,
+    date: strings.launch.date,
+    metrics: {
+      twitterFollowers: 0,
+      youtubeSubscribers: 0,
+      tiktokFollowers: 0,
+      instagramFollowers: 0,
+      newsletterSubscribers: 0,
+      totalGMV: 0,
+    },
+    skillsGained: [strings.launch.skill],
+    milestones: [strings.launch.milestone],
+  };
+  const months = (hasMetrics ? [...progressData] : [launchEntry]).reverse();
+  const sequenceLength = hasMetrics ? progressData.length : 1;
 
-  if (!latestData || !firstData) {
-    return null;
-  }
-
-  const overviewCards = [
-    {
-      title: strings.summary.audience,
-      value: (
-        latestData.metrics.twitterFollowers +
-        latestData.metrics.instagramFollowers +
-        latestData.metrics.tiktokFollowers
-      ).toLocaleString(),
-      hint: strings.summary.audienceHint,
-      icon: Users,
-    },
-    {
-      title: strings.summary.youtube,
-      value: latestData.metrics.youtubeSubscribers.toLocaleString(),
-      hint: `${calculateGrowth(latestData.metrics.youtubeSubscribers, firstData.metrics.youtubeSubscribers)}% ${strings.summary.youtubeHint}`,
-      icon: Video,
-    },
-    {
-      title: strings.summary.revenue,
-      value: `$${latestData.metrics.totalGMV.toLocaleString()}`,
-      hint: strings.summary.revenueHint,
-      icon: DollarSign,
-    },
-    {
-      title: strings.summary.productivity,
-      value: `${latestData.metrics.productivityGain}x`,
-      hint: strings.summary.productivityHint,
-      icon: TrendingUp,
-    },
-  ];
+  const overviewCards = hasMetrics
+    ? [
+        {
+          title: strings.summary.audience,
+          value: (
+            latestData!.metrics.twitterFollowers +
+            latestData!.metrics.instagramFollowers +
+            latestData!.metrics.tiktokFollowers
+          ).toLocaleString(),
+          hint: strings.summary.audienceHint,
+          icon: Users,
+        },
+        {
+          title: strings.summary.youtube,
+          value: latestData!.metrics.youtubeSubscribers.toLocaleString(),
+          hint: `${calculateGrowth(latestData!.metrics.youtubeSubscribers, firstData!.metrics.youtubeSubscribers)}% ${strings.summary.youtubeHint}`,
+          icon: Video,
+        },
+        {
+          title: strings.summary.revenue,
+          value: `$${latestData!.metrics.totalGMV.toLocaleString()}`,
+          hint: strings.summary.revenueHint,
+          icon: DollarSign,
+        },
+      ]
+    : [
+        {
+          title: strings.summary.audience,
+          value: "0",
+          hint: strings.launch.summaryHint,
+          icon: Users,
+        },
+        {
+          title: strings.summary.youtube,
+          value: "0",
+          hint: strings.launch.summaryHint,
+          icon: Video,
+        },
+        {
+          title: strings.summary.revenue,
+          value: "$0",
+          hint: strings.launch.summaryHint,
+          icon: DollarSign,
+        },
+      ];
 
   return (
     <div className="space-y-10 md:space-y-14">
-      <div className="grid gap-px border border-black/15 bg-black/15 md:grid-cols-2 xl:grid-cols-4">
+      <div className="grid gap-px border border-black/15 bg-black/15 md:grid-cols-3">
         {overviewCards.map((card) => {
           const Icon = card.icon;
 
@@ -167,6 +199,17 @@ export function ProgressTracker({
         </div>
 
         <div className="mt-8 space-y-8">
+          {!hasMetrics ? (
+            <div className="border border-black/15 bg-white px-6 py-8 md:px-8">
+              <p className="stitch-mono text-[10px] uppercase tracking-[0.3em] text-black/45">
+                {strings.launch.title}
+              </p>
+              <p className="mt-4 max-w-2xl text-sm leading-6 text-black/65 md:text-base">
+                {strings.launch.description}
+              </p>
+            </div>
+          ) : null}
+
           {months.map((monthData, index) => {
             const metricsList = [
               { label: strings.metrics.twitter, value: monthData.metrics.twitterFollowers, kind: "count", icon: Twitter },
@@ -175,7 +218,6 @@ export function ProgressTracker({
               { label: strings.metrics.instagram, value: monthData.metrics.instagramFollowers, kind: "count", icon: Instagram },
               { label: strings.metrics.newsletter, value: monthData.metrics.newsletterSubscribers, kind: "count", icon: Mail },
               { label: strings.metrics.totalGmv, value: monthData.metrics.totalGMV, kind: "currency", icon: DollarSign },
-              { label: strings.metrics.productivity, value: monthData.metrics.productivityGain, kind: "productivity", icon: TrendingUp },
               { label: strings.metrics.skills, value: monthData.skillsGained.length, kind: "count", icon: ArrowUpRight },
             ];
 
@@ -184,7 +226,7 @@ export function ProgressTracker({
                 <div className="grid gap-px border-b border-black/15 bg-black/15 lg:grid-cols-[240px_minmax(0,1fr)]">
                   <div className="bg-[#f7f5f1] px-5 py-6 md:px-6">
                     <p className="stitch-mono text-[10px] uppercase tracking-[0.32em] text-black/45">
-                      {strings.monthLabel} {progressData.length - index}
+                      {strings.monthLabel} {sequenceLength - index}
                     </p>
                     <div className="mt-6 flex items-start justify-between gap-4">
                       <div>
@@ -205,9 +247,7 @@ export function ProgressTracker({
                       const value =
                         metric.kind === "currency"
                           ? `$${metric.value.toLocaleString()}`
-                          : metric.kind === "productivity"
-                            ? `${metric.value}x`
-                            : metric.value.toLocaleString();
+                          : metric.value.toLocaleString();
 
                       return (
                         <div key={`${monthData.date}-${metric.label}`} className="bg-white px-5 py-5">

@@ -3,7 +3,7 @@ import "server-only";
 import { unstable_cache } from "next/cache";
 import { api } from "@/convex/_generated/api";
 import { PROJECTS_CACHE_TAG } from "@/lib/cache-tags";
-import { FALLBACK_GLOBAL_METRICS, FALLBACK_PROJECTS } from "@/lib/constants";
+import { FALLBACK_PROJECTS } from "@/lib/constants";
 import {
   fetchConvexAuthMutation,
   fetchConvexAuthQuery,
@@ -68,7 +68,7 @@ export async function fetchProjectSummaries(): Promise<{
 }> {
   if (!hasConvexEnv()) {
     return {
-      data: FALLBACK_PROJECTS.map(({ id, title, domain }) => ({ id, title, domain })),
+      data: FALLBACK_PROJECTS.map(({ id, title }) => ({ id, title })),
       error: null,
     };
   }
@@ -78,7 +78,7 @@ export async function fetchProjectSummaries(): Promise<{
     return { data, error: null };
   } catch (error) {
     return {
-      data: FALLBACK_PROJECTS.map(({ id, title, domain }) => ({ id, title, domain })),
+      data: FALLBACK_PROJECTS.map(({ id, title }) => ({ id, title })),
       error: error instanceof Error ? error.message : "Failed to fetch project summaries",
     };
   }
@@ -110,7 +110,7 @@ export async function fetchGlobalMetrics(): Promise<{
   error: string | null;
 }> {
   if (!hasConvexEnv()) {
-    return { data: FALLBACK_GLOBAL_METRICS, error: null };
+    return { data: [], error: null };
   }
 
   try {
@@ -118,7 +118,7 @@ export async function fetchGlobalMetrics(): Promise<{
     return { data, error: null };
   } catch (error) {
     return {
-      data: FALLBACK_GLOBAL_METRICS,
+      data: [],
       error: error instanceof Error ? error.message : "Failed to load global metrics",
     };
   }
@@ -129,7 +129,7 @@ export async function fetchLatestGlobalMetric(): Promise<{
   error: string | null;
 }> {
   if (!hasConvexEnv()) {
-    return { data: FALLBACK_GLOBAL_METRICS[0] ?? null, error: null };
+    return { data: null, error: null };
   }
 
   try {
@@ -137,7 +137,7 @@ export async function fetchLatestGlobalMetric(): Promise<{
     return { data, error: null };
   } catch (error) {
     return {
-      data: FALLBACK_GLOBAL_METRICS[0] ?? null,
+      data: null,
       error: error instanceof Error ? error.message : "Failed to load latest metric",
     };
   }
@@ -193,14 +193,12 @@ export async function saveProject(
       id: "id" in project ? project.id : undefined,
       project: {
         title: project.title,
-        domain: project.domain,
         description: project.description,
         objectives: project.objectives,
         progress: project.progress,
         status: project.status,
         aiSkills: project.aiSkills,
         tools: project.tools,
-        productivity: project.productivity,
         timeframe: project.timeframe,
         url: project.url ?? null,
       },

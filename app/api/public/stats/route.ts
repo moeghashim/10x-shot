@@ -6,9 +6,7 @@ function getFallbackStats() {
   return {
     projectsLaunched: 0,
     totalProjects: 0,
-    avgProductivityGain: 0,
     aiToolsIntegrated: 0,
-    currentProductivity: 0,
   };
 }
 
@@ -23,9 +21,7 @@ export async function GET() {
       data: {
         projectsLaunched: data.projectsLaunched,
         totalProjects: data.totalProjects,
-        avgProductivityGain: data.avgProductivityGain,
         aiToolsIntegrated: data.aiToolsIntegrated,
-        currentProductivity: data.currentProductivity,
       },
     });
   } catch (error) {

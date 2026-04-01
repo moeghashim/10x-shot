@@ -15,7 +15,6 @@ type Stat = {
 export function StatsSection() {
   const [stats, setStats] = useState<Stat[]>([
     { label: "Projects Launched", value: 0, max: 1, showMax: true },
-    { label: "Avg Productivity Gain", value: 0, max: 10, suffix: "x", showMax: true },
     { label: "AI Tools Integrated", value: 0, max: 50, showMax: true },
   ])
   const [loading, setLoading] = useState(true)
@@ -34,7 +33,6 @@ export function StatsSection() {
         const {
           projectsLaunched,
           totalProjects,
-          avgProductivityGain,
           aiToolsIntegrated,
         } = result.data || {}
 
@@ -43,16 +41,6 @@ export function StatsSection() {
             label: "Projects Launched",
             value: typeof projectsLaunched === "number" ? projectsLaunched : 0,
             max: typeof totalProjects === "number" && totalProjects > 0 ? totalProjects : 10,
-            showMax: true,
-          },
-          {
-            label: "Avg Productivity Gain",
-            value:
-              typeof avgProductivityGain === "number"
-                ? Math.round(avgProductivityGain * 10) / 10
-                : 0,
-            max: 10,
-            suffix: "x",
             showMax: true,
           },
           {
@@ -79,7 +67,7 @@ export function StatsSection() {
           Current Impact Metrics
         </h2>
 
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-6 sm:grid-cols-2">
           {stats.map((stat, index) => (
             <Card key={index} className="bg-white border-gray-200">
               <CardContent className="p-6">

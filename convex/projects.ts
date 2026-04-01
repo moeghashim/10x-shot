@@ -7,14 +7,12 @@ function toProject(doc: any) {
   return {
     id: doc.legacyId,
     title: doc.title,
-    domain: doc.domain,
     description: doc.description,
     objectives: doc.objectives,
     progress: doc.progress,
     status: doc.status,
     aiSkills: doc.aiSkills,
     tools: doc.tools,
-    productivity: doc.productivity,
     timeframe: doc.timeframe,
     url: doc.url ?? null,
   };
@@ -46,7 +44,6 @@ export const listSummaries = query({
       .map((doc) => ({
         id: doc.legacyId,
         title: doc.title,
-        domain: doc.domain,
       }));
   },
 });

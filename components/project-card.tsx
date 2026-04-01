@@ -1,5 +1,4 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
 import { SkillsDisplay } from "@/components/skills-display"
 import { Clock, TrendingUp, Play, Pause, ExternalLink } from "lucide-react"
@@ -27,12 +26,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
     <Card className="bg-white border-gray-200 hover:border-gray-300 transition-colors">
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
-          <div className="flex-1">
-            <CardTitle className="text-lg text-black mb-2">{project.title}</CardTitle>
-            <Badge variant="outline" className="text-gray-600 border-gray-300">
-              {project.domain}
-            </Badge>
-          </div>
+          <CardTitle className="text-lg text-black mb-2">{project.title}</CardTitle>
           <div className="flex items-center gap-1 px-2 py-1 rounded-full text-xs text-gray-600 border border-gray-300">
             {getStatusIcon(project.status)}
             {project.status}
@@ -58,18 +52,12 @@ export function ProjectCard({ project }: ProjectCardProps) {
           <Progress value={project.progress} className="h-2" />
         </div>
 
-        <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200">
-          <div className="flex items-center gap-2">
-            <TrendingUp className="h-4 w-4 text-gray-600" />
-            <span className="text-sm text-gray-600">Productivity Gain</span>
+        {project.timeframe && (
+          <div className="flex items-center gap-2 text-sm text-gray-500">
+            <Clock className="h-4 w-4" />
+            <span>{project.timeframe}</span>
           </div>
-          <span className="font-bold text-black">{project.productivity}x</span>
-        </div>
-
-        <div className="flex items-center gap-2 text-sm text-gray-500">
-          <Clock className="h-4 w-4" />
-          <span>{project.timeframe}</span>
-        </div>
+        )}
 
         {project.url && (
           <a

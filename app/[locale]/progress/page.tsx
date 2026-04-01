@@ -90,8 +90,8 @@ export default async function ProgressPage() {
                   youtubeHint: t("summary.youtubeHint"),
                   revenue: t("summary.revenue"),
                   revenueHint: t("summary.revenueHint"),
-                  productivity: t("summary.productivity"),
-                  productivityHint: t("summary.productivityHint"),
+                  pendingValue: t("summary.pendingValue"),
+                  pendingHint: t("summary.pendingHint"),
                 },
                 timelineEyebrow: t("timeline.eyebrow"),
                 timelineTitle: t("timeline.title"),
@@ -104,11 +104,19 @@ export default async function ProgressPage() {
                   instagram: t("metrics.instagram"),
                   newsletter: t("metrics.newsletter"),
                   totalGmv: t("metrics.totalGmv"),
-                  productivity: t("metrics.productivity"),
                   skills: t("metrics.skills"),
                 },
                 skillsTitle: t("timeline.skillsTitle"),
                 milestonesTitle: t("timeline.milestonesTitle"),
+                launch: {
+                  month: t("launch.month"),
+                  date: t("launch.date"),
+                  summaryHint: t("launch.summaryHint"),
+                  title: t("launch.title"),
+                  description: t("launch.description"),
+                  skill: t("launch.skill"),
+                  milestone: t("launch.milestone"),
+                },
               }}
             />
           </div>
