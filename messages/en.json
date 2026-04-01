@@ -22,9 +22,9 @@
         "contact": "Contact"
       },
       "hero": {
-        "eyebrow": "Independent laboratory / AI productivity systems",
-        "title": "BUILDING\n10X FASTER.",
-        "description": "Tracking the real-world impact of AI on productivity across live experiments. Minimal interface, real metrics, practical systems.",
+        "eyebrow": "Building in public / Dreaming in systems",
+        "title": "LIVING\nTHE DREAM.",
+        "description": "Building every idea I've ever dreamed of.",
         "primaryCta": "Launch Projects",
         "secondaryCta": "View Progress",
         "statusLabel": "System status",
@@ -115,7 +115,7 @@
     },
     "footer": {
       "rights": "© 2026 10 CLAWS. NO RIGHTS RESERVED.",
-      "tagline": "Measuring the real impact of AI on productivity across 10 diverse projects.",
+      "tagline": "Building every idea I've ever dreamed of.",
       "quickLinks": "Quick Links",
       "viewProjects": "View Projects",
       "progressTracker": "Progress Tracker",
