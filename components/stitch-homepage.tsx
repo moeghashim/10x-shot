@@ -327,9 +327,9 @@ export function StitchHomepage({
             <a className="stitch-mono text-[10px] uppercase tracking-[0.28em] text-black/55 transition-colors hover:text-black" href="#projects">
               {t("HomePage.stitch.footer.projects")}
             </a>
-            <a className="stitch-mono text-[10px] uppercase tracking-[0.28em] text-black/55 transition-colors hover:text-black" href="#stack">
+            <Link className="stitch-mono text-[10px] uppercase tracking-[0.28em] text-black/55 transition-colors hover:text-black" href="/stack">
               {t("HomePage.stitch.footer.stack")}
-            </a>
+            </Link>
             <Link className="stitch-mono text-[10px] uppercase tracking-[0.28em] text-black/55 transition-colors hover:text-black" href="/progress">
               {t("HomePage.stitch.footer.progress")}
             </Link>

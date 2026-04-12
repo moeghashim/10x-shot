@@ -6,6 +6,20 @@ export const projectStatusValidator = v.union(
   v.literal("completed")
 );
 
+export const stackGradeValidator = v.union(
+  v.literal("A"),
+  v.literal("B"),
+  v.literal("C"),
+  v.literal("D"),
+  v.literal("E"),
+  v.literal("F")
+);
+
+export const stackCategoryValidator = v.union(
+  v.literal("tool"),
+  v.literal("ai_skill")
+);
+
 export const supportedLocaleValidator = v.union(v.literal("en"), v.literal("ar"));
 
 export const translationStatusValidator = v.union(
@@ -38,6 +52,7 @@ export const projectFields = {
   objectives: v.optional(v.string()),
   progress: v.number(),
   status: projectStatusValidator,
+  stackItemIds: v.array(v.number()),
   aiSkills: v.array(v.string()),
   tools: v.array(v.string()),
   timeframe: v.optional(v.string()),
@@ -45,6 +60,12 @@ export const projectFields = {
 } as const;
 
 export const projectInputValidator = v.object(projectFields);
+
+export const stackItemInputValidator = v.object({
+  name: v.string(),
+  category: stackCategoryValidator,
+  grade: stackGradeValidator,
+});
 
 export const projectLocalizationValidator = v.object({
   title: localizedTextValidator,

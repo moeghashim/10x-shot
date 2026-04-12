@@ -6,7 +6,7 @@ import {
   fetchConvexAuthQuery,
   isAuthError,
 } from "@/lib/auth-server";
-import { PROJECTS_CACHE_TAG, SITE_COPY_CACHE_TAG } from "@/lib/cache-tags";
+import { PROJECTS_CACHE_TAG, SITE_COPY_CACHE_TAG, STACK_CACHE_TAG } from "@/lib/cache-tags";
 import { localizeGlobalMetricContent, localizeProjectContent } from "@/lib/translation";
 import type { GlobalMetric, Project } from "@/types/database";
 
@@ -28,6 +28,7 @@ function toProjectInput(project: Project | Omit<Project, "id">) {
     objectives: project.objectives,
     progress: project.progress,
     status: project.status,
+    stackItemIds: project.stackItemIds,
     aiSkills: project.aiSkills,
     tools: project.tools,
     timeframe: project.timeframe,
@@ -76,10 +77,13 @@ export async function POST() {
     });
 
     revalidateTag(PROJECTS_CACHE_TAG);
+    revalidateTag(STACK_CACHE_TAG);
     revalidateTag(SITE_COPY_CACHE_TAG);
     revalidatePath("/");
     revalidatePath("/en");
     revalidatePath("/ar");
+    revalidatePath("/en/stack");
+    revalidatePath("/ar/stack");
     revalidatePath("/en/progress");
     revalidatePath("/ar/progress");
 

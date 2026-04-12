@@ -14,7 +14,7 @@ type StitchPublicHeaderProps = {
   isHomepage?: boolean
 }
 
-function getSectionHref(locale: SupportedLocale, section: "projects" | "stack" | "contact", isHomepage: boolean) {
+function getSectionHref(locale: SupportedLocale, section: "projects" | "contact", isHomepage: boolean) {
   if (isHomepage) {
     return `#${section}`
   }
@@ -51,12 +51,12 @@ export function StitchPublicHeader({
           >
             {labels.projects}
           </a>
-          <a
+          <Link
             className="stitch-mono text-[10px] uppercase tracking-[0.3em] text-black/65 transition-colors hover:text-black"
-            href={getSectionHref(locale, "stack", isHomepage)}
+            href="/stack"
           >
             {labels.stack}
-          </a>
+          </Link>
           <a
             className="stitch-mono text-[10px] uppercase tracking-[0.3em] text-black/65 transition-colors hover:text-black"
             href={getSectionHref(locale, "contact", isHomepage)}

@@ -7,7 +7,10 @@ import {
   supportedLocaleValidator,
 } from "./validators";
 
-function pickLocalizedText(value: any, locale: "en" | "ar", fallback?: string | null) {
+type Locale = "en" | "ar";
+type StackLookup = Map<number, { name: string; category: "tool" | "ai_skill" }>;
+
+function pickLocalizedText(value: any, locale: Locale, fallback?: string | null) {
   if (!value) {
     return fallback ?? "";
   }
@@ -36,7 +39,7 @@ const ARABIC_PROJECT_DESCRIPTION_FALLBACKS: Record<string, string> = {
     "أداة مفتوحة المصدر للويب ولسطر الأوامر للتعلّم من منصة X.\nيقوم Rabbit Brain بتحليل التغريدات، وحفظ الإشارات المرجعية، وتتبع صناع المحتوى، وبناء خلاصات يومية للحسابات حتى تصبح الأفكار المفيدة أسهل في الرجوع إليها من الخط الزمني الذي جاءت منه.",
 };
 
-function pickProjectDescription(doc: any, locale: "en" | "ar") {
+function pickProjectDescription(doc: any, locale: Locale) {
   if (locale !== "ar") {
     return pickLocalizedText(doc.localizedDescription, locale, doc.description);
   }
@@ -56,7 +59,7 @@ function pickProjectDescription(doc: any, locale: "en" | "ar") {
   return pickLocalizedText(doc.localizedDescription, locale, doc.description);
 }
 
-function pickLocalizedList(value: any, locale: "en" | "ar", fallback?: string[]) {
+function pickLocalizedList(value: any, locale: Locale, fallback?: string[]) {
   if (!value) {
     return fallback ?? [];
   }
@@ -71,6 +74,69 @@ function pickLocalizedList(value: any, locale: "en" | "ar", fallback?: string[])
   }
 
   return fallback ?? [];
+}
+
+function normalizeStackItemIds(stackItemIds?: number[]) {
+  return Array.from(new Set((stackItemIds ?? []).filter((id) => Number.isInteger(id))));
+}
+
+function buildStackLookup(stackDocs: Array<any>): StackLookup {
+  return new Map(
+    stackDocs.map((doc) => [
+      doc.legacyId,
+      {
+        name: doc.name,
+        category: doc.category,
+      },
+    ])
+  );
+}
+
+function resolveStackLists(
+  stackItemIds: number[] | undefined,
+  stackLookup: StackLookup | undefined,
+  fallback: { aiSkills?: string[]; tools?: string[] } = {}
+) {
+  const normalizedIds = normalizeStackItemIds(stackItemIds);
+  if (normalizedIds.length === 0 || !stackLookup) {
+    return {
+      stackItemIds: normalizedIds,
+      aiSkills: fallback.aiSkills ?? [],
+      tools: fallback.tools ?? [],
+    };
+  }
+
+  const aiSkills: string[] = [];
+  const tools: string[] = [];
+
+  for (const id of normalizedIds) {
+    const item = stackLookup.get(id);
+    if (!item) {
+      continue;
+    }
+
+    if (item.category === "ai_skill") {
+      aiSkills.push(item.name);
+    } else {
+      tools.push(item.name);
+    }
+  }
+
+  return {
+    stackItemIds: normalizedIds,
+    aiSkills: aiSkills.length > 0 ? aiSkills : fallback.aiSkills ?? [],
+    tools: tools.length > 0 ? tools : fallback.tools ?? [],
+  };
+}
+
+function resolveRequiredStackLists(stackItemIds: number[] | undefined, stackLookup: StackLookup) {
+  const normalizedIds = normalizeStackItemIds(stackItemIds);
+  const missingIds = normalizedIds.filter((id) => !stackLookup.has(id));
+  if (missingIds.length > 0) {
+    throw new ConvexError(`Unknown stack item ids: ${missingIds.join(", ")}`);
+  }
+
+  return resolveStackLists(normalizedIds, stackLookup);
 }
 
 function toLocalizationBundle(doc: any) {
@@ -117,21 +183,29 @@ function toLocalizationBundle(doc: any) {
   };
 }
 
-function toProject(doc: any, locale: "en" | "ar" = "en") {
+function toProject(doc: any, locale: Locale = "en", stackLookup?: StackLookup) {
+  const stack = resolveStackLists(doc.stackItemIds, stackLookup, {
+    aiSkills: doc.aiSkills,
+    tools: doc.tools,
+  });
+
   return {
     id: doc.legacyId,
     title: pickProjectTitle(doc.localizedTitle, doc.title),
     description: pickProjectDescription(doc, locale),
-    objectives: doc.objectives || doc.localizedObjectives
-      ? pickLocalizedText(doc.localizedObjectives, locale, doc.objectives)
-      : undefined,
+    objectives:
+      doc.objectives || doc.localizedObjectives
+        ? pickLocalizedText(doc.localizedObjectives, locale, doc.objectives)
+        : undefined,
     progress: doc.progress,
     status: doc.status,
-    aiSkills: pickLocalizedList(doc.localizedAiSkills, locale, doc.aiSkills),
-    tools: pickLocalizedList(doc.localizedTools, locale, doc.tools),
-    timeframe: doc.timeframe || doc.localizedTimeframe
-      ? pickLocalizedText(doc.localizedTimeframe, locale, doc.timeframe)
-      : undefined,
+    stackItemIds: stack.stackItemIds,
+    aiSkills: pickLocalizedList(doc.localizedAiSkills, locale, stack.aiSkills),
+    tools: pickLocalizedList(doc.localizedTools, locale, stack.tools),
+    timeframe:
+      doc.timeframe || doc.localizedTimeframe
+        ? pickLocalizedText(doc.localizedTimeframe, locale, doc.timeframe)
+        : undefined,
     url: doc.url ?? null,
   };
 }
@@ -142,8 +216,15 @@ export const listPublic = query({
   },
   handler: async (ctx, args) => {
     const locale = args.locale ?? "en";
-    const docs = await ctx.db.query("projects").collect();
-    return docs.sort((a, b) => a.legacyId - b.legacyId).map((doc) => toProject(doc, locale));
+    const [docs, stackDocs] = await Promise.all([
+      ctx.db.query("projects").collect(),
+      ctx.db.query("stackItems").collect(),
+    ]);
+    const stackLookup = buildStackLookup(stackDocs);
+
+    return docs
+      .sort((a, b) => a.legacyId - b.legacyId)
+      .map((doc) => toProject(doc, locale, stackLookup));
   },
 });
 
@@ -151,8 +232,15 @@ export const listAdmin = query({
   args: {},
   handler: async (ctx) => {
     await requireAdmin(ctx);
-    const docs = await ctx.db.query("projects").collect();
-    return docs.sort((a, b) => a.legacyId - b.legacyId).map((doc) => toProject(doc, "en"));
+    const [docs, stackDocs] = await Promise.all([
+      ctx.db.query("projects").collect(),
+      ctx.db.query("stackItems").collect(),
+    ]);
+    const stackLookup = buildStackLookup(stackDocs);
+
+    return docs
+      .sort((a, b) => a.legacyId - b.legacyId)
+      .map((doc) => toProject(doc, "en", stackLookup));
   },
 });
 
@@ -173,6 +261,7 @@ export const getAdminById = query({
 
     return {
       id: doc.legacyId,
+      stackItemIds: normalizeStackItemIds(doc.stackItemIds),
       localization: toLocalizationBundle(doc),
     };
   },
@@ -201,6 +290,17 @@ export const save = mutation({
     const { profile } = await requireAdmin(ctx);
     assertProjectInput(args.project);
 
+    const stackDocs = await ctx.db.query("stackItems").collect();
+    const stackLookup = buildStackLookup(stackDocs);
+    const resolvedStack = resolveRequiredStackLists(args.project.stackItemIds, stackLookup);
+
+    const persistedProject = {
+      ...args.project,
+      stackItemIds: resolvedStack.stackItemIds,
+      aiSkills: resolvedStack.aiSkills,
+      tools: resolvedStack.tools,
+    };
+
     const now = Date.now();
     const existing =
       args.id !== undefined
@@ -216,7 +316,7 @@ export const save = mutation({
 
     if (existing) {
       await ctx.db.patch(existing._id, {
-        ...args.project,
+        ...persistedProject,
         localizedTitle: args.localized?.title,
         localizedDescription: args.localized?.description,
         localizedObjectives: args.localized?.objectives,
@@ -225,10 +325,11 @@ export const save = mutation({
         localizedTools: args.localized?.tools,
         updatedAt: now,
       });
+
       return toProject(
         {
           ...existing,
-          ...args.project,
+          ...persistedProject,
           localizedTitle: args.localized?.title,
           localizedDescription: args.localized?.description,
           localizedObjectives: args.localized?.objectives,
@@ -237,7 +338,8 @@ export const save = mutation({
           localizedTools: args.localized?.tools,
           updatedAt: now,
         },
-        "en"
+        "en",
+        stackLookup
       );
     }
 
@@ -245,7 +347,7 @@ export const save = mutation({
     const nextLegacyId = currentProjects.reduce((max, project) => Math.max(max, project.legacyId), 0) + 1;
 
     const createdId = await ctx.db.insert("projects", {
-      ...args.project,
+      ...persistedProject,
       localizedTitle: args.localized?.title,
       localizedDescription: args.localized?.description,
       localizedObjectives: args.localized?.objectives,
@@ -262,12 +364,12 @@ export const save = mutation({
       action: "CREATE_PROJECT",
       resourceType: "project",
       resourceId: nextLegacyId,
-      details: `Created project: ${args.project.title}`,
+      details: `Created project: ${persistedProject.title}`,
       createdAt: now,
     });
 
     const created = await ctx.db.get(createdId);
-    return toProject(created, "en");
+    return toProject(created, "en", stackLookup);
   },
 });
 

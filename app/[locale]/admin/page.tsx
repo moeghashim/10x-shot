@@ -8,6 +8,7 @@ import { ProjectManager } from "@/components/project-manager";
 import { MetricsManager } from "@/components/metrics-manager";
 import { GlobalMetricsManager } from "@/components/global-metrics-manager";
 import { SiteCopyManager } from "@/components/site-copy-manager";
+import { StackManager } from "@/components/stack-manager";
 import { UserManager } from "@/components/user-manager";
 import { authClient } from "@/lib/auth-client";
 
@@ -54,8 +55,9 @@ export default function AdminPage() {
 
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <Tabs defaultValue="projects" className="w-full">
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="grid w-full grid-cols-6">
             <TabsTrigger value="projects">Projects</TabsTrigger>
+            <TabsTrigger value="stack">Stack</TabsTrigger>
             <TabsTrigger value="project-metrics">Project Metrics</TabsTrigger>
             <TabsTrigger value="global-metrics">Global Metrics</TabsTrigger>
             <TabsTrigger value="site-copy">Site Copy</TabsTrigger>
@@ -64,6 +66,10 @@ export default function AdminPage() {
 
           <TabsContent value="projects" className="mt-6">
             <ProjectManager />
+          </TabsContent>
+
+          <TabsContent value="stack" className="mt-6">
+            <StackManager />
           </TabsContent>
 
           <TabsContent value="project-metrics" className="mt-6">

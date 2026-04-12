@@ -5,6 +5,8 @@ import {
   localizedStringListValidator,
   localizedTextValidator,
   projectStatusValidator,
+  stackCategoryValidator,
+  stackGradeValidator,
   translationStatusValidator,
 } from "./validators";
 
@@ -20,6 +22,7 @@ export default defineSchema({
     localizedObjectives: v.optional(localizedTextValidator),
     progress: v.number(),
     status: projectStatusValidator,
+    stackItemIds: v.optional(v.array(v.number())),
     aiSkills: v.array(v.string()),
     localizedAiSkills: v.optional(localizedStringListValidator),
     tools: v.array(v.string()),
@@ -32,6 +35,17 @@ export default defineSchema({
   })
     .index("by_legacy_id", ["legacyId"])
     .index("by_status", ["status"]),
+  stackItems: defineTable({
+    legacyId: v.number(),
+    name: v.string(),
+    category: stackCategoryValidator,
+    grade: stackGradeValidator,
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_legacy_id", ["legacyId"])
+    .index("by_name", ["name"])
+    .index("by_category", ["category"]),
   projectMetrics: defineTable({
     legacyId: v.optional(v.number()),
     projectLegacyId: v.number(),

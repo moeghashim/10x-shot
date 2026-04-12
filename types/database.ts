@@ -7,6 +7,8 @@
  * Project status types
  */
 export type ProjectStatus = "active" | "planning" | "completed"
+export type StackGrade = "A" | "B" | "C" | "D" | "E" | "F"
+export type StackCategory = "tool" | "ai_skill"
 
 export type SupportedLocale = "en" | "ar"
 export type TranslationStatus = "synced" | "failed" | "pending"
@@ -58,10 +60,30 @@ export interface Project {
   objectives?: string
   progress: number
   status: ProjectStatus
+  stackItemIds: number[]
   aiSkills: string[]
   tools: string[]
   timeframe?: string
   url?: string | null
+}
+
+export interface StackItem {
+  id: number
+  name: string
+  category: StackCategory
+  grade: StackGrade
+}
+
+export interface StackProjectReference {
+  id: number
+  title: string
+  status: ProjectStatus
+  url?: string | null
+}
+
+export interface StackItemWithProjects extends StackItem {
+  usageCount: number
+  projects: StackProjectReference[]
 }
 
 /**
@@ -154,6 +176,7 @@ export interface DbProject {
   objectives?: string
   progress: number
   status: string
+  stack_item_ids?: number[]
   ai_skills: string[]
   tools: string[]
   timeframe?: string

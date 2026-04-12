@@ -2,7 +2,7 @@ import "server-only";
 
 import { unstable_cache } from "next/cache";
 import { api } from "@/convex/_generated/api";
-import { PROJECTS_CACHE_TAG } from "@/lib/cache-tags";
+import { PROJECTS_CACHE_TAG, STACK_CACHE_TAG } from "@/lib/cache-tags";
 import { FALLBACK_PROJECTS } from "@/lib/constants";
 import {
   fetchConvexAuthMutation,
@@ -17,6 +17,8 @@ import type {
   Project,
   ProjectMetric,
   ProjectSummary,
+  StackItem,
+  StackItemWithProjects,
   SupportedLocale,
   UserActivity,
 } from "@/types/database";
@@ -43,9 +45,100 @@ const fetchProjectsFromDbCached = unstable_cache(
       };
     }
   },
-  ["projects:v3"],
+  ["projects:v4"],
   { revalidate: 60, tags: [PROJECTS_CACHE_TAG] }
 );
+
+const fetchStackFromDbCached = unstable_cache(
+  async () => {
+    if (!hasConvexEnv()) {
+      return {
+        data: null,
+        errorMessage: "Convex is not configured",
+      };
+    }
+
+    try {
+      const data = await fetchConvexQuery(api.stack.listPublic, {});
+      return {
+        data,
+        errorMessage: null,
+      };
+    } catch (error) {
+      return {
+        data: null,
+        errorMessage: error instanceof Error ? error.message : "Failed to fetch stack",
+      };
+    }
+  },
+  ["stack:v1"],
+  { revalidate: 60, tags: [STACK_CACHE_TAG] }
+);
+
+function deriveProjectStack(project: Omit<Project, "id"> | Project, stackItems: StackItem[]) {
+  const selectedIds = project.stackItemIds ?? []
+  const selectedItems = stackItems.filter((item) => selectedIds.includes(item.id));
+
+  return {
+    aiSkills: selectedItems.filter((item) => item.category === "ai_skill").map((item) => item.name),
+    tools: selectedItems.filter((item) => item.category === "tool").map((item) => item.name),
+  };
+}
+
+function buildFallbackStack(): StackItemWithProjects[] {
+  const lookup = new Map<string, StackItemWithProjects>()
+  let nextId = 1
+
+  for (const project of FALLBACK_PROJECTS) {
+    for (const tool of project.tools) {
+      const key = `tool:${tool.toLowerCase()}`
+      const entry =
+        lookup.get(key) ??
+        {
+          id: nextId++,
+          name: tool,
+          category: "tool" as const,
+          grade: "C" as const,
+          usageCount: 0,
+          projects: [],
+        }
+
+      entry.projects.push({
+        id: project.id,
+        title: project.title,
+        status: project.status,
+        url: project.url ?? null,
+      })
+      entry.usageCount = entry.projects.length
+      lookup.set(key, entry)
+    }
+
+    for (const skill of project.aiSkills) {
+      const key = `ai_skill:${skill.toLowerCase()}`
+      const entry =
+        lookup.get(key) ??
+        {
+          id: nextId++,
+          name: skill,
+          category: "ai_skill" as const,
+          grade: "C" as const,
+          usageCount: 0,
+          projects: [],
+        }
+
+      entry.projects.push({
+        id: project.id,
+        title: project.title,
+        status: project.status,
+        url: project.url ?? null,
+      })
+      entry.usageCount = entry.projects.length
+      lookup.set(key, entry)
+    }
+  }
+
+  return Array.from(lookup.values()).sort((a, b) => a.name.localeCompare(b.name))
+}
 
 export async function fetchProjects(opts?: {
   allowFallback?: boolean;
@@ -65,6 +158,38 @@ export async function fetchProjects(opts?: {
   }
 
   return { data: [], error: errorMessage };
+}
+
+export async function fetchStack(): Promise<{
+  data: StackItemWithProjects[];
+  error: string | null;
+}> {
+  const { data, errorMessage } = await fetchStackFromDbCached();
+
+  if (data) {
+    return { data, error: null };
+  }
+
+  return { data: buildFallbackStack(), error: errorMessage };
+}
+
+export async function fetchAdminStack(): Promise<{
+  data: StackItem[];
+  error: string | null;
+}> {
+  if (!hasConvexEnv()) {
+    return { data: [], error: "Convex is not configured" };
+  }
+
+  try {
+    const data = await fetchConvexAuthQuery(api.stack.listAdmin, {});
+    return { data, error: null };
+  } catch (error) {
+    return {
+      data: [],
+      error: error instanceof Error ? error.message : "Failed to load stack",
+    };
+  }
 }
 
 export async function fetchProjectSummaries(): Promise<{
@@ -194,13 +319,20 @@ export async function saveProject(
   }
 
   try {
+    const stackItems = await fetchConvexAuthQuery(api.stack.listAdmin, {});
+    const derivedStack = deriveProjectStack(project, stackItems);
     const previous =
       "id" in project && project.id
         ? await fetchConvexAuthQuery(api.projects.getAdminById, {
             id: project.id,
           })
         : null;
-    const { localized } = await localizeProjectContent(project, previous?.localization);
+    const projectWithDerivedStack = {
+      ...project,
+      aiSkills: derivedStack.aiSkills,
+      tools: derivedStack.tools,
+    };
+    const { localized } = await localizeProjectContent(projectWithDerivedStack, previous?.localization);
     const data = await fetchConvexAuthMutation(api.projects.save, {
       id: "id" in project ? project.id : undefined,
       project: {
@@ -209,8 +341,9 @@ export async function saveProject(
         objectives: project.objectives,
         progress: project.progress,
         status: project.status,
-        aiSkills: project.aiSkills,
-        tools: project.tools,
+        stackItemIds: project.stackItemIds,
+        aiSkills: derivedStack.aiSkills,
+        tools: derivedStack.tools,
         timeframe: project.timeframe,
         url: project.url ?? null,
       },
@@ -236,6 +369,46 @@ export async function deleteProject(projectId: number): Promise<{ error: string 
   } catch (error) {
     return {
       error: error instanceof Error ? error.message : "Failed to delete project",
+    };
+  }
+}
+
+export async function saveStackItem(
+  stack: Omit<StackItem, "id"> | StackItem
+): Promise<{ data: StackItem | null; error: string | null }> {
+  if (!hasConvexEnv()) {
+    return { data: null, error: "Convex is not configured" };
+  }
+
+  try {
+    const data = await fetchConvexAuthMutation(api.stack.save, {
+      id: "id" in stack ? stack.id : undefined,
+      stack: {
+        name: stack.name,
+        category: stack.category,
+        grade: stack.grade,
+      },
+    });
+    return { data, error: null };
+  } catch (error) {
+    return {
+      data: null,
+      error: error instanceof Error ? error.message : "Failed to save stack item",
+    };
+  }
+}
+
+export async function deleteStackItem(stackId: number): Promise<{ error: string | null }> {
+  if (!hasConvexEnv()) {
+    return { error: "Convex is not configured" };
+  }
+
+  try {
+    await fetchConvexAuthMutation(api.stack.remove, { id: stackId });
+    return { error: null };
+  } catch (error) {
+    return {
+      error: error instanceof Error ? error.message : "Failed to delete stack item",
     };
   }
 }

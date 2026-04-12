@@ -6,26 +6,42 @@ import {
   fetchConvexAuthQuery,
   isAuthError,
 } from "@/lib/auth-server";
-import { PROJECTS_CACHE_TAG } from "@/lib/cache-tags";
+import { PROJECTS_CACHE_TAG, STACK_CACHE_TAG } from "@/lib/cache-tags";
 import { localizeProjectContent } from "@/lib/translation";
-import type { Project } from "@/types/database";
+import type { Project, StackItem } from "@/types/database";
 
 function revalidateProjectViews() {
   revalidateTag(PROJECTS_CACHE_TAG);
+  revalidateTag(STACK_CACHE_TAG);
   revalidatePath("/");
   revalidatePath("/en");
   revalidatePath("/ar");
+  revalidatePath("/en/stack");
+  revalidatePath("/ar/stack");
 }
 
-function toProjectInput(project: Omit<Project, "id"> | Project) {
+function deriveProjectStack(project: Omit<Project, "id"> | Project, stackItems: StackItem[]) {
+  const selectedIds = project.stackItemIds ?? []
+  const selectedItems = stackItems.filter((item) => selectedIds.includes(item.id));
+
+  return {
+    aiSkills: selectedItems.filter((item) => item.category === "ai_skill").map((item) => item.name),
+    tools: selectedItems.filter((item) => item.category === "tool").map((item) => item.name),
+  };
+}
+
+function toProjectInput(project: Omit<Project, "id"> | Project, stackItems: StackItem[]) {
+  const derivedStack = deriveProjectStack(project, stackItems);
+
   return {
     title: project.title,
     description: project.description,
     objectives: project.objectives,
     progress: project.progress,
     status: project.status,
-    aiSkills: project.aiSkills,
-    tools: project.tools,
+    stackItemIds: project.stackItemIds,
+    aiSkills: derivedStack.aiSkills,
+    tools: derivedStack.tools,
     timeframe: project.timeframe,
     url: project.url ?? null,
   };
@@ -56,16 +72,21 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const project: Omit<Project, "id"> | Project = await request.json();
+    const stackItems = await fetchConvexAuthQuery(api.stack.listAdmin, {});
+    const projectForLocalization = {
+      ...project,
+      ...deriveProjectStack(project, stackItems),
+    };
     const previous =
       "id" in project && project.id
         ? await fetchConvexAuthQuery(api.projects.getAdminById, {
             id: project.id,
           })
         : null;
-    const { localized, hadFailures } = await localizeProjectContent(project, previous?.localization);
+    const { localized, hadFailures } = await localizeProjectContent(projectForLocalization, previous?.localization);
     const data = await fetchConvexAuthMutation(api.projects.save, {
       id: "id" in project ? project.id : undefined,
-      project: toProjectInput(project),
+      project: toProjectInput(project, stackItems),
       localized,
     });
 
