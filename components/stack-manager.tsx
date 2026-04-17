@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Pencil, Plus, Save, Trash2, X } from "lucide-react"
+import { Check, Pencil, Plus, Save, Table2, Trash2, X } from "lucide-react"
 import { useProjects } from "@/hooks/use-projects"
 import { useStack } from "@/hooks/use-stack"
 import { Badge } from "@/components/ui/badge"
@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Textarea } from "@/components/ui/textarea"
 import type { Project, StackCategory, StackGrade, StackItem } from "@/types/database"
 
@@ -189,6 +190,8 @@ export function StackManager() {
   const [isCreating, setIsCreating] = useState(false)
   const [filter, setFilter] = useState("")
   const [isBackfilling, setIsBackfilling] = useState(false)
+  const [view, setView] = useState<"cards" | "matrix">("cards")
+  const sortedProjects = [...projects].sort((left, right) => left.title.localeCompare(right.title))
 
   const usageByStackId = new Map<number, { count: number; projects: Array<{ id: number; title: string }> }>()
 
@@ -210,6 +213,10 @@ export function StackManager() {
 
     return item.name.toLowerCase().includes(filter.trim().toLowerCase())
   })
+  const editingStackItem =
+    editingStackId === null
+      ? null
+      : stackItems.find((item) => item.id === editingStackId) ?? null
 
   const handleSaveStackItem = async (stackItem: StackFormValue | (StackFormValue & { id: number })) => {
     const result = await saveStackItem(stackItem)
@@ -293,27 +300,34 @@ export function StackManager() {
         <StackForm projects={projects} onSave={handleSaveStackItem} onCancel={() => setIsCreating(false)} />
       ) : null}
 
-      <div className="grid gap-4">
-        {filteredStackItems.map((stackItem) => {
-          const usage = usageByStackId.get(stackItem.id) ?? { count: 0, projects: [] }
+      {editingStackItem ? (
+        <StackForm
+          stackItem={{
+            ...editingStackItem,
+            projectIds: (usageByStackId.get(editingStackItem.id)?.projects ?? []).map((project) => project.id),
+          }}
+          projects={projects}
+          onSave={handleSaveStackItem}
+          onCancel={() => setEditingStackId(null)}
+        />
+      ) : null}
 
-          return (
-            <Card key={stackItem.id} className={editingStackId === stackItem.id ? "ring-2 ring-blue-500" : ""}>
-              {editingStackId === stackItem.id ? (
-                <CardContent className="pt-6">
-                  <StackForm
-                    stackItem={{
-                      ...stackItem,
-                      projectIds: usage.projects.map((project) => project.id),
-                    }}
-                    projects={projects}
-                    onSave={handleSaveStackItem}
-                    onCancel={() => setEditingStackId(null)}
-                    isInline
-                  />
-                </CardContent>
-              ) : (
-                <>
+      <Tabs value={view} onValueChange={(value) => setView(value as "cards" | "matrix")} className="space-y-4">
+        <TabsList>
+          <TabsTrigger value="cards">Cards</TabsTrigger>
+          <TabsTrigger value="matrix">
+            <Table2 className="mr-2 h-4 w-4" />
+            Matrix
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="cards" className="mt-0">
+          <div className="grid gap-4">
+            {filteredStackItems.map((stackItem) => {
+              const usage = usageByStackId.get(stackItem.id) ?? { count: 0, projects: [] }
+
+              return (
+                <Card key={stackItem.id} className={editingStackId === stackItem.id ? "ring-2 ring-blue-500" : ""}>
                   <CardHeader>
                     <div className="flex items-start justify-between gap-4">
                       <div className="space-y-2">
@@ -328,7 +342,10 @@ export function StackManager() {
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => setEditingStackId(stackItem.id)}
+                          onClick={() => {
+                            setEditingStackId(stackItem.id)
+                            setIsCreating(false)
+                          }}
                           aria-label={`Edit ${stackItem.name}`}
                         >
                           <Pencil className="h-4 w-4" />
@@ -361,12 +378,110 @@ export function StackManager() {
                       </div>
                     </div>
                   </CardContent>
-                </>
+                </Card>
+              )
+            })}
+          </div>
+        </TabsContent>
+
+        <TabsContent value="matrix" className="mt-0">
+          <Card>
+            <CardContent className="p-0">
+              {filteredStackItems.length > 0 ? (
+                <div className="overflow-x-auto">
+                  <table className="min-w-full border-collapse text-sm">
+                    <thead className="bg-gray-50">
+                      <tr className="border-b border-gray-200">
+                        <th className="sticky left-0 z-20 min-w-[220px] border-r border-gray-200 bg-gray-50 px-4 py-3 text-left font-medium">
+                          Stack
+                        </th>
+                        <th className="min-w-[100px] border-r border-gray-200 px-3 py-3 text-left font-medium">Type</th>
+                        <th className="min-w-[90px] border-r border-gray-200 px-3 py-3 text-left font-medium">Grade</th>
+                        <th className="min-w-[90px] border-r border-gray-200 px-3 py-3 text-left font-medium">Usage</th>
+                        <th className="min-w-[120px] border-r border-gray-200 px-3 py-3 text-left font-medium">Actions</th>
+                        {sortedProjects.map((project) => (
+                          <th
+                            key={project.id}
+                            className="min-w-[140px] border-r border-gray-200 px-3 py-3 text-left font-medium last:border-r-0"
+                          >
+                            <div className="space-y-1">
+                              <p className="line-clamp-2 min-w-0">{project.title}</p>
+                              <p className="text-xs font-normal text-gray-500">{project.status}</p>
+                            </div>
+                          </th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {filteredStackItems.map((stackItem) => {
+                        const usage = usageByStackId.get(stackItem.id) ?? { count: 0, projects: [] }
+                        const linkedProjectIds = new Set(usage.projects.map((project) => project.id))
+
+                        return (
+                          <tr key={stackItem.id} className="border-b border-gray-200 last:border-b-0">
+                            <td className="sticky left-0 z-10 border-r border-gray-200 bg-white px-4 py-3 align-top">
+                              <div className="space-y-2">
+                                <p className="font-medium">{stackItem.name}</p>
+                                {stackItem.notes ? (
+                                  <p className="line-clamp-3 text-xs leading-5 text-gray-500">{stackItem.notes}</p>
+                                ) : null}
+                              </div>
+                            </td>
+                            <td className="border-r border-gray-200 px-3 py-3 align-top">
+                              <Badge variant="outline">{stackItem.category === "tool" ? "Tool" : "AI Skill"}</Badge>
+                            </td>
+                            <td className="border-r border-gray-200 px-3 py-3 align-top">
+                              <Badge>Grade {stackItem.grade}</Badge>
+                            </td>
+                            <td className="border-r border-gray-200 px-3 py-3 align-top">{usage.count}</td>
+                            <td className="border-r border-gray-200 px-3 py-3 align-top">
+                              <div className="flex items-center gap-2">
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => {
+                                    setEditingStackId(stackItem.id)
+                                    setIsCreating(false)
+                                  }}
+                                  aria-label={`Edit ${stackItem.name}`}
+                                >
+                                  <Pencil className="h-4 w-4" />
+                                </Button>
+                                <Button
+                                  variant="destructive"
+                                  size="sm"
+                                  onClick={() => handleDeleteStackItem(stackItem)}
+                                  aria-label={`Delete ${stackItem.name}`}
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            </td>
+                            {sortedProjects.map((project) => (
+                              <td
+                                key={`${stackItem.id}-${project.id}`}
+                                className="border-r border-gray-200 px-3 py-3 text-center align-middle last:border-r-0"
+                              >
+                                {linkedProjectIds.has(project.id) ? (
+                                  <Check className="mx-auto h-4 w-4 text-green-600" />
+                                ) : (
+                                  <span className="text-gray-300">-</span>
+                                )}
+                              </td>
+                            ))}
+                          </tr>
+                        )
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <div className="px-6 py-8 text-sm text-gray-500">No stack items match the current filter.</div>
               )}
-            </Card>
-          )
-        })}
-      </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   )
 }
