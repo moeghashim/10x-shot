@@ -85,61 +85,6 @@ function deriveProjectStack(project: Omit<Project, "id"> | Project, stackItems: 
   };
 }
 
-function buildFallbackStack(): StackItemWithProjects[] {
-  const lookup = new Map<string, StackItemWithProjects>()
-  let nextId = 1
-
-  for (const project of FALLBACK_PROJECTS) {
-    for (const tool of project.tools) {
-      const key = `tool:${tool.toLowerCase()}`
-      const entry =
-        lookup.get(key) ??
-        {
-          id: nextId++,
-          name: tool,
-          category: "tool" as const,
-          grade: "C" as const,
-          usageCount: 0,
-          projects: [],
-        }
-
-      entry.projects.push({
-        id: project.id,
-        title: project.title,
-        status: project.status,
-        url: project.url ?? null,
-      })
-      entry.usageCount = entry.projects.length
-      lookup.set(key, entry)
-    }
-
-    for (const skill of project.aiSkills) {
-      const key = `ai_skill:${skill.toLowerCase()}`
-      const entry =
-        lookup.get(key) ??
-        {
-          id: nextId++,
-          name: skill,
-          category: "ai_skill" as const,
-          grade: "C" as const,
-          usageCount: 0,
-          projects: [],
-        }
-
-      entry.projects.push({
-        id: project.id,
-        title: project.title,
-        status: project.status,
-        url: project.url ?? null,
-      })
-      entry.usageCount = entry.projects.length
-      lookup.set(key, entry)
-    }
-  }
-
-  return Array.from(lookup.values()).sort((a, b) => a.name.localeCompare(b.name))
-}
-
 export async function fetchProjects(opts?: {
   allowFallback?: boolean;
   locale?: SupportedLocale;
@@ -170,7 +115,7 @@ export async function fetchStack(): Promise<{
     return { data, error: null };
   }
 
-  return { data: buildFallbackStack(), error: errorMessage };
+  return { data: [], error: errorMessage };
 }
 
 export async function fetchAdminStack(): Promise<{

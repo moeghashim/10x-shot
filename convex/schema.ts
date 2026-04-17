@@ -40,6 +40,7 @@ export default defineSchema({
     name: v.string(),
     category: stackCategoryValidator,
     grade: stackGradeValidator,
+    notes: v.optional(v.string()),
     createdAt: v.number(),
     updatedAt: v.number(),
   })

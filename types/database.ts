@@ -72,6 +72,7 @@ export interface StackItem {
   name: string
   category: StackCategory
   grade: StackGrade
+  notes?: string
 }
 
 export interface StackProjectReference {

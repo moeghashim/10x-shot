@@ -65,6 +65,7 @@ export const stackItemInputValidator = v.object({
   name: v.string(),
   category: stackCategoryValidator,
   grade: stackGradeValidator,
+  notes: v.optional(v.string()),
 });
 
 export const projectLocalizationValidator = v.object({

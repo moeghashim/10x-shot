@@ -3,6 +3,11 @@
 import { useEffect, useState } from "react"
 import type { StackItem } from "@/types/database"
 
+type StackItemPayload = Omit<StackItem, "id"> & {
+  id?: number
+  projectIds?: number[]
+}
+
 export function useStack() {
   const [stackItems, setStackItems] = useState<StackItem[]>([])
   const [loading, setLoading] = useState(true)
@@ -29,7 +34,7 @@ export function useStack() {
     }
   }
 
-  const saveStackItem = async (stackItem: Omit<StackItem, "id"> | StackItem) => {
+  const saveStackItem = async (stackItem: StackItemPayload) => {
     try {
       const response = await fetch("/api/admin/stack", {
         method: "POST",
@@ -47,7 +52,7 @@ export function useStack() {
 
       const data = result.data
       if (data) {
-        if ("id" in stackItem && stackItem.id) {
+        if (stackItem.id) {
           setStackItems((prev) => prev.map((item) => (item.id === data.id ? data : item)))
         } else {
           setStackItems((prev) => [...prev, data].sort((a, b) => a.name.localeCompare(b.name)))

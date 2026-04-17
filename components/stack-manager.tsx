@@ -9,23 +9,41 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import type { StackCategory, StackGrade, StackItem } from "@/types/database"
+import { Textarea } from "@/components/ui/textarea"
+import type { Project, StackCategory, StackGrade, StackItem } from "@/types/database"
+
+type StackFormValue = Omit<StackItem, "id"> & {
+  projectIds: number[]
+}
 
 type StackFormProps = {
-  stackItem?: StackItem
-  onSave: (stackItem: Omit<StackItem, "id"> | StackItem) => void
+  stackItem?: StackItem & { projectIds: number[] }
+  projects: Project[]
+  onSave: (stackItem: StackFormValue | (StackFormValue & { id: number })) => void
   onCancel: () => void
   isInline?: boolean
 }
 
 const stackGrades: StackGrade[] = ["A", "B", "C", "D", "E", "F"]
 
-function StackForm({ stackItem, onSave, onCancel, isInline = false }: StackFormProps) {
-  const [formData, setFormData] = useState<Omit<StackItem, "id">>({
+function StackForm({ stackItem, projects, onSave, onCancel, isInline = false }: StackFormProps) {
+  const [formData, setFormData] = useState<StackFormValue>({
     name: stackItem?.name || "",
     category: stackItem?.category || "tool",
     grade: stackItem?.grade || "C",
+    notes: stackItem?.notes || "",
+    projectIds: stackItem?.projectIds || [],
   })
+  const sortedProjects = [...projects].sort((left, right) => left.title.localeCompare(right.title))
+
+  const toggleProject = (projectId: number) => {
+    setFormData((prev) => ({
+      ...prev,
+      projectIds: prev.projectIds.includes(projectId)
+        ? prev.projectIds.filter((id) => id !== projectId)
+        : [...prev.projectIds, projectId],
+    }))
+  }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -87,6 +105,56 @@ function StackForm({ stackItem, onSave, onCancel, isInline = false }: StackFormP
         </div>
       </div>
 
+      <div>
+        <label className="text-sm font-medium">Notes</label>
+        <Textarea
+          placeholder="Add context about when to use this stack item."
+          value={formData.notes || ""}
+          onChange={(e) => setFormData((prev) => ({ ...prev, notes: e.target.value }))}
+          rows={4}
+        />
+      </div>
+
+      <div className="space-y-3 rounded-md border border-gray-200 p-4">
+        <div className="flex items-center justify-between gap-4">
+          <div>
+            <p className="text-sm font-medium">Linked Projects</p>
+            <p className="text-xs text-gray-500">Assign this stack item directly to the projects that use it.</p>
+          </div>
+          <Badge variant="secondary">{formData.projectIds.length} selected</Badge>
+        </div>
+
+        {sortedProjects.length > 0 ? (
+          <div className="grid gap-2 md:grid-cols-2">
+            {sortedProjects.map((project) => {
+              const checked = formData.projectIds.includes(project.id)
+
+              return (
+                <label
+                  key={project.id}
+                  className={`flex cursor-pointer items-start gap-3 rounded-md border p-3 transition-colors ${
+                    checked ? "border-black bg-black text-white" : "border-gray-200 bg-white text-black hover:border-black"
+                  }`}
+                >
+                  <input
+                    type="checkbox"
+                    className="mt-1"
+                    checked={checked}
+                    onChange={() => toggleProject(project.id)}
+                  />
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium">{project.title}</p>
+                    <p className={`text-xs ${checked ? "text-white/70" : "text-gray-500"}`}>{project.status}</p>
+                  </div>
+                </label>
+              )
+            })}
+          </div>
+        ) : (
+          <p className="text-sm text-gray-500">No projects available yet.</p>
+        )}
+      </div>
+
       <div className="flex gap-2">
         <Button type="submit">
           <Save className="mr-2 h-4 w-4" />
@@ -116,13 +184,13 @@ function StackForm({ stackItem, onSave, onCancel, isInline = false }: StackFormP
 
 export function StackManager() {
   const { stackItems, loading, saveStackItem, deleteStackItem, reload: reloadStack } = useStack()
-  const { projects, reload: reloadProjects } = useProjects()
+  const { projects, loading: projectsLoading, reload: reloadProjects } = useProjects()
   const [editingStackId, setEditingStackId] = useState<number | null>(null)
   const [isCreating, setIsCreating] = useState(false)
   const [filter, setFilter] = useState("")
   const [isBackfilling, setIsBackfilling] = useState(false)
 
-  const usageByStackId = new Map<number, { count: number; projects: string[] }>()
+  const usageByStackId = new Map<number, { count: number; projects: Array<{ id: number; title: string }> }>()
 
   for (const project of projects) {
     const stackItemIds = Array.isArray(project.stackItemIds) ? project.stackItemIds : []
@@ -130,7 +198,7 @@ export function StackManager() {
     for (const stackItemId of stackItemIds) {
       const entry = usageByStackId.get(stackItemId) ?? { count: 0, projects: [] }
       entry.count += 1
-      entry.projects.push(project.title)
+      entry.projects.push({ id: project.id, title: project.title })
       usageByStackId.set(stackItemId, entry)
     }
   }
@@ -143,10 +211,11 @@ export function StackManager() {
     return item.name.toLowerCase().includes(filter.trim().toLowerCase())
   })
 
-  const handleSaveStackItem = async (stackItem: Omit<StackItem, "id"> | StackItem) => {
+  const handleSaveStackItem = async (stackItem: StackFormValue | (StackFormValue & { id: number })) => {
     const result = await saveStackItem(stackItem)
 
     if (result.success) {
+      await Promise.all([reloadStack(), reloadProjects()])
       setEditingStackId(null)
       setIsCreating(false)
     } else if (result.error) {
@@ -192,7 +261,7 @@ export function StackManager() {
     }
   }
 
-  if (loading) {
+  if (loading || projectsLoading) {
     return <div className="py-8 text-center">Loading stack...</div>
   }
 
@@ -221,7 +290,7 @@ export function StackManager() {
       </div>
 
       {isCreating ? (
-        <StackForm onSave={handleSaveStackItem} onCancel={() => setIsCreating(false)} />
+        <StackForm projects={projects} onSave={handleSaveStackItem} onCancel={() => setIsCreating(false)} />
       ) : null}
 
       <div className="grid gap-4">
@@ -233,7 +302,11 @@ export function StackManager() {
               {editingStackId === stackItem.id ? (
                 <CardContent className="pt-6">
                   <StackForm
-                    stackItem={stackItem}
+                    stackItem={{
+                      ...stackItem,
+                      projectIds: usage.projects.map((project) => project.id),
+                    }}
+                    projects={projects}
                     onSave={handleSaveStackItem}
                     onCancel={() => setEditingStackId(null)}
                     isInline
@@ -272,13 +345,14 @@ export function StackManager() {
                     </div>
                   </CardHeader>
                   <CardContent className="space-y-3">
+                    {stackItem.notes ? <p className="text-sm leading-6 text-gray-600">{stackItem.notes}</p> : null}
                     <div>
                       <p className="text-xs font-medium uppercase tracking-wide text-gray-500">Used In Projects</p>
                       <div className="mt-2 flex flex-wrap gap-2">
                         {usage.projects.length > 0 ? (
-                          usage.projects.map((projectTitle) => (
-                            <Badge key={`${stackItem.id}-${projectTitle}`} variant="outline">
-                              {projectTitle}
+                          usage.projects.map((project) => (
+                            <Badge key={`${stackItem.id}-${project.id}`} variant="outline">
+                              {project.title}
                             </Badge>
                           ))
                         ) : (

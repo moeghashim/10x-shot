@@ -9,6 +9,11 @@ import {
 import { PROJECTS_CACHE_TAG, STACK_CACHE_TAG } from "@/lib/cache-tags";
 import type { StackItem } from "@/types/database";
 
+type StackUpsertPayload = Omit<StackItem, "id"> & {
+  id?: number;
+  projectIds?: number[];
+};
+
 function revalidateStackViews() {
   revalidateTag(PROJECTS_CACHE_TAG);
   revalidateTag(STACK_CACHE_TAG);
@@ -43,14 +48,16 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
-    const stack: Omit<StackItem, "id"> | StackItem = await request.json();
+    const stack: StackUpsertPayload = await request.json();
     const data = await fetchConvexAuthMutation(api.stack.save, {
-      id: "id" in stack ? stack.id : undefined,
+      id: stack.id,
       stack: {
         name: stack.name,
         category: stack.category,
         grade: stack.grade,
+        notes: stack.notes?.trim() ? stack.notes.trim() : undefined,
       },
+      projectIds: Array.isArray(stack.projectIds) ? stack.projectIds : undefined,
     });
 
     revalidateStackViews();

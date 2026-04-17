@@ -1,7 +1,9 @@
 import { ConvexError, v } from "convex/values";
-import { mutation, query } from "./_generated/server";
+import { mutation, query, type MutationCtx } from "./_generated/server";
 import { requireAdmin } from "./lib";
 import { stackItemInputValidator } from "./validators";
+
+type StackLookup = Map<number, { name: string; category: "tool" | "ai_skill" }>;
 
 function toStackItem(doc: any) {
   return {
@@ -9,7 +11,109 @@ function toStackItem(doc: any) {
     name: doc.name,
     category: doc.category,
     grade: doc.grade,
+    notes: doc.notes,
   };
+}
+
+function normalizeIds(ids: number[] | undefined) {
+  return Array.from(new Set((ids ?? []).filter((id) => Number.isInteger(id))));
+}
+
+function buildStackLookup(stackDocs: Array<any>): StackLookup {
+  return new Map(
+    stackDocs.map((doc) => [
+      doc.legacyId,
+      {
+        name: doc.name,
+        category: doc.category,
+      },
+    ])
+  );
+}
+
+function deriveProjectStack(stackItemIds: number[] | undefined, stackLookup: StackLookup) {
+  const aiSkills: string[] = [];
+  const tools: string[] = [];
+
+  for (const stackItemId of normalizeIds(stackItemIds)) {
+    const item = stackLookup.get(stackItemId);
+    if (!item) {
+      continue;
+    }
+
+    if (item.category === "ai_skill") {
+      aiSkills.push(item.name);
+    } else {
+      tools.push(item.name);
+    }
+  }
+
+  return { aiSkills, tools };
+}
+
+function sameStringArray(left: string[] | undefined, right: string[]) {
+  if ((left ?? []).length !== right.length) {
+    return false;
+  }
+
+  return right.every((value, index) => (left ?? [])[index] === value);
+}
+
+async function syncStackItemProjects(
+  ctx: MutationCtx,
+  stackDocs: Array<any>,
+  stackItemId: number,
+  projectIds: number[],
+  now: number
+) {
+  const normalizedProjectIds = normalizeIds(projectIds);
+  const projectDocs = await ctx.db.query("projects").collect();
+  const projectIdsSet = new Set(normalizedProjectIds);
+  const projectLookup = new Map(projectDocs.map((project) => [project.legacyId, project]));
+  const missingProjectIds = normalizedProjectIds.filter((projectId) => !projectLookup.has(projectId));
+
+  if (missingProjectIds.length > 0) {
+    throw new ConvexError(`Unknown project ids: ${missingProjectIds.join(", ")}`);
+  }
+
+  const stackLookup = buildStackLookup(stackDocs);
+
+  for (const project of projectDocs) {
+    const currentStackItemIds = normalizeIds(project.stackItemIds);
+    const isLinked = currentStackItemIds.includes(stackItemId);
+    const shouldBeLinked = projectIdsSet.has(project.legacyId);
+
+    if (!isLinked && !shouldBeLinked) {
+      continue;
+    }
+
+    const nextStackItemIds = shouldBeLinked
+      ? normalizeIds([...currentStackItemIds, stackItemId])
+      : currentStackItemIds.filter((id) => id !== stackItemId);
+    const derivedStack = deriveProjectStack(nextStackItemIds, stackLookup);
+    const stackIdsChanged =
+      nextStackItemIds.length !== currentStackItemIds.length ||
+      nextStackItemIds.some((id, index) => id !== currentStackItemIds[index]);
+    const derivedChanged =
+      !sameStringArray(project.aiSkills, derivedStack.aiSkills) || !sameStringArray(project.tools, derivedStack.tools);
+
+    if (!stackIdsChanged && !derivedChanged) {
+      continue;
+    }
+
+    await ctx.db.patch(project._id, {
+      stackItemIds: nextStackItemIds,
+      aiSkills: derivedStack.aiSkills,
+      tools: derivedStack.tools,
+      updatedAt: now,
+    });
+  }
+}
+
+async function getLinkedProjectIds(ctx: MutationCtx, stackItemId: number) {
+  const projectDocs = await ctx.db.query("projects").collect();
+
+  return projectDocs.filter((project) => (project.stackItemIds ?? []).includes(stackItemId)).map((project) => project.legacyId);
 }
 
 export const listPublic = query({
@@ -71,6 +175,7 @@ export const save = mutation({
   args: {
     id: v.optional(v.number()),
     stack: stackItemInputValidator,
+    projectIds: v.optional(v.array(v.number())),
   },
   handler: async (ctx, args) => {
     const { profile } = await requireAdmin(ctx);
@@ -89,6 +194,7 @@ export const save = mutation({
     }
 
     const normalizedName = args.stack.name.trim();
+    const normalizedNotes = args.stack.notes?.trim();
     if (!normalizedName) {
       throw new ConvexError("Stack item name is required");
     }
@@ -110,8 +216,30 @@ export const save = mutation({
         name: normalizedName,
         category: args.stack.category,
         grade: args.stack.grade,
+        notes: normalizedNotes,
         updatedAt: now,
       });
+
+      const updatedStackDocs = allStackItems.map((item) =>
+        item.legacyId === existing.legacyId
+          ? {
+              ...item,
+              name: normalizedName,
+              category: args.stack.category,
+              grade: args.stack.grade,
+              notes: normalizedNotes,
+              updatedAt: now,
+            }
+          : item
+      );
+
+      await syncStackItemProjects(
+        ctx,
+        updatedStackDocs,
+        existing.legacyId,
+        args.projectIds ?? (await getLinkedProjectIds(ctx, existing.legacyId)),
+        now
+      );
 
       await ctx.db.insert("adminActivity", {
         userId: profile.userId,
@@ -127,6 +255,7 @@ export const save = mutation({
         name: normalizedName,
         category: args.stack.category,
         grade: args.stack.grade,
+        notes: normalizedNotes,
       };
     }
 
@@ -136,9 +265,31 @@ export const save = mutation({
       name: normalizedName,
       category: args.stack.category,
       grade: args.stack.grade,
+      notes: normalizedNotes,
       createdAt: now,
       updatedAt: now,
     });
+
+    if (args.projectIds !== undefined) {
+      await syncStackItemProjects(
+        ctx,
+        [
+          ...allStackItems,
+          {
+            legacyId: nextLegacyId,
+            name: normalizedName,
+            category: args.stack.category,
+            grade: args.stack.grade,
+            notes: normalizedNotes,
+            createdAt: now,
+            updatedAt: now,
+          },
+        ],
+        nextLegacyId,
+        args.projectIds,
+        now
+      );
+    }
 
     await ctx.db.insert("adminActivity", {
       userId: profile.userId,
@@ -154,6 +305,7 @@ export const save = mutation({
       name: normalizedName,
       category: args.stack.category,
       grade: args.stack.grade,
+      notes: normalizedNotes,
     };
   },
 });
