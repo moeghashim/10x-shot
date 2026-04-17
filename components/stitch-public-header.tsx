@@ -28,7 +28,7 @@ export function StitchPublicHeader({
   isHomepage = false,
 }: StitchPublicHeaderProps) {
   return (
-    <header className="sticky top-0 z-50 border-b border-black/15 bg-[#f7f5f1]/80 backdrop-blur-xl">
+    <header className="sticky top-0 z-50 border-b border-black/15 bg-[#f7f5f1]/90 backdrop-blur-xl">
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-4 md:px-10">
         <Link href="/" className="group inline-flex items-center gap-3">
           <Image
@@ -44,21 +44,21 @@ export function StitchPublicHeader({
           </span>
         </Link>
 
-        <nav className="hidden items-center gap-2 rounded-full border border-black/10 bg-white/70 px-2 py-2 shadow-[0_8px_25px_rgba(0,0,0,0.05)] md:flex">
+        <nav className="hidden items-center gap-8 md:flex">
           <a
-            className="stitch-mono rounded-full px-4 py-2 text-[10px] uppercase tracking-[0.3em] text-black/65 transition-colors hover:bg-black hover:text-white"
+            className="stitch-mono text-[10px] uppercase tracking-[0.3em] text-black/65 transition-colors hover:text-black"
             href={getSectionHref(locale, "projects", isHomepage)}
           >
             {labels.projects}
           </a>
           <Link
-            className="stitch-mono rounded-full px-4 py-2 text-[10px] uppercase tracking-[0.3em] text-black/65 transition-colors hover:bg-black hover:text-white"
+            className="stitch-mono text-[10px] uppercase tracking-[0.3em] text-black/65 transition-colors hover:text-black"
             href="/stack"
           >
             {labels.stack}
           </Link>
           <a
-            className="stitch-mono rounded-full px-4 py-2 text-[10px] uppercase tracking-[0.3em] text-black/65 transition-colors hover:bg-black hover:text-white"
+            className="stitch-mono text-[10px] uppercase tracking-[0.3em] text-black/65 transition-colors hover:text-black"
             href={getSectionHref(locale, "contact", isHomepage)}
           >
             {labels.contact}
@@ -68,7 +68,7 @@ export function StitchPublicHeader({
         <div className="flex items-center gap-3">
           <Link
             href="/progress"
-            className="stitch-mono hidden h-11 items-center rounded-full border border-black/15 bg-black px-5 text-[10px] uppercase tracking-[0.28em] text-white transition-transform hover:-translate-y-0.5 md:inline-flex"
+            className="stitch-mono hidden border border-black/15 bg-white px-4 py-2 text-[10px] uppercase tracking-[0.28em] text-black transition-colors hover:border-black md:inline-flex"
           >
             {labels.progress}
           </Link>
