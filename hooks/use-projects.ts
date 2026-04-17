@@ -6,6 +6,15 @@
 import { useState, useEffect } from 'react'
 import type { Project } from '@/types/database'
 
+function normalizeProject(project: Project): Project {
+  return {
+    ...project,
+    stackItemIds: Array.isArray(project.stackItemIds) ? project.stackItemIds : [],
+    aiSkills: Array.isArray(project.aiSkills) ? project.aiSkills : [],
+    tools: Array.isArray(project.tools) ? project.tools : [],
+  }
+}
+
 export function useProjects() {
   const [projects, setProjects] = useState<Project[]>([])
   const [loading, setLoading] = useState(true)
@@ -24,7 +33,7 @@ export function useProjects() {
         throw new Error(result.error || 'Failed to fetch projects')
       }
       
-      setProjects(result.data || [])
+      setProjects(Array.isArray(result.data) ? result.data.map(normalizeProject) : [])
     } catch (err: any) {
       setError(err.message)
       console.error('Failed to load projects from database:', err)
@@ -55,9 +64,9 @@ export function useProjects() {
       // Update local state with data returned from DB
       if (data) {
         if ('id' in project && project.id) {
-          setProjects(prev => prev.map(p => p.id === data.id ? data : p))
+          setProjects(prev => prev.map(p => p.id === data.id ? normalizeProject(data) : p))
         } else {
-          setProjects(prev => [...prev, data])
+          setProjects(prev => [...prev, normalizeProject(data)])
         }
       }
 
@@ -107,4 +116,3 @@ export function useProjects() {
     deleteProject
   }
 }
-

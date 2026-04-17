@@ -125,7 +125,9 @@ export function StackManager() {
   const usageByStackId = new Map<number, { count: number; projects: string[] }>()
 
   for (const project of projects) {
-    for (const stackItemId of project.stackItemIds) {
+    const stackItemIds = Array.isArray(project.stackItemIds) ? project.stackItemIds : []
+
+    for (const stackItemId of stackItemIds) {
       const entry = usageByStackId.get(stackItemId) ?? { count: 0, projects: [] }
       entry.count += 1
       entry.projects.push(project.title)
