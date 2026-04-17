@@ -182,12 +182,17 @@
     "eyebrow": "System inventory / Shared stack",
     "title": "Stack Catalog",
     "description": "A live inventory of the tools and AI skills used across the 10 Claws projects, including where each item is used and its current grade.",
+    "stack": "Stack",
     "grade": "Grade",
     "category": "Category",
     "usage": "Projects using it",
     "projects": "Projects",
     "noProjects": "Not assigned to any project yet.",
     "empty": "No stack items available yet.",
+    "views": {
+      "cards": "Cards",
+      "matrix": "Matrix"
+    },
     "categories": {
       "tool": "Tool",
       "ai_skill": "AI Skill"

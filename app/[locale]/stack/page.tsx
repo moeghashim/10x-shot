@@ -52,6 +52,11 @@ export default async function StackRoute({
         noProjects: t("noProjects"),
         empty: t("empty"),
         backToProjects: t("projects"),
+        stack: t("stack"),
+        views: {
+          cards: t("views.cards"),
+          matrix: t("views.matrix"),
+        },
         categories: {
           tool: t("categories.tool"),
           ai_skill: t("categories.ai_skill"),
