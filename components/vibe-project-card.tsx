@@ -1,5 +1,6 @@
 import { SkillsDisplay } from "@/components/skills-display"
 import { Clock, TrendingUp, Play, Pause, ExternalLink } from "lucide-react"
+import { getProjectStatusStyles } from "@/lib/project-status"
 import type { Project } from "@/types/database"
 
 interface VibeProjectCardProps {
@@ -22,39 +23,17 @@ function isProjectLaunchingSoon(project: Project) {
 }
 
 export function VibeProjectCard({ project, labels, skillLabels }: VibeProjectCardProps) {
-  const status = ["active", "planning", "completed"].includes(project.status)
-    ? project.status
-    : "planning"
+  const { status, badge: statusBadgeClass, icon: statusIconClass } = getProjectStatusStyles(project.status)
   const launchingSoon = isProjectLaunchingSoon(project)
-
-  const statusStyles = {
-    active: {
-      border: "border-emerald-600",
-      text: "text-emerald-600",
-      icon: "text-emerald-600",
-    },
-    planning: {
-      border: "border-amber-500",
-      text: "text-amber-600",
-      icon: "text-amber-600",
-    },
-    completed: {
-      border: "border-black",
-      text: "text-black",
-      icon: "text-black",
-    },
-  } as const
-
-  const statusStyle = statusStyles[status as keyof typeof statusStyles]
 
   const getStatusIcon = (status: string) => {
     switch (status) {
       case "active":
-        return <Play className={`h-3 w-3 ${statusStyle.icon}`} />
+        return <Play className={`h-3 w-3 ${statusIconClass}`} />
       case "planning":
-        return <Pause className={`h-3 w-3 ${statusStyle.icon}`} />
+        return <Pause className={`h-3 w-3 ${statusIconClass}`} />
       case "completed":
-        return <TrendingUp className={`h-3 w-3 ${statusStyle.icon}`} />
+        return <TrendingUp className={`h-3 w-3 ${statusIconClass}`} />
       default:
         return null
     }
@@ -64,7 +43,7 @@ export function VibeProjectCard({ project, labels, skillLabels }: VibeProjectCar
     <div className="vibe-font bg-white border-2 border-dashed border-gray-300 p-6 transition-all hover:border-black text-start">
       <div className="flex items-start justify-between mb-4">
         <h3 className="text-xl font-black uppercase tracking-tighter mb-2">{project.title}</h3>
-        <div className={`flex items-center gap-1 px-2 py-1 border-2 ${statusStyle.border} text-[10px] font-black uppercase tracking-widest bg-white whitespace-nowrap ${statusStyle.text}`}>
+        <div className={`flex items-center gap-1 px-2 py-1 border-2 text-[10px] font-black uppercase tracking-widest whitespace-nowrap ${statusBadgeClass}`}>
           {getStatusIcon(status)}
           {labels.status[status]}
         </div>

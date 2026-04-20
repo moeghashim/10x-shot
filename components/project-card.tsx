@@ -2,6 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { SkillsDisplay } from "@/components/skills-display"
 import { Clock, TrendingUp, Play, Pause, ExternalLink } from "lucide-react"
+import { getProjectStatusStyles } from "@/lib/project-status"
 import type { Project } from "@/types/database"
 
 interface ProjectCardProps {
@@ -9,14 +10,16 @@ interface ProjectCardProps {
 }
 
 export function ProjectCard({ project }: ProjectCardProps) {
+  const { status, badge: statusBadgeClass, icon: statusIconClass } = getProjectStatusStyles(project.status)
+
   const getStatusIcon = (status: string) => {
     switch (status) {
       case "active":
-        return <Play className="h-3 w-3" />
+        return <Play className={`h-3 w-3 ${statusIconClass}`} />
       case "planning":
-        return <Pause className="h-3 w-3" />
+        return <Pause className={`h-3 w-3 ${statusIconClass}`} />
       case "completed":
-        return <TrendingUp className="h-3 w-3" />
+        return <TrendingUp className={`h-3 w-3 ${statusIconClass}`} />
       default:
         return null
     }
@@ -27,9 +30,9 @@ export function ProjectCard({ project }: ProjectCardProps) {
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
           <CardTitle className="text-lg text-black mb-2">{project.title}</CardTitle>
-          <div className="flex items-center gap-1 px-2 py-1 rounded-full text-xs text-gray-600 border border-gray-300">
-            {getStatusIcon(project.status)}
-            {project.status}
+          <div className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs border ${statusBadgeClass}`}>
+            {getStatusIcon(status)}
+            {status}
           </div>
         </div>
       </CardHeader>

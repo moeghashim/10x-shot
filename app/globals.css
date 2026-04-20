@@ -37,6 +37,15 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+  --status-active-bg: #eaf4ee;
+  --status-active-border: #2f6b4f;
+  --status-active-text: #24533d;
+  --status-planning-bg: #f6eedc;
+  --status-planning-border: #a06a13;
+  --status-planning-text: #7b500b;
+  --status-completed-bg: #eceff1;
+  --status-completed-border: #5b6670;
+  --status-completed-text: #434c54;
 }
 
 .dark {

@@ -3,6 +3,7 @@ import Image from "next/image"
 import { Link } from "@/i18n/routing"
 import { StitchPublicHeader } from "@/components/stitch-public-header"
 import { StitchTechStack } from "@/components/stitch-tech-stack"
+import { getProjectStatusStyles } from "@/lib/project-status"
 import { getSiteCopyText, type SiteCopyMap } from "@/lib/site-content"
 import type { Project, SupportedLocale } from "@/types/database"
 
@@ -152,6 +153,7 @@ export function StitchHomepage({
             <div className="mt-8 grid gap-px border border-black/15 bg-black/15 lg:grid-cols-2">
               {projects.map((project) => {
                 const launchingSoon = isProjectLaunchingSoon(project)
+                const { badge: statusBadgeClass } = getProjectStatusStyles(project.status)
 
                 return (
                   <article key={project.id} className="flex h-full flex-col bg-white p-6 md:p-8">
@@ -164,7 +166,7 @@ export function StitchHomepage({
                           {project.title}
                         </h3>
                       </div>
-                      <span className="stitch-mono shrink-0 border border-black/15 px-3 py-1 text-[10px] uppercase tracking-[0.25em] text-black">
+                      <span className={`stitch-mono shrink-0 border px-3 py-1 text-[10px] uppercase tracking-[0.25em] ${statusBadgeClass}`}>
                         {formatProjectStatus(project.status, t)}
                       </span>
                     </div>

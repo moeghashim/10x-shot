@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input"
 import { Progress } from "@/components/ui/progress"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
+import { getProjectStatusStyles } from "@/lib/project-status"
 import type { Project, StackItem } from "@/types/database"
 
 function deriveProjectStack(stackItems: StackItem[], stackItemIds: number[]) {
@@ -391,92 +392,96 @@ export function ProjectManager() {
       ) : null}
 
       <div className="grid gap-4">
-        {projects.map((project) => (
-          <Card key={project.id} className={editingProjectId === project.id ? "ring-2 ring-blue-500" : ""}>
-            {editingProjectId === project.id ? (
-              <CardContent className="pt-6">
-                <ProjectForm
-                  project={project}
-                  stackItems={stackItems}
-                  stackLoading={stackLoading}
-                  onSave={handleSaveProject}
-                  onCancel={() => setEditingProjectId(null)}
-                  isInline
-                />
-              </CardContent>
-            ) : (
-              <>
-                <CardHeader>
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <CardTitle className="flex items-center gap-2">
-                        {project.title}
-                        <Badge variant={project.status === "active" ? "default" : "secondary"}>
-                          {project.status}
-                        </Badge>
-                      </CardTitle>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setEditingProjectId(project.id)}
-                        aria-label={`Edit ${project.title}`}
-                      >
-                        <Pencil className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="destructive"
-                        size="sm"
-                        onClick={() => handleDeleteProject(project)}
-                        aria-label={`Delete ${project.title}`}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <p className="mb-4 text-sm text-gray-600">{project.description}</p>
+        {projects.map((project) => {
+          const { status, badge: statusBadgeClass } = getProjectStatusStyles(project.status)
 
-                  <div className="space-y-3">
-                    <div>
-                      <div className="mb-1 flex justify-between text-sm">
-                        <span>Progress</span>
-                        <span>{project.progress}%</span>
-                      </div>
-                      <Progress value={project.progress} />
-                    </div>
-
-                    <div className="space-y-2">
-                      <div>
-                        <span className="text-sm font-medium">AI Skills: </span>
-                        <div className="mt-1 flex flex-wrap gap-1">
-                          {project.aiSkills.map((skill) => (
-                            <Badge key={skill} variant="secondary" className="text-xs">
-                              {skill}
-                            </Badge>
-                          ))}
-                        </div>
-                      </div>
-
-                      <div>
-                        <span className="text-sm font-medium">Tools: </span>
-                        <div className="mt-1 flex flex-wrap gap-1">
-                          {project.tools.map((tool) => (
-                            <Badge key={tool} variant="outline" className="text-xs">
-                              {tool}
-                            </Badge>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+          return (
+            <Card key={project.id} className={editingProjectId === project.id ? "ring-2 ring-blue-500" : ""}>
+              {editingProjectId === project.id ? (
+                <CardContent className="pt-6">
+                  <ProjectForm
+                    project={project}
+                    stackItems={stackItems}
+                    stackLoading={stackLoading}
+                    onSave={handleSaveProject}
+                    onCancel={() => setEditingProjectId(null)}
+                    isInline
+                  />
                 </CardContent>
-              </>
-            )}
-          </Card>
-        ))}
+              ) : (
+                <>
+                  <CardHeader>
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <CardTitle className="flex items-center gap-2">
+                          {project.title}
+                          <Badge variant="outline" className={statusBadgeClass}>
+                            {status}
+                          </Badge>
+                        </CardTitle>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setEditingProjectId(project.id)}
+                          aria-label={`Edit ${project.title}`}
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          onClick={() => handleDeleteProject(project)}
+                          aria-label={`Delete ${project.title}`}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="mb-4 text-sm text-gray-600">{project.description}</p>
+
+                    <div className="space-y-3">
+                      <div>
+                        <div className="mb-1 flex justify-between text-sm">
+                          <span>Progress</span>
+                          <span>{project.progress}%</span>
+                        </div>
+                        <Progress value={project.progress} />
+                      </div>
+
+                      <div className="space-y-2">
+                        <div>
+                          <span className="text-sm font-medium">AI Skills: </span>
+                          <div className="mt-1 flex flex-wrap gap-1">
+                            {project.aiSkills.map((skill) => (
+                              <Badge key={skill} variant="secondary" className="text-xs">
+                                {skill}
+                              </Badge>
+                            ))}
+                          </div>
+                        </div>
+
+                        <div>
+                          <span className="text-sm font-medium">Tools: </span>
+                          <div className="mt-1 flex flex-wrap gap-1">
+                            {project.tools.map((tool) => (
+                              <Badge key={tool} variant="outline" className="text-xs">
+                                {tool}
+                              </Badge>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </>
+              )}
+            </Card>
+          )
+        })}
       </div>
     </div>
   )
