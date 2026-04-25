@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Textarea } from "@/components/ui/textarea"
-import type { Project, StackCategory, StackGrade, StackItem } from "@/types/database"
+import type { Project, StackCategory, StackFamiliarity, StackGrade, StackItem } from "@/types/database"
 
 type StackFormValue = Omit<StackItem, "id"> & {
   projectIds: number[]
@@ -26,12 +26,24 @@ type StackFormProps = {
 }
 
 const stackGrades: StackGrade[] = ["A", "B", "C", "D", "E", "F"]
+const stackFamiliarityLevels: Array<{ value: StackFamiliarity; label: string }> = [
+  { value: "learning", label: "Learning" },
+  { value: "comfortable", label: "Comfortable" },
+  { value: "proficient", label: "Proficient" },
+  { value: "expert", label: "Expert" },
+]
+
+function getFamiliarityLabel(familiarity?: StackFamiliarity) {
+  return stackFamiliarityLevels.find((level) => level.value === familiarity)?.label ?? "Learning"
+}
 
 function StackForm({ stackItem, projects, onSave, onCancel, isInline = false }: StackFormProps) {
   const [formData, setFormData] = useState<StackFormValue>({
     name: stackItem?.name || "",
     category: stackItem?.category || "tool",
     grade: stackItem?.grade || "C",
+    familiarity: stackItem?.familiarity || "learning",
+    reason: stackItem?.reason || "",
     notes: stackItem?.notes || "",
     projectIds: stackItem?.projectIds || [],
   })
@@ -104,6 +116,35 @@ function StackForm({ stackItem, projects, onSave, onCancel, isInline = false }: 
             </SelectContent>
           </Select>
         </div>
+      </div>
+
+      <div>
+        <label className="text-sm font-medium">Familiarity</label>
+        <Select
+          value={formData.familiarity || "learning"}
+          onValueChange={(value: StackFamiliarity) => setFormData((prev) => ({ ...prev, familiarity: value }))}
+        >
+          <SelectTrigger>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {stackFamiliarityLevels.map((level) => (
+              <SelectItem key={level.value} value={level.value}>
+                {level.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div>
+        <label className="text-sm font-medium">Reason Chosen</label>
+        <Textarea
+          placeholder="Explain why this belongs in the stack."
+          value={formData.reason || ""}
+          onChange={(e) => setFormData((prev) => ({ ...prev, reason: e.target.value }))}
+          rows={3}
+        />
       </div>
 
       <div>
@@ -211,7 +252,8 @@ export function StackManager() {
       return true
     }
 
-    return item.name.toLowerCase().includes(filter.trim().toLowerCase())
+    const searchText = [item.name, item.reason, item.notes].filter(Boolean).join(" ").toLowerCase()
+    return searchText.includes(filter.trim().toLowerCase())
   })
   const editingStackItem =
     editingStackId === null
@@ -335,6 +377,7 @@ export function StackManager() {
                         <div className="flex flex-wrap gap-2">
                           <Badge variant="outline">{stackItem.category === "tool" ? "Tool" : "AI Skill"}</Badge>
                           <Badge>Grade {stackItem.grade}</Badge>
+                          <Badge variant="outline">{getFamiliarityLabel(stackItem.familiarity)}</Badge>
                           <Badge variant="secondary">{usage.count} project{usage.count === 1 ? "" : "s"}</Badge>
                         </div>
                       </div>
@@ -362,6 +405,12 @@ export function StackManager() {
                     </div>
                   </CardHeader>
                   <CardContent className="space-y-3">
+                    {stackItem.reason ? (
+                      <div>
+                        <p className="text-xs font-medium uppercase tracking-wide text-gray-500">Reason Chosen</p>
+                        <p className="mt-1 text-sm leading-6 text-gray-700">{stackItem.reason}</p>
+                      </div>
+                    ) : null}
                     {stackItem.notes ? <p className="text-sm leading-6 text-gray-600">{stackItem.notes}</p> : null}
                     <div>
                       <p className="text-xs font-medium uppercase tracking-wide text-gray-500">Used In Projects</p>
@@ -397,6 +446,7 @@ export function StackManager() {
                         </th>
                         <th className="min-w-[100px] border-r border-gray-200 px-3 py-3 text-left font-medium">Type</th>
                         <th className="min-w-[90px] border-r border-gray-200 px-3 py-3 text-left font-medium">Grade</th>
+                        <th className="min-w-[130px] border-r border-gray-200 px-3 py-3 text-left font-medium">Familiarity</th>
                         <th className="min-w-[90px] border-r border-gray-200 px-3 py-3 text-left font-medium">Usage</th>
                         <th className="min-w-[120px] border-r border-gray-200 px-3 py-3 text-left font-medium">Actions</th>
                         {sortedProjects.map((project) => (
@@ -422,6 +472,9 @@ export function StackManager() {
                             <td className="sticky left-0 z-10 border-r border-gray-200 bg-white px-4 py-3 align-top">
                               <div className="space-y-2">
                                 <p className="font-medium">{stackItem.name}</p>
+                                {stackItem.reason ? (
+                                  <p className="line-clamp-3 text-xs leading-5 text-gray-700">{stackItem.reason}</p>
+                                ) : null}
                                 {stackItem.notes ? (
                                   <p className="line-clamp-3 text-xs leading-5 text-gray-500">{stackItem.notes}</p>
                                 ) : null}
@@ -432,6 +485,9 @@ export function StackManager() {
                             </td>
                             <td className="border-r border-gray-200 px-3 py-3 align-top">
                               <Badge>Grade {stackItem.grade}</Badge>
+                            </td>
+                            <td className="border-r border-gray-200 px-3 py-3 align-top">
+                              <Badge variant="outline">{getFamiliarityLabel(stackItem.familiarity)}</Badge>
                             </td>
                             <td className="border-r border-gray-200 px-3 py-3 align-top">{usage.count}</td>
                             <td className="border-r border-gray-200 px-3 py-3 align-top">

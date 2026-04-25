@@ -9,6 +9,7 @@
 export type ProjectStatus = "active" | "planning" | "completed"
 export type StackGrade = "A" | "B" | "C" | "D" | "E" | "F"
 export type StackCategory = "tool" | "ai_skill"
+export type StackFamiliarity = "learning" | "comfortable" | "proficient" | "expert"
 
 export type SupportedLocale = "en" | "ar"
 export type TranslationStatus = "synced" | "failed" | "pending"
@@ -72,6 +73,8 @@ export interface StackItem {
   name: string
   category: StackCategory
   grade: StackGrade
+  familiarity?: StackFamiliarity
+  reason?: string
   notes?: string
 }
 

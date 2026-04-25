@@ -6,7 +6,7 @@ import Image from "next/image"
 import { Link } from "@/i18n/routing"
 import { StitchPublicHeader } from "@/components/stitch-public-header"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import type { StackItemWithProjects, SupportedLocale } from "@/types/database"
+import type { StackFamiliarity, StackItemWithProjects, SupportedLocale } from "@/types/database"
 
 type StackPageProps = {
   locale: SupportedLocale
@@ -16,6 +16,8 @@ type StackPageProps = {
     description: string
     eyebrow: string
     grade: string
+    familiarity: string
+    reason: string
     category: string
     usage: string
     noProjects: string
@@ -30,6 +32,7 @@ type StackPageProps = {
       tool: string
       ai_skill: string
     }
+    familiarityLevels: Record<StackFamiliarity, string>
     nav: {
       projects: string
       stack: string
@@ -51,6 +54,8 @@ export function StackPage({ locale, stackItems, strings }: StackPageProps) {
   ).sort((left, right) => left.title.localeCompare(right.title))
 
   const projectHref = (project: { url?: string | null }) => project.url || `/${locale}#projects`
+  const getFamiliarityLabel = (familiarity?: StackFamiliarity) =>
+    familiarity ? strings.familiarityLevels[familiarity] : strings.familiarityLevels.learning
 
   return (
     <div className="min-h-screen bg-[#f7f5f1] text-black selection:bg-black selection:text-white">
@@ -140,8 +145,18 @@ export function StackPage({ locale, stackItems, strings }: StackPageProps) {
                             <span className="stitch-mono inline-flex bg-black px-3 py-2 text-[10px] uppercase tracking-[0.28em] text-white">
                               {strings.grade} {item.grade}
                             </span>
+                            <span className="stitch-mono inline-flex border border-black bg-[#f3f1ed] px-3 py-2 text-[10px] uppercase tracking-[0.28em] text-black">
+                              {getFamiliarityLabel(item.familiarity)}
+                            </span>
                           </div>
                         </div>
+
+                        {item.reason ? (
+                          <div className="border-l border-black pl-4">
+                            <p className="stitch-mono text-[10px] uppercase tracking-[0.3em] text-black/45">{strings.reason}</p>
+                            <p className="mt-2 text-sm leading-7 text-black/72">{item.reason}</p>
+                          </div>
+                        ) : null}
 
                         {item.notes ? <p className="text-sm leading-7 text-black/68">{item.notes}</p> : null}
 
@@ -190,6 +205,9 @@ export function StackPage({ locale, stackItems, strings }: StackPageProps) {
                           <th className="min-w-[100px] border-r border-black/15 px-4 py-4 text-left">
                             <span className="stitch-mono text-[10px] uppercase tracking-[0.28em] text-black/60">{strings.grade}</span>
                           </th>
+                          <th className="min-w-[150px] border-r border-black/15 px-4 py-4 text-left">
+                            <span className="stitch-mono text-[10px] uppercase tracking-[0.28em] text-black/60">{strings.familiarity}</span>
+                          </th>
                           <th className="min-w-[120px] border-r border-black/15 px-4 py-4 text-left">
                             <span className="stitch-mono text-[10px] uppercase tracking-[0.28em] text-black/60">{strings.usage}</span>
                           </th>
@@ -217,6 +235,12 @@ export function StackPage({ locale, stackItems, strings }: StackPageProps) {
                               <td className="sticky left-0 z-10 border-r border-black/15 bg-white px-4 py-4 align-top">
                                 <div className="space-y-2">
                                   <p className="font-medium text-black">{item.name}</p>
+                                  {item.reason ? (
+                                    <p className="text-xs leading-6 text-black/70">
+                                      <span className="stitch-mono uppercase tracking-[0.22em] text-black/45">{strings.reason}: </span>
+                                      {item.reason}
+                                    </p>
+                                  ) : null}
                                   {item.notes ? <p className="text-xs leading-6 text-black/55">{item.notes}</p> : null}
                                 </div>
                               </td>
@@ -228,6 +252,11 @@ export function StackPage({ locale, stackItems, strings }: StackPageProps) {
                               <td className="border-r border-black/15 px-4 py-4 align-top">
                                 <span className="stitch-mono inline-flex bg-black px-3 py-2 text-[10px] uppercase tracking-[0.28em] text-white">
                                   {strings.grade} {item.grade}
+                                </span>
+                              </td>
+                              <td className="border-r border-black/15 px-4 py-4 align-top">
+                                <span className="stitch-mono inline-flex border border-black/15 px-3 py-2 text-[10px] uppercase tracking-[0.28em] text-black/65">
+                                  {getFamiliarityLabel(item.familiarity)}
                                 </span>
                               </td>
                               <td className="border-r border-black/15 px-4 py-4 align-top">

@@ -55,6 +55,8 @@ export async function POST(request: NextRequest) {
         name: stack.name,
         category: stack.category,
         grade: stack.grade,
+        familiarity: stack.familiarity,
+        reason: stack.reason?.trim() ? stack.reason.trim() : undefined,
         notes: stack.notes?.trim() ? stack.notes.trim() : undefined,
       },
       projectIds: Array.isArray(stack.projectIds) ? stack.projectIds : undefined,

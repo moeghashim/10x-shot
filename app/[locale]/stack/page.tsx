@@ -47,6 +47,8 @@ export default async function StackRoute({
         description: t("description"),
         eyebrow: t("eyebrow"),
         grade: t("grade"),
+        familiarity: t("familiarity"),
+        reason: t("reason"),
         category: t("category"),
         usage: t("usage"),
         noProjects: t("noProjects"),
@@ -60,6 +62,12 @@ export default async function StackRoute({
         categories: {
           tool: t("categories.tool"),
           ai_skill: t("categories.ai_skill"),
+        },
+        familiarityLevels: {
+          learning: t("familiarityLevels.learning"),
+          comfortable: t("familiarityLevels.comfortable"),
+          proficient: t("familiarityLevels.proficient"),
+          expert: t("familiarityLevels.expert"),
         },
         nav: {
           projects: nav("projects"),

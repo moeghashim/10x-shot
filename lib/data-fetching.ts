@@ -332,6 +332,9 @@ export async function saveStackItem(
         name: stack.name,
         category: stack.category,
         grade: stack.grade,
+        familiarity: stack.familiarity,
+        reason: stack.reason,
+        notes: stack.notes,
       },
     });
     return { data, error: null };

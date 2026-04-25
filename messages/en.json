@@ -184,6 +184,8 @@
     "description": "A live inventory of the tools and AI skills used across the 10 Claws projects, including where each item is used and its current grade.",
     "stack": "Stack",
     "grade": "Grade",
+    "familiarity": "Familiarity",
+    "reason": "Why I chose it",
     "category": "Category",
     "usage": "Projects using it",
     "projects": "Projects",
@@ -196,6 +198,12 @@
     "categories": {
       "tool": "Tool",
       "ai_skill": "AI Skill"
+    },
+    "familiarityLevels": {
+      "learning": "Learning",
+      "comfortable": "Comfortable",
+      "proficient": "Proficient",
+      "expert": "Expert"
     }
   }
 }

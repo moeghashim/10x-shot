@@ -20,6 +20,13 @@ export const stackCategoryValidator = v.union(
   v.literal("ai_skill")
 );
 
+export const stackFamiliarityValidator = v.union(
+  v.literal("learning"),
+  v.literal("comfortable"),
+  v.literal("proficient"),
+  v.literal("expert")
+);
+
 export const supportedLocaleValidator = v.union(v.literal("en"), v.literal("ar"));
 
 export const translationStatusValidator = v.union(
@@ -65,6 +72,8 @@ export const stackItemInputValidator = v.object({
   name: v.string(),
   category: stackCategoryValidator,
   grade: stackGradeValidator,
+  familiarity: v.optional(stackFamiliarityValidator),
+  reason: v.optional(v.string()),
   notes: v.optional(v.string()),
 });
 

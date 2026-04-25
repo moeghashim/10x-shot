@@ -6,6 +6,7 @@ import {
   localizedTextValidator,
   projectStatusValidator,
   stackCategoryValidator,
+  stackFamiliarityValidator,
   stackGradeValidator,
   translationStatusValidator,
 } from "./validators";
@@ -40,6 +41,8 @@ export default defineSchema({
     name: v.string(),
     category: stackCategoryValidator,
     grade: stackGradeValidator,
+    familiarity: v.optional(stackFamiliarityValidator),
+    reason: v.optional(v.string()),
     notes: v.optional(v.string()),
     createdAt: v.number(),
     updatedAt: v.number(),

@@ -11,6 +11,8 @@ function toStackItem(doc: any) {
     name: doc.name,
     category: doc.category,
     grade: doc.grade,
+    familiarity: doc.familiarity,
+    reason: doc.reason,
     notes: doc.notes,
   };
 }
@@ -194,7 +196,8 @@ export const save = mutation({
     }
 
     const normalizedName = args.stack.name.trim();
-    const normalizedNotes = args.stack.notes?.trim();
+    const normalizedReason = args.stack.reason?.trim() || undefined;
+    const normalizedNotes = args.stack.notes?.trim() || undefined;
     if (!normalizedName) {
       throw new ConvexError("Stack item name is required");
     }
@@ -216,6 +219,8 @@ export const save = mutation({
         name: normalizedName,
         category: args.stack.category,
         grade: args.stack.grade,
+        familiarity: args.stack.familiarity,
+        reason: normalizedReason,
         notes: normalizedNotes,
         updatedAt: now,
       });
@@ -227,6 +232,8 @@ export const save = mutation({
               name: normalizedName,
               category: args.stack.category,
               grade: args.stack.grade,
+              familiarity: args.stack.familiarity,
+              reason: normalizedReason,
               notes: normalizedNotes,
               updatedAt: now,
             }
@@ -255,6 +262,8 @@ export const save = mutation({
         name: normalizedName,
         category: args.stack.category,
         grade: args.stack.grade,
+        familiarity: args.stack.familiarity,
+        reason: normalizedReason,
         notes: normalizedNotes,
       };
     }
@@ -265,6 +274,8 @@ export const save = mutation({
       name: normalizedName,
       category: args.stack.category,
       grade: args.stack.grade,
+      familiarity: args.stack.familiarity,
+      reason: normalizedReason,
       notes: normalizedNotes,
       createdAt: now,
       updatedAt: now,
@@ -280,6 +291,8 @@ export const save = mutation({
             name: normalizedName,
             category: args.stack.category,
             grade: args.stack.grade,
+            familiarity: args.stack.familiarity,
+            reason: normalizedReason,
             notes: normalizedNotes,
             createdAt: now,
             updatedAt: now,
@@ -305,6 +318,8 @@ export const save = mutation({
       name: normalizedName,
       category: args.stack.category,
       grade: args.stack.grade,
+      familiarity: args.stack.familiarity,
+      reason: normalizedReason,
       notes: normalizedNotes,
     };
   },
