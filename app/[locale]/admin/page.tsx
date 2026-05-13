@@ -7,6 +7,7 @@ import { AdminAuth } from "@/components/admin-auth";
 import { ProjectManager } from "@/components/project-manager";
 import { MetricsManager } from "@/components/metrics-manager";
 import { GlobalMetricsManager } from "@/components/global-metrics-manager";
+import { RoadmapManager } from "@/components/roadmap-manager";
 import { SiteCopyManager } from "@/components/site-copy-manager";
 import { StackManager } from "@/components/stack-manager";
 import { UserManager } from "@/components/user-manager";
@@ -55,13 +56,14 @@ export default function AdminPage() {
 
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <Tabs defaultValue="projects" className="w-full">
-          <TabsList className="grid w-full grid-cols-6">
-            <TabsTrigger value="projects">Projects</TabsTrigger>
-            <TabsTrigger value="stack">Stack</TabsTrigger>
-            <TabsTrigger value="project-metrics">Project Metrics</TabsTrigger>
-            <TabsTrigger value="global-metrics">Global Metrics</TabsTrigger>
-            <TabsTrigger value="site-copy">Site Copy</TabsTrigger>
-            <TabsTrigger value="users">Users</TabsTrigger>
+          <TabsList className="flex h-auto w-full justify-start overflow-x-auto">
+            <TabsTrigger className="shrink-0" value="projects">Projects</TabsTrigger>
+            <TabsTrigger className="shrink-0" value="stack">Stack</TabsTrigger>
+            <TabsTrigger className="shrink-0" value="project-metrics">Project Metrics</TabsTrigger>
+            <TabsTrigger className="shrink-0" value="roadmap">Roadmap</TabsTrigger>
+            <TabsTrigger className="shrink-0" value="global-metrics">Global Metrics</TabsTrigger>
+            <TabsTrigger className="shrink-0" value="site-copy">Site Copy</TabsTrigger>
+            <TabsTrigger className="shrink-0" value="users">Users</TabsTrigger>
           </TabsList>
 
           <TabsContent value="projects" className="mt-6">
@@ -74,6 +76,10 @@ export default function AdminPage() {
 
           <TabsContent value="project-metrics" className="mt-6">
             <MetricsManager />
+          </TabsContent>
+
+          <TabsContent value="roadmap" className="mt-6">
+            <RoadmapManager />
           </TabsContent>
 
           <TabsContent value="global-metrics" className="mt-6">

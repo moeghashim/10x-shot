@@ -1,6 +1,11 @@
-import { ProgressTracker } from "@/components/progress-tracker"
+import { ProgressDashboard } from "@/components/progress-dashboard"
 import { StitchPublicHeader } from "@/components/stitch-public-header"
-import { fetchGlobalMetrics } from "@/lib/data-fetching"
+import {
+  fetchGlobalMetrics,
+  fetchPlanningCards,
+  fetchProjects,
+  fetchPublicProjectMetrics,
+} from "@/lib/data-fetching"
 import { fetchPublicSiteCopy, getSiteCopyText } from "@/lib/site-content"
 import { Link } from "@/i18n/routing"
 import { ArrowLeft } from "lucide-react"
@@ -13,7 +18,13 @@ export default async function ProgressPage({
 }) {
   const { locale: routeLocale } = await params
   const locale = (routeLocale === "ar" ? "ar" : "en") as SupportedLocale
-  const { data: metrics } = await fetchGlobalMetrics(locale)
+  const [{ data: globalMetrics }, { data: projects }, { data: projectMetrics }, { data: planningCards }] =
+    await Promise.all([
+      fetchGlobalMetrics(locale),
+      fetchProjects({ locale }),
+      fetchPublicProjectMetrics(locale),
+      fetchPlanningCards(locale),
+    ])
   const { data: siteCopy } = await fetchPublicSiteCopy()
   const t = (key: string) => getSiteCopyText(siteCopy, locale, key)
 
@@ -76,43 +87,52 @@ export default async function ProgressPage({
 
         <section className="bg-[#f7f5f1]">
           <div className="mx-auto max-w-7xl px-6 py-12 md:px-10 md:py-16">
-            <ProgressTracker
-              metrics={metrics}
+            <ProgressDashboard
+              projects={projects}
+              projectMetrics={projectMetrics}
+              globalMetrics={globalMetrics}
+              planningCards={planningCards}
               strings={{
                 summary: {
                   audience: t("ProgressPage.summary.audience"),
                   audienceHint: t("ProgressPage.summary.audienceHint"),
-                  youtube: t("ProgressPage.summary.youtube"),
-                  youtubeHint: t("ProgressPage.summary.youtubeHint"),
-                  revenue: t("ProgressPage.summary.revenue"),
-                  revenueHint: t("ProgressPage.summary.revenueHint"),
-                  pendingValue: t("ProgressPage.summary.pendingValue"),
-                  pendingHint: t("ProgressPage.summary.pendingHint"),
+                  totalSales: t("ProgressPage.summary.totalSales"),
+                  totalSalesHint: t("ProgressPage.summary.totalSalesHint"),
+                  latestSales: t("ProgressPage.summary.latestSales"),
+                  latestSalesHint: t("ProgressPage.summary.latestSalesHint"),
+                  monthChange: t("ProgressPage.summary.monthChange"),
+                  monthChangeHint: t("ProgressPage.summary.monthChangeHint"),
                 },
-                timelineEyebrow: t("ProgressPage.timeline.eyebrow"),
-                timelineTitle: t("ProgressPage.timeline.title"),
-                timelineDescription: t("ProgressPage.timeline.description"),
-                monthLabel: t("ProgressPage.timeline.monthLabel"),
-                metrics: {
-                  twitter: t("ProgressPage.metrics.twitter"),
-                  youtube: t("ProgressPage.metrics.youtube"),
-                  tiktok: t("ProgressPage.metrics.tiktok"),
-                  instagram: t("ProgressPage.metrics.instagram"),
-                  newsletter: t("ProgressPage.metrics.newsletter"),
-                  totalGmv: t("ProgressPage.metrics.totalGmv"),
-                  skills: t("ProgressPage.metrics.skills"),
+                filters: {
+                  allProjects: t("ProgressPage.filters.allProjects"),
+                  label: t("ProgressPage.filters.label"),
                 },
-                skillsTitle: t("ProgressPage.timeline.skillsTitle"),
-                milestonesTitle: t("ProgressPage.timeline.milestonesTitle"),
-                launch: {
-                  month: t("ProgressPage.launch.month"),
-                  date: t("ProgressPage.launch.date"),
-                  summaryHint: t("ProgressPage.launch.summaryHint"),
-                  title: t("ProgressPage.launch.title"),
-                  description: t("ProgressPage.launch.description"),
-                  skill: t("ProgressPage.launch.skill"),
-                  milestone: t("ProgressPage.launch.milestone"),
+                sales: {
+                  eyebrow: t("ProgressPage.sales.eyebrow"),
+                  title: t("ProgressPage.sales.title"),
+                  description: t("ProgressPage.sales.description"),
+                  empty: t("ProgressPage.sales.empty"),
                 },
+                achievements: {
+                  eyebrow: t("ProgressPage.achievements.eyebrow"),
+                  title: t("ProgressPage.achievements.title"),
+                  description: t("ProgressPage.achievements.description"),
+                  empty: t("ProgressPage.achievements.empty"),
+                },
+                kanban: {
+                  eyebrow: t("ProgressPage.kanban.eyebrow"),
+                  title: t("ProgressPage.kanban.title"),
+                  description: t("ProgressPage.kanban.description"),
+                  empty: t("ProgressPage.kanban.empty"),
+                  columns: {
+                    now: t("ProgressPage.kanban.columns.now"),
+                    next: t("ProgressPage.kanban.columns.next"),
+                    later: t("ProgressPage.kanban.columns.later"),
+                    done: t("ProgressPage.kanban.columns.done"),
+                  },
+                },
+                project: t("ProgressPage.project"),
+                progress: t("ProgressPage.progress"),
               }}
             />
           </div>

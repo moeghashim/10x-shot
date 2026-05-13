@@ -6,7 +6,11 @@ import type {
   GlobalMetricLocalizationBundle,
   LocalizedStringListValue,
   LocalizedTextValue,
+  PlanningCard,
+  PlanningCardLocalizationBundle,
   Project,
+  ProjectMetric,
+  ProjectMetricLocalizationBundle,
   ProjectLocalizationBundle,
   SiteContentEntry,
   TranslationStatus,
@@ -45,6 +49,15 @@ type ProjectStoredLocalization = {
 type GlobalMetricStoredLocalization = {
   skillsGained: StoredLocalizedStringList
   milestones: StoredLocalizedStringList
+}
+
+type ProjectMetricStoredLocalization = {
+  achievements: StoredLocalizedStringList
+}
+
+type PlanningCardStoredLocalization = {
+  title: StoredLocalizedText
+  description: StoredLocalizedText
 }
 
 function hashValue(value: string | string[]) {
@@ -405,6 +418,117 @@ export async function localizeGlobalMetricContent(
       localized: {
         skillsGained: fallbackList(english.skillsGained, previousStored?.skillsGained),
         milestones: fallbackList(english.milestones, previousStored?.milestones),
+      },
+    }
+  }
+}
+
+export async function localizeProjectMetricContent(
+  metric: Omit<ProjectMetric, "id" | "created_at">,
+  previous?: ProjectMetricLocalizationBundle | null
+): Promise<{ localized: ProjectMetricStoredLocalization; hadFailures: boolean }> {
+  const english = {
+    achievements: metric.achievements,
+  }
+
+  const previousStored = previous
+    ? {
+        achievements: toStoredLocalizedList(previous.achievements)!,
+      }
+    : undefined
+
+  if (isListUnchanged(english.achievements, previousStored?.achievements) && previousStored) {
+    return { localized: previousStored, hadFailures: false }
+  }
+
+  try {
+    const translated = await translateStructured<{ achievements: string[] }>({
+      key: `project-metric:${metric.project_id}:${metric.month}`,
+      context: "Public monthly project achievements",
+      payload: english,
+      schema: {
+        type: "object",
+        additionalProperties: false,
+        properties: {
+          achievements: {
+            type: "array",
+            items: { type: "string" },
+          },
+        },
+        required: ["achievements"],
+      },
+    })
+
+    return {
+      hadFailures: false,
+      localized: {
+        achievements: buildListResult(english.achievements, translated.achievements, "synced", Date.now()),
+      },
+    }
+  } catch (_error) {
+    return {
+      hadFailures: true,
+      localized: {
+        achievements: fallbackList(english.achievements, previousStored?.achievements),
+      },
+    }
+  }
+}
+
+export async function localizePlanningCardContent(
+  card: Omit<PlanningCard, "id" | "created_at" | "updated_at"> | PlanningCard,
+  previous?: PlanningCardLocalizationBundle | null
+): Promise<{ localized: PlanningCardStoredLocalization; hadFailures: boolean }> {
+  const english = {
+    title: card.title,
+    description: card.description,
+  }
+
+  const previousStored = previous
+    ? {
+        title: toStoredLocalizedText(previous.title)!,
+        description: toStoredLocalizedText(previous.description)!,
+      }
+    : undefined
+
+  const unchanged =
+    isTextUnchanged(english.title, previousStored?.title) &&
+    isTextUnchanged(english.description, previousStored?.description)
+
+  if (unchanged && previousStored) {
+    return { localized: previousStored, hadFailures: false }
+  }
+
+  try {
+    const translated = await translateStructured<{ title: string; description: string }>({
+      key: `planning-card:${"id" in card ? card.id : "new"}`,
+      context: "Public roadmap kanban card",
+      payload: english,
+      schema: {
+        type: "object",
+        additionalProperties: false,
+        properties: {
+          title: { type: "string" },
+          description: { type: "string" },
+        },
+        required: ["title", "description"],
+      },
+    })
+
+    const translatedAt = Date.now()
+    return {
+      hadFailures: false,
+      localized: {
+        title: buildTextResult(english.title, translated.title, "synced", translatedAt),
+        description: buildTextResult(english.description, translated.description, "synced", translatedAt),
+      },
+    }
+  } catch (_error) {
+    return {
+      hadFailures: true,
+      localized: {
+        title: fallbackText(english.title, previousStored?.title),
+        description: fallbackText(english.description, previousStored?.description),
       },
     }
   }
