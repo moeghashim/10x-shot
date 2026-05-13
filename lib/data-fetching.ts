@@ -2,7 +2,7 @@ import "server-only";
 
 import { unstable_cache } from "next/cache";
 import { api } from "@/convex/_generated/api";
-import { PROJECTS_CACHE_TAG, STACK_CACHE_TAG } from "@/lib/cache-tags";
+import { PROGRESS_CACHE_TAG, PROJECTS_CACHE_TAG, STACK_CACHE_TAG } from "@/lib/cache-tags";
 import { FALLBACK_PROJECTS } from "@/lib/constants";
 import {
   fetchConvexAuthMutation,
@@ -10,10 +10,15 @@ import {
   fetchConvexQuery,
   hasConvexEnv,
 } from "@/lib/auth-server";
-import { localizeGlobalMetricContent, localizeProjectContent } from "@/lib/translation";
+import {
+  localizeGlobalMetricContent,
+  localizeProjectContent,
+  localizeProjectMetricContent,
+} from "@/lib/translation";
 import type {
   AdminUser,
   GlobalMetric,
+  PlanningCard,
   Project,
   ProjectMetric,
   ProjectSummary,
@@ -73,6 +78,58 @@ const fetchStackFromDbCached = unstable_cache(
   },
   ["stack:v1"],
   { revalidate: 60, tags: [STACK_CACHE_TAG] }
+);
+
+const fetchPublicProjectMetricsCached = unstable_cache(
+  async (locale: SupportedLocale) => {
+    if (!hasConvexEnv()) {
+      return {
+        data: null,
+        errorMessage: "Convex is not configured",
+      };
+    }
+
+    try {
+      const data = await fetchConvexQuery(api.projectMetrics.listPublic, { locale });
+      return {
+        data,
+        errorMessage: null,
+      };
+    } catch (error) {
+      return {
+        data: null,
+        errorMessage: error instanceof Error ? error.message : "Failed to fetch project metrics",
+      };
+    }
+  },
+  ["project-metrics-public:v1"],
+  { revalidate: 60, tags: [PROGRESS_CACHE_TAG] }
+);
+
+const fetchPlanningCardsCached = unstable_cache(
+  async (locale: SupportedLocale) => {
+    if (!hasConvexEnv()) {
+      return {
+        data: null,
+        errorMessage: "Convex is not configured",
+      };
+    }
+
+    try {
+      const data = await fetchConvexQuery(api.planningCards.listPublic, { locale });
+      return {
+        data,
+        errorMessage: null,
+      };
+    } catch (error) {
+      return {
+        data: null,
+        errorMessage: error instanceof Error ? error.message : "Failed to fetch planning cards",
+      };
+    }
+  },
+  ["planning-cards-public:v1"],
+  { revalidate: 60, tags: [PROGRESS_CACHE_TAG] }
 );
 
 function deriveProjectStack(project: Omit<Project, "id"> | Project, stackItems: StackItem[]) {
@@ -178,6 +235,32 @@ export async function fetchProjectMetrics(projectId?: number): Promise<{
       error: error instanceof Error ? error.message : "Failed to load metrics",
     };
   }
+}
+
+export async function fetchPublicProjectMetrics(locale: SupportedLocale = "en"): Promise<{
+  data: ProjectMetric[];
+  error: string | null;
+}> {
+  const { data, errorMessage } = await fetchPublicProjectMetricsCached(locale);
+
+  if (data) {
+    return { data, error: null };
+  }
+
+  return { data: [], error: errorMessage };
+}
+
+export async function fetchPlanningCards(locale: SupportedLocale = "en"): Promise<{
+  data: PlanningCard[];
+  error: string | null;
+}> {
+  const { data, errorMessage } = await fetchPlanningCardsCached(locale);
+
+  if (data) {
+    return { data, error: null };
+  }
+
+  return { data: [], error: errorMessage };
 }
 
 export async function fetchGlobalMetrics(locale: SupportedLocale = "en"): Promise<{
@@ -369,7 +452,12 @@ export async function saveProjectMetric(
   }
 
   try {
-    await fetchConvexAuthMutation(api.projectMetrics.save, { metric });
+    const previous = await fetchConvexAuthQuery(api.projectMetrics.getAdminByProjectMonth, {
+      projectId: metric.project_id,
+      month: metric.month,
+    });
+    const { localized } = await localizeProjectMetricContent(metric, previous?.localization);
+    await fetchConvexAuthMutation(api.projectMetrics.save, { metric, localized });
     return { error: null };
   } catch (error) {
     return {

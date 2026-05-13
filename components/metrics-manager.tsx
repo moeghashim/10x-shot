@@ -6,7 +6,8 @@ import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
-import { Calendar, Plus, Save, TrendingUp, TrendingDown, Minus } from "lucide-react"
+import { Textarea } from "@/components/ui/textarea"
+import { Calendar, DollarSign, Plus, Save, TrendingUp, TrendingDown, Minus } from "lucide-react"
 import { format, parseISO } from "date-fns"
 import { useProjectMetrics } from "@/hooks/use-metrics"
 import type { ProjectMetric, ProjectSummary } from "@/types/database"
@@ -21,12 +22,15 @@ export function MetricsManager() {
     project_id: 0,
     month: format(new Date(), 'yyyy-MM'),
     progress: 0,
+    sales_gmv: 0,
     productivity_score: 0,
     hours_worked: 0,
     ai_assistance_hours: 0,
     manual_hours: 0,
+    achievements: [],
     notes: ""
   })
+  const [achievementsInput, setAchievementsInput] = useState("")
 
   useEffect(() => {
     if (selectedProject) {
@@ -59,7 +63,13 @@ export function MetricsManager() {
   }, [])
 
   const handleSaveMetric = async () => {
-    const result = await saveMetricDb(newMetric)
+    const result = await saveMetricDb({
+      ...newMetric,
+      achievements: achievementsInput
+        .split(",")
+        .map((achievement) => achievement.trim())
+        .filter((achievement) => achievement.length > 0),
+    })
     
     if (result.success) {
       // Reset form
@@ -67,12 +77,15 @@ export function MetricsManager() {
         project_id: selectedProject || 0,
         month: format(new Date(), 'yyyy-MM'),
         progress: 0,
+        sales_gmv: 0,
         productivity_score: 0,
         hours_worked: 0,
         ai_assistance_hours: 0,
         manual_hours: 0,
+        achievements: [],
         notes: ""
       })
+      setAchievementsInput("")
     }
   }
 
@@ -154,6 +167,16 @@ export function MetricsManager() {
             </div>
             
             <div>
+              <label className="text-sm font-medium">Sales GMV ($)</label>
+              <Input
+                type="number"
+                min="0"
+                value={newMetric.sales_gmv}
+                onChange={(e) => setNewMetric(prev => ({ ...prev, sales_gmv: Number(e.target.value) }))}
+              />
+            </div>
+
+            <div>
               <label className="text-sm font-medium">Productivity Score</label>
               <Input
                 type="number"
@@ -196,6 +219,16 @@ export function MetricsManager() {
             </div>
           </div>
           
+          <div className="mt-4">
+            <label className="text-sm font-medium">Achievements (comma-separated)</label>
+            <Textarea
+              placeholder="First paid order, Closed partner pilot, Shipped analytics"
+              value={achievementsInput}
+              onChange={(e) => setAchievementsInput(e.target.value)}
+              rows={3}
+            />
+          </div>
+
           <div className="mt-4">
             <label className="text-sm font-medium">Notes</label>
             <Input
@@ -260,6 +293,16 @@ export function MetricsManager() {
                         </div>
                         <div className="text-2xl font-bold text-blue-600">{metric.progress}%</div>
                       </div>
+
+                      <div className="text-center">
+                        <div className="flex items-center justify-center gap-1">
+                          <span className="font-medium">Sales GMV</span>
+                          <DollarSign className="h-3 w-3 text-gray-500" />
+                        </div>
+                        <div className="text-2xl font-bold text-gray-900">
+                          ${metric.sales_gmv.toLocaleString()}
+                        </div>
+                      </div>
                       
                       <div className="text-center">
                         <div className="flex items-center justify-center gap-1">
@@ -296,6 +339,19 @@ export function MetricsManager() {
                         <div className="mt-2">
                           <span className="font-medium text-sm">Notes: </span>
                           <span className="text-sm text-gray-600">{metric.notes}</span>
+                        </div>
+                      )}
+
+                      {metric.achievements.length > 0 && (
+                        <div className="mt-3">
+                          <span className="font-medium text-sm">Achievements: </span>
+                          <div className="mt-2 flex flex-wrap gap-2">
+                            {metric.achievements.map((achievement) => (
+                              <Badge key={`${metric.id}-${achievement}`} variant="outline">
+                                {achievement}
+                              </Badge>
+                            ))}
+                          </div>
                         </div>
                       )}
                     </div>

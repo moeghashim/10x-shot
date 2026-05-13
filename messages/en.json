@@ -144,8 +144,44 @@
       "revenue": "Revenue",
       "revenueHint": "Latest monthly GMV",
       "pendingValue": "Pending",
-      "pendingHint": "No real numbers published yet"
+      "pendingHint": "No real numbers published yet",
+      "totalSales": "Total Sales",
+      "totalSalesHint": "Project GMV across the selected view",
+      "latestSales": "Latest Sales",
+      "latestSalesHint": "Most recent tracked month",
+      "monthChange": "MoM Change",
+      "monthChangeHint": "Latest month versus the previous month"
     },
+    "filters": {
+      "label": "Project filter / Public dashboard",
+      "allProjects": "All projects"
+    },
+    "sales": {
+      "eyebrow": "Sales growth / Monthly GMV",
+      "title": "Sales Growth",
+      "description": "Monthly project sales plotted as a live operating graph, with totals changing as the project filter changes.",
+      "empty": "No sales data has been recorded for this view yet."
+    },
+    "achievements": {
+      "eyebrow": "Monthly achievements / Shipped proof",
+      "title": "Monthly Wins",
+      "description": "A month-by-month record of project achievements, launches, revenue moments, and operating milestones.",
+      "empty": "No monthly achievements have been recorded for this view yet."
+    },
+    "kanban": {
+      "eyebrow": "Roadmap board / What happens next",
+      "title": "Planning Board",
+      "description": "A public kanban board for the work currently planned, queued, deferred, and completed across the 10 Claws portfolio.",
+      "empty": "No cards in this column yet.",
+      "columns": {
+        "now": "Now",
+        "next": "Next",
+        "later": "Later",
+        "done": "Done"
+      }
+    },
+    "project": "Project",
+    "progress": "Progress",
     "timeline": {
       "eyebrow": "Monthly telemetry / Archived states",
       "title": "Monthly Log",

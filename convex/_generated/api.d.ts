@@ -13,6 +13,7 @@ import type * as auth from "../auth.js";
 import type * as globalMetrics from "../globalMetrics.js";
 import type * as http from "../http.js";
 import type * as lib from "../lib.js";
+import type * as planningCards from "../planningCards.js";
 import type * as projectMetrics from "../projectMetrics.js";
 import type * as projects from "../projects.js";
 import type * as siteContent from "../siteContent.js";
@@ -32,6 +33,7 @@ declare const fullApi: ApiFromModules<{
   globalMetrics: typeof globalMetrics;
   http: typeof http;
   lib: typeof lib;
+  planningCards: typeof planningCards;
   projectMetrics: typeof projectMetrics;
   projects: typeof projects;
   siteContent: typeof siteContent;

@@ -30,6 +30,7 @@ export function assertProjectInput(input: {
 
 export function assertProjectMetricInput(input: {
   progress: number;
+  sales_gmv: number;
   productivity_score: number;
   hours_worked: number;
   ai_assistance_hours: number;
@@ -40,6 +41,9 @@ export function assertProjectMetricInput(input: {
   }
   if (input.productivity_score < 0 || input.productivity_score > 10) {
     throw new ConvexError("Metric productivity must be between 0 and 10");
+  }
+  if (input.sales_gmv < 0) {
+    throw new ConvexError("Metric sales GMV cannot be negative");
   }
   if (input.hours_worked < 0 || input.ai_assistance_hours < 0 || input.manual_hours < 0) {
     throw new ConvexError("Metric hours cannot be negative");

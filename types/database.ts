@@ -7,6 +7,7 @@
  * Project status types
  */
 export type ProjectStatus = "active" | "planning" | "completed"
+export type PlanningCardColumn = "now" | "next" | "later" | "done"
 export type StackGrade = "A" | "B" | "C" | "D" | "E" | "F"
 export type StackCategory = "tool" | "ai_skill"
 export type StackFamiliarity = "learning" | "comfortable" | "proficient" | "expert"
@@ -98,12 +99,18 @@ export interface ProjectMetric {
   project_id: number
   month: string
   progress: number
+  sales_gmv: number
   productivity_score: number
   hours_worked: number
   ai_assistance_hours: number
   manual_hours: number
+  achievements: string[]
   notes?: string
   created_at?: string
+}
+
+export interface ProjectMetricLocalizationBundle {
+  achievements: LocalizedStringListValue
 }
 
 /**
@@ -121,6 +128,22 @@ export interface GlobalMetric {
   skills_gained: string[]
   milestones: string[]
   created_at?: string
+}
+
+export interface PlanningCard {
+  id?: number
+  project_id: number
+  column: PlanningCardColumn
+  title: string
+  description: string
+  order: number
+  created_at?: string
+  updated_at?: string
+}
+
+export interface PlanningCardLocalizationBundle {
+  title: LocalizedTextValue
+  description: LocalizedTextValue
 }
 
 export interface SiteContentEntry {

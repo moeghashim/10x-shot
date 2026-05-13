@@ -6,6 +6,13 @@ export const projectStatusValidator = v.union(
   v.literal("completed")
 );
 
+export const planningCardColumnValidator = v.union(
+  v.literal("now"),
+  v.literal("next"),
+  v.literal("later"),
+  v.literal("done")
+);
+
 export const stackGradeValidator = v.union(
   v.literal("A"),
   v.literal("B"),
@@ -90,14 +97,35 @@ export const projectMetricFields = {
   project_id: v.number(),
   month: v.string(),
   progress: v.number(),
+  sales_gmv: v.number(),
   productivity_score: v.number(),
   hours_worked: v.number(),
   ai_assistance_hours: v.number(),
   manual_hours: v.number(),
+  achievements: v.array(v.string()),
   notes: v.optional(v.string()),
 } as const;
 
 export const projectMetricInputValidator = v.object(projectMetricFields);
+
+export const projectMetricLocalizationValidator = v.object({
+  achievements: localizedStringListValidator,
+});
+
+export const planningCardFields = {
+  project_id: v.number(),
+  column: planningCardColumnValidator,
+  title: v.string(),
+  description: v.string(),
+  order: v.number(),
+} as const;
+
+export const planningCardInputValidator = v.object(planningCardFields);
+
+export const planningCardLocalizationValidator = v.object({
+  title: localizedTextValidator,
+  description: localizedTextValidator,
+});
 
 export const globalMetricFields = {
   month: v.string(),
