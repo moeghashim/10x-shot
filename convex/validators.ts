@@ -7,10 +7,12 @@ export const projectStatusValidator = v.union(
 );
 
 export const planningCardColumnValidator = v.union(
+  v.literal("todo"),
+  v.literal("doing"),
+  v.literal("done"),
   v.literal("now"),
   v.literal("next"),
-  v.literal("later"),
-  v.literal("done")
+  v.literal("later")
 );
 
 export const stackGradeValidator = v.union(

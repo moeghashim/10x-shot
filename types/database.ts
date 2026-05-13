@@ -7,7 +7,7 @@
  * Project status types
  */
 export type ProjectStatus = "active" | "planning" | "completed"
-export type PlanningCardColumn = "now" | "next" | "later" | "done"
+export type PlanningCardColumn = "todo" | "doing" | "done"
 export type StackGrade = "A" | "B" | "C" | "D" | "E" | "F"
 export type StackCategory = "tool" | "ai_skill"
 export type StackFamiliarity = "learning" | "comfortable" | "proficient" | "expert"

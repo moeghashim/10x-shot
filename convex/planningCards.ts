@@ -9,6 +9,15 @@ import {
 } from "./validators";
 
 type Locale = "en" | "ar";
+type PublicColumn = "todo" | "doing" | "done";
+
+function normalizeColumn(column: string): PublicColumn {
+  if (column === "doing" || column === "done") {
+    return column;
+  }
+
+  return "todo";
+}
 
 function pickLocalizedText(value: any, locale: Locale, fallback?: string | null) {
   if (!value) {
@@ -45,7 +54,7 @@ function toPlanningCard(doc: any, locale: Locale = "en") {
   return {
     id: doc.legacyId,
     project_id: doc.projectLegacyId,
-    column: doc.column,
+    column: normalizeColumn(doc.column),
     title: pickLocalizedText(doc.localizedTitle, locale, doc.title),
     description: pickLocalizedText(doc.localizedDescription, locale, doc.description),
     order: doc.order,

@@ -12,16 +12,15 @@ import { usePlanningCards } from "@/hooks/use-planning-cards"
 import type { PlanningCard, PlanningCardColumn, ProjectSummary } from "@/types/database"
 
 const columns: Array<{ value: PlanningCardColumn; label: string }> = [
-  { value: "now", label: "Now" },
-  { value: "next", label: "Next" },
-  { value: "later", label: "Later" },
+  { value: "todo", label: "To do" },
+  { value: "doing", label: "Doing" },
   { value: "done", label: "Done" },
 ]
 
 function getBlankCard(projectId = 0): PlanningCard {
   return {
     project_id: projectId,
-    column: "now",
+    column: "todo",
     title: "",
     description: "",
     order: 0,

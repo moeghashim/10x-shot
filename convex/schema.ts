@@ -71,7 +71,14 @@ export default defineSchema({
   planningCards: defineTable({
     legacyId: v.optional(v.number()),
     projectLegacyId: v.number(),
-    column: v.union(v.literal("now"), v.literal("next"), v.literal("later"), v.literal("done")),
+    column: v.union(
+      v.literal("todo"),
+      v.literal("doing"),
+      v.literal("done"),
+      v.literal("now"),
+      v.literal("next"),
+      v.literal("later")
+    ),
     title: v.string(),
     description: v.string(),
     localizedTitle: v.optional(localizedTextValidator),

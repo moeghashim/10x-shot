@@ -125,9 +125,8 @@ export default async function ProgressPage({
                   description: t("ProgressPage.kanban.description"),
                   empty: t("ProgressPage.kanban.empty"),
                   columns: {
-                    now: t("ProgressPage.kanban.columns.now"),
-                    next: t("ProgressPage.kanban.columns.next"),
-                    later: t("ProgressPage.kanban.columns.later"),
+                    todo: t("ProgressPage.kanban.columns.todo"),
+                    doing: t("ProgressPage.kanban.columns.doing"),
                     done: t("ProgressPage.kanban.columns.done"),
                   },
                 },
