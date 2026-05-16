@@ -22,11 +22,27 @@ export const createAuthOptions = (ctx: GenericCtx<DataModel>) => {
     process.env.SITE_URL ||
     process.env.NEXT_PUBLIC_SITE_URL ||
     "http://localhost:3000";
+  const trustedOrigins = Array.from(
+    new Set(
+      [
+        siteUrl,
+        process.env.SITE_URL,
+        process.env.NEXT_PUBLIC_SITE_URL,
+        "https://www.10claws.com",
+        "https://10claws.com",
+        "http://localhost:3000",
+        "http://localhost:3001",
+        "http://127.0.0.1:3000",
+        "http://127.0.0.1:3001",
+      ].filter((origin): origin is string => Boolean(origin))
+    )
+  );
   const secret =
     process.env.BETTER_AUTH_SECRET || "change-me-before-production";
 
   return {
     baseURL: siteUrl,
+    trustedOrigins,
     secret,
     database: authComponent.adapter(ctx),
     emailAndPassword: {
