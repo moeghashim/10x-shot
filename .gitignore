@@ -3,6 +3,7 @@
 # dependencies
 /node_modules
 .pnpm-store/
+.DS_Store
 
 # next.js
 /.next/

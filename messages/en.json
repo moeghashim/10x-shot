@@ -174,9 +174,8 @@
       "description": "A public kanban board for the work currently planned, queued, deferred, and completed across the 10 Claws portfolio.",
       "empty": "No cards in this column yet.",
       "columns": {
-        "now": "Now",
-        "next": "Next",
-        "later": "Later",
+        "todo": "To do",
+        "doing": "Doing",
         "done": "Done"
       }
     },

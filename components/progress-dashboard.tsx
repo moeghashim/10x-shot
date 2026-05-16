@@ -65,7 +65,7 @@ type AchievementItem = {
   achievement: string
 }
 
-const columnOrder: PlanningCardColumn[] = ["now", "next", "later", "done"]
+const columnOrder: PlanningCardColumn[] = ["todo", "doing", "done"]
 
 function parseMetricMonth(month: string) {
   return parseISO(month.length === 7 ? `${month}-01` : month)
