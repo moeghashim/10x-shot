@@ -17,7 +17,7 @@ type TrendField = "progress" | "productivity_score" | "hours_worked" | "ai_assis
 export function MetricsManager() {
   const [projects, setProjects] = useState<ProjectSummary[]>([])
   const [selectedProject, setSelectedProject] = useState<number | null>(null)
-  const { metrics, loading, saveMetric: saveMetricDb, reload } = useProjectMetrics(selectedProject || undefined)
+  const { metrics, loading, error: metricsError, saveMetric: saveMetricDb } = useProjectMetrics(selectedProject || undefined)
   const [newMetric, setNewMetric] = useState<Omit<ProjectMetric, 'id' | 'created_at'>>({
     project_id: 0,
     month: format(new Date(), 'yyyy-MM'),
@@ -31,10 +31,41 @@ export function MetricsManager() {
     notes: ""
   })
   const [achievementsInput, setAchievementsInput] = useState("")
+  const [formMessage, setFormMessage] = useState<{ type: "error" | "success"; text: string } | null>(null)
+
+  const validateMetric = () => {
+    if (!selectedProject || !newMetric.project_id) {
+      return "Select a project before saving metrics."
+    }
+
+    if (!newMetric.month) {
+      return "Select a month before saving metrics."
+    }
+
+    if (newMetric.progress < 0 || newMetric.progress > 100) {
+      return "Progress must be between 0 and 100."
+    }
+
+    if (newMetric.productivity_score < 0 || newMetric.productivity_score > 10) {
+      return "Productivity Score must be between 0 and 10."
+    }
+
+    if (
+      newMetric.sales_gmv < 0 ||
+      newMetric.hours_worked < 0 ||
+      newMetric.ai_assistance_hours < 0 ||
+      newMetric.manual_hours < 0
+    ) {
+      return "Sales and hours cannot be negative."
+    }
+
+    return null
+  }
 
   useEffect(() => {
     if (selectedProject) {
       setNewMetric(prev => ({ ...prev, project_id: selectedProject }))
+      setFormMessage(null)
     }
   }, [selectedProject])
 
@@ -63,6 +94,13 @@ export function MetricsManager() {
   }, [])
 
   const handleSaveMetric = async () => {
+    setFormMessage(null)
+    const validationError = validateMetric()
+    if (validationError) {
+      setFormMessage({ type: "error", text: validationError })
+      return
+    }
+
     const result = await saveMetricDb({
       ...newMetric,
       achievements: achievementsInput
@@ -72,6 +110,7 @@ export function MetricsManager() {
     })
     
     if (result.success) {
+      setFormMessage({ type: "success", text: "Metric saved." })
       // Reset form
       setNewMetric({
         project_id: selectedProject || 0,
@@ -86,6 +125,11 @@ export function MetricsManager() {
         notes: ""
       })
       setAchievementsInput("")
+    } else {
+      setFormMessage({
+        type: "error",
+        text: result.error || "Metric could not be saved.",
+      })
     }
   }
 
@@ -133,6 +177,12 @@ export function MetricsManager() {
         </div>
       </div>
 
+      {metricsError ? (
+        <div className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          {metricsError}
+        </div>
+      ) : null}
+
       {/* Add New Metric Form */}
       <Card>
         <CardHeader>
@@ -143,6 +193,17 @@ export function MetricsManager() {
           <CardDescription>
             Track progress and productivity for the selected project
           </CardDescription>
+          {formMessage ? (
+            <div
+              className={`mt-4 rounded-md border px-4 py-3 text-sm ${
+                formMessage.type === "error"
+                  ? "border-red-200 bg-red-50 text-red-700"
+                  : "border-green-200 bg-green-50 text-green-700"
+              }`}
+            >
+              {formMessage.text}
+            </div>
+          ) : null}
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
