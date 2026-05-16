@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
 import { Textarea } from "@/components/ui/textarea"
-import { Calendar, DollarSign, Plus, Save, TrendingUp, TrendingDown, Minus } from "lucide-react"
+import { Calendar, DollarSign, Plus, Save, Trash2, TrendingUp, TrendingDown, Minus } from "lucide-react"
 import { format, parseISO } from "date-fns"
 import { useProjectMetrics } from "@/hooks/use-metrics"
 import type { ProjectMetric, ProjectSummary } from "@/types/database"
@@ -17,7 +17,13 @@ type TrendField = "progress" | "productivity_score" | "hours_worked" | "ai_assis
 export function MetricsManager() {
   const [projects, setProjects] = useState<ProjectSummary[]>([])
   const [selectedProject, setSelectedProject] = useState<number | null>(null)
-  const { metrics, loading, error: metricsError, saveMetric: saveMetricDb } = useProjectMetrics(selectedProject || undefined)
+  const {
+    metrics,
+    loading,
+    error: metricsError,
+    saveMetric: saveMetricDb,
+    deleteMetric: deleteMetricDb,
+  } = useProjectMetrics(selectedProject || undefined)
   const [newMetric, setNewMetric] = useState<Omit<ProjectMetric, 'id' | 'created_at'>>({
     project_id: 0,
     month: format(new Date(), 'yyyy-MM'),
@@ -131,6 +137,31 @@ export function MetricsManager() {
         text: result.error || "Metric could not be saved.",
       })
     }
+  }
+
+  const handleDeleteMetric = async (metric: ProjectMetric) => {
+    setFormMessage(null)
+    if (!metric.id) {
+      setFormMessage({ type: "error", text: "This metric cannot be deleted because it is missing an id." })
+      return
+    }
+
+    const monthLabel = format(parseISO(metric.month + "-01"), "MMMM yyyy")
+    const confirmed = window.confirm(`Delete the ${monthLabel} metric? This action cannot be undone.`)
+    if (!confirmed) {
+      return
+    }
+
+    const result = await deleteMetricDb(metric.id)
+    if (result.success) {
+      setFormMessage({ type: "success", text: `${monthLabel} metric deleted.` })
+      return
+    }
+
+    setFormMessage({
+      type: "error",
+      text: result.error || "Metric could not be deleted.",
+    })
   }
 
   const getProjectMetrics = (projectId: number) => {
@@ -337,10 +368,22 @@ export function MetricsManager() {
                           <CardDescription>{project?.title}</CardDescription>
                         )}
                       </div>
-                      <Badge variant="outline">
-                        <Calendar className="h-3 w-3 mr-1" />
-                        {format(parseISO(metric.created_at || metric.month + '-01'), 'MMM dd')}
-                      </Badge>
+                      <div className="flex items-center gap-2">
+                        <Badge variant="outline">
+                          <Calendar className="h-3 w-3 mr-1" />
+                          {format(parseISO(metric.created_at || metric.month + '-01'), 'MMM dd')}
+                        </Badge>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          className="border-red-200 text-red-700 hover:bg-red-50 hover:text-red-800"
+                          onClick={() => handleDeleteMetric(metric)}
+                        >
+                          <Trash2 className="h-4 w-4 mr-2" />
+                          Delete
+                        </Button>
+                      </div>
                     </div>
                   </CardHeader>
                   <CardContent>

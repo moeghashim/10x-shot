@@ -56,6 +56,30 @@ export function useProjectMetrics(projectId?: number) {
     }
   };
 
+  const deleteMetric = async (id: number) => {
+    try {
+      const response = await fetch("/api/admin/project-metrics", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ id }),
+      });
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || "Failed to delete metric");
+      }
+
+      await loadMetrics();
+      return { success: true, error: null };
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Failed to delete metric";
+      setError(message);
+      return { success: false, error: message };
+    }
+  };
+
   useEffect(() => {
     void loadMetrics();
   }, [projectId]);
@@ -66,5 +90,6 @@ export function useProjectMetrics(projectId?: number) {
     error,
     reload: loadMetrics,
     saveMetric,
+    deleteMetric,
   };
 }

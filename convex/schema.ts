@@ -67,7 +67,8 @@ export default defineSchema({
     updatedAt: v.number(),
   })
     .index("by_project_month", ["projectLegacyId", "month"])
-    .index("by_month", ["month"]),
+    .index("by_month", ["month"])
+    .index("by_legacy_id", ["legacyId"]),
   planningCards: defineTable({
     legacyId: v.optional(v.number()),
     projectLegacyId: v.number(),

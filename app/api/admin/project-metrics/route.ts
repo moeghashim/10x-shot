@@ -21,6 +21,13 @@ function handleRouteError(error: unknown) {
   );
 }
 
+function revalidateProgressViews() {
+  revalidateTag(PROGRESS_CACHE_TAG);
+  revalidatePath("/progress");
+  revalidatePath("/en/progress");
+  revalidatePath("/ar/progress");
+}
+
 export async function GET(request: NextRequest) {
   try {
     const projectId = request.nextUrl.searchParams.get("projectId");
@@ -52,10 +59,22 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    revalidateTag(PROGRESS_CACHE_TAG);
-    revalidatePath("/progress");
-    revalidatePath("/en/progress");
-    revalidatePath("/ar/progress");
+    revalidateProgressViews();
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    return handleRouteError(error);
+  }
+}
+
+export async function DELETE(request: NextRequest) {
+  try {
+    const { id } = await request.json();
+    if (!id) {
+      return NextResponse.json({ error: "Project metric id is required" }, { status: 400 });
+    }
+
+    await fetchConvexAuthMutation(api.projectMetrics.remove, { id });
+    revalidateProgressViews();
     return NextResponse.json({ success: true });
   } catch (error) {
     return handleRouteError(error);

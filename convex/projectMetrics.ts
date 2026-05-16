@@ -1,5 +1,5 @@
 import { mutation, query } from "./_generated/server";
-import { v } from "convex/values";
+import { ConvexError, v } from "convex/values";
 import { assertProjectMetricInput, requireAdmin, toIsoString } from "./lib";
 import {
   projectMetricInputValidator,
@@ -170,6 +170,35 @@ export const save = mutation({
       resourceId: args.metric.project_id,
       details: `Saved project metric for ${args.metric.month}`,
       createdAt: now,
+    });
+
+    return { success: true };
+  },
+});
+
+export const remove = mutation({
+  args: {
+    id: v.number(),
+  },
+  handler: async (ctx, args) => {
+    const { profile } = await requireAdmin(ctx);
+    const doc = await ctx.db
+      .query("projectMetrics")
+      .withIndex("by_legacy_id", (q) => q.eq("legacyId", args.id))
+      .first();
+
+    if (!doc) {
+      throw new ConvexError("Project metric not found");
+    }
+
+    await ctx.db.delete(doc._id);
+    await ctx.db.insert("adminActivity", {
+      userId: profile.userId,
+      action: "DELETE_PROJECT_METRIC",
+      resourceType: "project_metric",
+      resourceId: args.id,
+      details: `Deleted project metric for ${doc.projectLegacyId} ${doc.month}`,
+      createdAt: Date.now(),
     });
 
     return { success: true };
