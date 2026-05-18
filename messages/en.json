@@ -18,6 +18,7 @@
       "nav": {
         "projects": "Projects",
         "stack": "Stack",
+        "future": "Future",
         "progress": "Progress",
         "contact": "Contact"
       },
@@ -118,6 +119,17 @@
       "connect": "Connect",
       "follow": "Follow for real-time updates and insights from the experiment",
       "builtWith": "Made by AI with human assistance"
+    }
+  },
+  "FuturePage": {
+    "title": "Future",
+    "description": "An AI-authored, human-approved view of what 10 Claws will test next.",
+    "back": "Back to Home",
+    "footer": {
+      "tagline": "Generated structure, reviewed intent, measurable proof.",
+      "home": "Home",
+      "progress": "Progress",
+      "future": "Future"
     }
   },
   "ProgressPage": {

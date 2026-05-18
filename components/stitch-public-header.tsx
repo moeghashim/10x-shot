@@ -8,6 +8,7 @@ type StitchPublicHeaderProps = {
   labels: {
     projects: string
     stack: string
+    future: string
     contact: string
     progress: string
   }
@@ -56,6 +57,12 @@ export function StitchPublicHeader({
             href="/stack"
           >
             {labels.stack}
+          </Link>
+          <Link
+            className="stitch-mono text-[10px] uppercase tracking-[0.3em] text-black/65 transition-colors hover:text-black"
+            href="/future"
+          >
+            {labels.future}
           </Link>
           <a
             className="stitch-mono text-[10px] uppercase tracking-[0.3em] text-black/65 transition-colors hover:text-black"
