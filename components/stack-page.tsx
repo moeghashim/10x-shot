@@ -36,6 +36,7 @@ type StackPageProps = {
     nav: {
       projects: string
       stack: string
+      future: string
       contact: string
       progress: string
       home: string
@@ -64,6 +65,7 @@ export function StackPage({ locale, stackItems, strings }: StackPageProps) {
         labels={{
           projects: strings.nav.projects,
           stack: strings.nav.stack,
+          future: strings.nav.future,
           contact: strings.nav.contact,
           progress: strings.nav.progress,
         }}

@@ -35,6 +35,7 @@ export default async function ProgressPage({
         labels={{
           projects: t("HomePage.stitch.nav.projects"),
           stack: t("HomePage.stitch.nav.stack"),
+          future: t("HomePage.stitch.nav.future"),
           contact: t("HomePage.stitch.nav.contact"),
           progress: t("HomePage.stitch.nav.progress"),
         }}

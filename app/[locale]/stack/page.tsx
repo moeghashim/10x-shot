@@ -72,6 +72,7 @@ export default async function StackRoute({
         nav: {
           projects: nav("projects"),
           stack: nav("stack"),
+          future: nav("future"),
           contact: nav("contact"),
           progress: nav("progress"),
           home: progressNav("home"),
