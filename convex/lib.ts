@@ -50,6 +50,32 @@ export function assertProjectMetricInput(input: {
   }
 }
 
+export function assertProjectMetricTargetInput(input: {
+  target_progress: number;
+  target_sales_gmv: number;
+  target_productivity_score: number;
+  target_hours_worked: number;
+  target_ai_assistance_hours: number;
+  target_manual_hours: number;
+}) {
+  if (input.target_progress < 0 || input.target_progress > 100) {
+    throw new ConvexError("Target progress must be between 0 and 100");
+  }
+  if (input.target_productivity_score < 0 || input.target_productivity_score > 10) {
+    throw new ConvexError("Target productivity must be between 0 and 10");
+  }
+  if (input.target_sales_gmv < 0) {
+    throw new ConvexError("Target sales GMV cannot be negative");
+  }
+  if (
+    input.target_hours_worked < 0 ||
+    input.target_ai_assistance_hours < 0 ||
+    input.target_manual_hours < 0
+  ) {
+    throw new ConvexError("Target hours cannot be negative");
+  }
+}
+
 export function toIsoString(timestamp?: number | null) {
   if (!timestamp) {
     return undefined;
