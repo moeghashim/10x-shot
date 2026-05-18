@@ -113,6 +113,21 @@ export interface ProjectMetricLocalizationBundle {
   achievements: LocalizedStringListValue
 }
 
+export interface ProjectMetricTarget {
+  id?: number
+  project_id: number
+  month: string
+  target_progress: number
+  target_sales_gmv: number
+  target_productivity_score: number
+  target_hours_worked: number
+  target_ai_assistance_hours: number
+  target_manual_hours: number
+  notes?: string
+  created_at?: string
+  updated_at?: string
+}
+
 /**
  * Global metrics interface
  */

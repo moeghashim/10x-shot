@@ -7,16 +7,90 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
 import { Textarea } from "@/components/ui/textarea"
-import { Calendar, DollarSign, Plus, Save, Trash2, TrendingUp, TrendingDown, Minus } from "lucide-react"
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Legend,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts"
+import { Calendar, DollarSign, Minus, Plus, Save, Target, Trash2, TrendingDown, TrendingUp } from "lucide-react"
 import { format, parseISO } from "date-fns"
 import { useProjectMetrics } from "@/hooks/use-metrics"
-import type { ProjectMetric, ProjectSummary } from "@/types/database"
+import { useProjectMetricTargets } from "@/hooks/use-metric-targets"
+import type { ProjectMetric, ProjectMetricTarget, ProjectSummary } from "@/types/database"
 
 type TrendField = "progress" | "productivity_score" | "hours_worked" | "ai_assistance_hours" | "manual_hours"
+type TargetDraft = Omit<ProjectMetricTarget, "id" | "created_at" | "updated_at">
+
+function buildNextTwelveMonthTargets(projectId: number, targets: ProjectMetricTarget[]): TargetDraft[] {
+  return Array.from({ length: 12 }, (_, index) => {
+    const date = new Date()
+    date.setDate(1)
+    date.setMonth(date.getMonth() + index)
+    const month = format(date, "yyyy-MM")
+    const existing = targets.find((target) => target.project_id === projectId && target.month === month)
+
+    return {
+      project_id: projectId,
+      month,
+      target_progress: existing?.target_progress ?? 0,
+      target_sales_gmv: existing?.target_sales_gmv ?? 0,
+      target_productivity_score: existing?.target_productivity_score ?? 0,
+      target_hours_worked: existing?.target_hours_worked ?? 0,
+      target_ai_assistance_hours: existing?.target_ai_assistance_hours ?? 0,
+      target_manual_hours: existing?.target_manual_hours ?? 0,
+      notes: existing?.notes ?? "",
+    }
+  })
+}
+
+function formatCurrency(value: number) {
+  return `$${Math.round(value).toLocaleString()}`
+}
+
+function buildCombinedSalesChartData(metrics: ProjectMetric[], targets: ProjectMetricTarget[]) {
+  const actualSalesByMonth = new Map<string, number>()
+  const targetSalesByMonth = new Map<string, number>()
+
+  for (const metric of metrics) {
+    actualSalesByMonth.set(metric.month, (actualSalesByMonth.get(metric.month) ?? 0) + metric.sales_gmv)
+  }
+
+  for (const target of targets) {
+    targetSalesByMonth.set(
+      target.month,
+      (targetSalesByMonth.get(target.month) ?? 0) + target.target_sales_gmv
+    )
+  }
+
+  return Array.from(new Set([...actualSalesByMonth.keys(), ...targetSalesByMonth.keys()]))
+    .sort((a, b) => a.localeCompare(b))
+    .map((month) => ({
+      month: format(parseISO(month + "-01"), "MMM yyyy"),
+      actual_sales: actualSalesByMonth.has(month) ? actualSalesByMonth.get(month) : null,
+      target_sales: targetSalesByMonth.has(month) ? targetSalesByMonth.get(month) : null,
+    }))
+}
 
 export function MetricsManager() {
   const [projects, setProjects] = useState<ProjectSummary[]>([])
   const [selectedProject, setSelectedProject] = useState<number | null>(null)
+  const {
+    metrics: allMetrics,
+    loading: allMetricsLoading,
+    error: allMetricsError,
+    reload: reloadAllMetrics,
+  } = useProjectMetrics()
+  const {
+    targets: allTargets,
+    loading: allTargetsLoading,
+    error: allTargetsError,
+    reload: reloadAllTargets,
+  } = useProjectMetricTargets()
   const {
     metrics,
     loading,
@@ -24,6 +98,12 @@ export function MetricsManager() {
     saveMetric: saveMetricDb,
     deleteMetric: deleteMetricDb,
   } = useProjectMetrics(selectedProject || undefined)
+  const {
+    targets,
+    loading: targetsLoading,
+    error: targetsError,
+    saveTargets: saveTargetsDb,
+  } = useProjectMetricTargets(selectedProject || undefined)
   const [newMetric, setNewMetric] = useState<Omit<ProjectMetric, 'id' | 'created_at'>>({
     project_id: 0,
     month: format(new Date(), 'yyyy-MM'),
@@ -36,8 +116,10 @@ export function MetricsManager() {
     achievements: [],
     notes: ""
   })
+  const [targetRows, setTargetRows] = useState<TargetDraft[]>([])
   const [achievementsInput, setAchievementsInput] = useState("")
   const [formMessage, setFormMessage] = useState<{ type: "error" | "success"; text: string } | null>(null)
+  const [targetMessage, setTargetMessage] = useState<{ type: "error" | "success"; text: string } | null>(null)
 
   const validateMetric = () => {
     if (!selectedProject || !newMetric.project_id) {
@@ -68,12 +150,47 @@ export function MetricsManager() {
     return null
   }
 
+  const validateTargets = () => {
+    if (!selectedProject) {
+      return "Select a project before saving targets."
+    }
+
+    for (const target of targetRows) {
+      const monthLabel = format(parseISO(target.month + "-01"), "MMMM yyyy")
+      if (target.target_progress < 0 || target.target_progress > 100) {
+        return `${monthLabel} target progress must be between 0 and 100.`
+      }
+      if (target.target_productivity_score < 0 || target.target_productivity_score > 10) {
+        return `${monthLabel} target productivity must be between 0 and 10.`
+      }
+      if (
+        target.target_sales_gmv < 0 ||
+        target.target_hours_worked < 0 ||
+        target.target_ai_assistance_hours < 0 ||
+        target.target_manual_hours < 0
+      ) {
+        return `${monthLabel} targets cannot contain negative values.`
+      }
+    }
+
+    return null
+  }
+
   useEffect(() => {
     if (selectedProject) {
       setNewMetric(prev => ({ ...prev, project_id: selectedProject }))
       setFormMessage(null)
+      setTargetMessage(null)
     }
   }, [selectedProject])
+
+  useEffect(() => {
+    if (selectedProject) {
+      setTargetRows(buildNextTwelveMonthTargets(selectedProject, targets))
+    } else {
+      setTargetRows([])
+    }
+  }, [selectedProject, targets])
 
   useEffect(() => {
     async function loadProjects() {
@@ -116,6 +233,7 @@ export function MetricsManager() {
     })
     
     if (result.success) {
+      await reloadAllMetrics()
       setFormMessage({ type: "success", text: "Metric saved." })
       // Reset form
       setNewMetric({
@@ -154,6 +272,7 @@ export function MetricsManager() {
 
     const result = await deleteMetricDb(metric.id)
     if (result.success) {
+      await reloadAllMetrics()
       setFormMessage({ type: "success", text: `${monthLabel} metric deleted.` })
       return
     }
@@ -161,6 +280,44 @@ export function MetricsManager() {
     setFormMessage({
       type: "error",
       text: result.error || "Metric could not be deleted.",
+    })
+  }
+
+  const handleTargetChange = (
+    month: string,
+    field: keyof Omit<TargetDraft, "project_id" | "month">,
+    value: string | number
+  ) => {
+    setTargetRows((currentRows) =>
+      currentRows.map((row) =>
+        row.month === month
+          ? {
+              ...row,
+              [field]: typeof value === "number" ? value : value,
+            }
+          : row
+      )
+    )
+  }
+
+  const handleSaveTargets = async () => {
+    setTargetMessage(null)
+    const validationError = validateTargets()
+    if (validationError) {
+      setTargetMessage({ type: "error", text: validationError })
+      return
+    }
+
+    const result = await saveTargetsDb(targetRows)
+    if (result.success) {
+      await reloadAllTargets()
+      setTargetMessage({ type: "success", text: "Metric targets saved." })
+      return
+    }
+
+    setTargetMessage({
+      type: "error",
+      text: result.error || "Metric targets could not be saved.",
     })
   }
 
@@ -182,11 +339,34 @@ export function MetricsManager() {
     return 'same'
   }
 
-  if (loading) {
+  if (loading || targetsLoading || allMetricsLoading || allTargetsLoading) {
     return <div className="text-center py-8">Loading metrics...</div>
   }
 
   const filteredMetrics = selectedProject ? getProjectMetrics(selectedProject) : metrics
+  const combinedSalesChartData = buildCombinedSalesChartData(allMetrics, allTargets)
+  const comparisonRows = targetRows.map((target) => {
+    const actual = filteredMetrics.find((metric) => metric.month === target.month)
+    const salesGap = actual ? actual.sales_gmv - target.target_sales_gmv : null
+    const progressGap = actual ? actual.progress - target.target_progress : null
+    const productivityGap = actual ? actual.productivity_score - target.target_productivity_score : null
+    const hoursGap = actual ? actual.hours_worked - target.target_hours_worked : null
+
+    return {
+      ...target,
+      label: format(parseISO(target.month + "-01"), "MMM yyyy"),
+      actual,
+      salesGap,
+      progressGap,
+      productivityGap,
+      hoursGap,
+    }
+  })
+  const comparisonChartData = comparisonRows.map((row) => ({
+    month: row.label,
+    actual_sales: row.actual?.sales_gmv ?? null,
+    target_sales: row.target_sales_gmv,
+  }))
 
   return (
     <div className="space-y-6">
@@ -211,6 +391,24 @@ export function MetricsManager() {
       {metricsError ? (
         <div className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
           {metricsError}
+        </div>
+      ) : null}
+
+      {targetsError ? (
+        <div className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          {targetsError}
+        </div>
+      ) : null}
+
+      {allMetricsError ? (
+        <div className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          {allMetricsError}
+        </div>
+      ) : null}
+
+      {allTargetsError ? (
+        <div className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          {allTargetsError}
         </div>
       ) : null}
 
@@ -333,6 +531,262 @@ export function MetricsManager() {
           <Button onClick={handleSaveMetric} className="mt-4">
             <Save className="h-4 w-4 mr-2" />
             Save Metric
+          </Button>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <DollarSign className="h-5 w-5" />
+            All Projects Sales Projection
+          </CardTitle>
+          <CardDescription>
+            Combined projected sales versus real sales across every project.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {combinedSalesChartData.length === 0 ? (
+            <div className="flex h-[280px] items-center justify-center rounded-md border border-dashed text-sm text-gray-500">
+              No real or projected sales recorded yet.
+            </div>
+          ) : (
+            <div className="h-[320px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={combinedSalesChartData} margin={{ left: 8, right: 16, top: 12, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                  <XAxis dataKey="month" tick={{ fontSize: 11 }} />
+                  <YAxis tickFormatter={(value) => `$${Number(value).toLocaleString()}`} width={78} />
+                  <Tooltip
+                    formatter={(value, name) => [
+                      value === null ? "No data" : formatCurrency(Number(value)),
+                      name === "actual_sales" ? "Real sales" : "Projected sales",
+                    ]}
+                  />
+                  <Legend />
+                  <Bar dataKey="target_sales" name="Projected sales" fill="#111827" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="actual_sales" name="Real sales" fill="#2563eb" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Target className="h-5 w-5" />
+            Next 12 Month Targets
+          </CardTitle>
+          <CardDescription>
+            Add projections for the selected project and compare them with real monthly metrics.
+          </CardDescription>
+          {targetMessage ? (
+            <div
+              className={`mt-4 rounded-md border px-4 py-3 text-sm ${
+                targetMessage.type === "error"
+                  ? "border-red-200 bg-red-50 text-red-700"
+                  : "border-green-200 bg-green-50 text-green-700"
+              }`}
+            >
+              {targetMessage.text}
+            </div>
+          ) : null}
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div className="h-[300px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={comparisonChartData} margin={{ left: 8, right: 16, top: 12, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                <XAxis dataKey="month" tick={{ fontSize: 11 }} />
+                <YAxis tickFormatter={(value) => `$${Number(value).toLocaleString()}`} width={78} />
+                <Tooltip
+                  formatter={(value, name) => [
+                    value === null ? "No real metric" : formatCurrency(Number(value)),
+                    name === "actual_sales" ? "Real sales" : "Projected sales",
+                  ]}
+                />
+                <Legend />
+                <Bar dataKey="target_sales" name="Projected sales" fill="#111827" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="actual_sales" name="Real sales" fill="#2563eb" radius={[4, 4, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+
+          <div className="overflow-x-auto rounded-md border">
+            <table className="w-full min-w-[1500px] text-sm">
+              <thead className="bg-gray-50 text-left text-xs uppercase tracking-wide text-gray-500">
+                <tr>
+                  <th className="px-3 py-3 font-medium">Month</th>
+                  <th className="px-3 py-3 font-medium">Target Progress</th>
+                  <th className="px-3 py-3 font-medium">Real Progress</th>
+                  <th className="px-3 py-3 font-medium">Progress Gap</th>
+                  <th className="px-3 py-3 font-medium">Target Sales GMV</th>
+                  <th className="px-3 py-3 font-medium">Real Sales GMV</th>
+                  <th className="px-3 py-3 font-medium">Sales Gap</th>
+                  <th className="px-3 py-3 font-medium">Target Productivity</th>
+                  <th className="px-3 py-3 font-medium">Real Productivity</th>
+                  <th className="px-3 py-3 font-medium">Productivity Gap</th>
+                  <th className="px-3 py-3 font-medium">Target Hours</th>
+                  <th className="px-3 py-3 font-medium">Real Hours</th>
+                  <th className="px-3 py-3 font-medium">Hours Gap</th>
+                  <th className="px-3 py-3 font-medium">Target AI Hours</th>
+                  <th className="px-3 py-3 font-medium">Target Manual Hours</th>
+                  <th className="px-3 py-3 font-medium">Notes</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y">
+                {comparisonRows.map((row) => (
+                  <tr key={row.month} className="bg-white">
+                    <td className="whitespace-nowrap px-3 py-3 font-medium">{row.label}</td>
+                    <td className="px-3 py-3">
+                      <Input
+                        className="w-24"
+                        type="number"
+                        min="0"
+                        max="100"
+                        value={row.target_progress}
+                        onChange={(event) =>
+                          handleTargetChange(row.month, "target_progress", Number(event.target.value))
+                        }
+                      />
+                    </td>
+                    <td className="whitespace-nowrap px-3 py-3 text-gray-700">
+                      {row.actual ? `${row.actual.progress}%` : "No real metric"}
+                    </td>
+                    <td
+                      className={`whitespace-nowrap px-3 py-3 font-medium ${
+                        row.progressGap === null
+                          ? "text-gray-500"
+                          : row.progressGap >= 0
+                            ? "text-green-700"
+                            : "text-red-700"
+                      }`}
+                    >
+                      {row.progressGap === null
+                        ? "Pending"
+                        : `${row.progressGap >= 0 ? "+" : ""}${row.progressGap}%`}
+                    </td>
+                    <td className="px-3 py-3">
+                      <Input
+                        className="w-32"
+                        type="number"
+                        min="0"
+                        value={row.target_sales_gmv}
+                        onChange={(event) =>
+                          handleTargetChange(row.month, "target_sales_gmv", Number(event.target.value))
+                        }
+                      />
+                    </td>
+                    <td className="whitespace-nowrap px-3 py-3 text-gray-700">
+                      {row.actual ? formatCurrency(row.actual.sales_gmv) : "No real metric"}
+                    </td>
+                    <td
+                      className={`whitespace-nowrap px-3 py-3 font-medium ${
+                        row.salesGap === null
+                          ? "text-gray-500"
+                          : row.salesGap >= 0
+                            ? "text-green-700"
+                            : "text-red-700"
+                      }`}
+                    >
+                      {row.salesGap === null
+                        ? "Pending"
+                        : `${row.salesGap >= 0 ? "+" : "-"}${formatCurrency(Math.abs(row.salesGap))}`}
+                    </td>
+                    <td className="px-3 py-3">
+                      <Input
+                        className="w-24"
+                        type="number"
+                        step="0.1"
+                        min="0"
+                        max="10"
+                        value={row.target_productivity_score}
+                        onChange={(event) =>
+                          handleTargetChange(row.month, "target_productivity_score", Number(event.target.value))
+                        }
+                      />
+                    </td>
+                    <td className="whitespace-nowrap px-3 py-3 text-gray-700">
+                      {row.actual ? `${row.actual.productivity_score}/10` : "No real metric"}
+                    </td>
+                    <td
+                      className={`whitespace-nowrap px-3 py-3 font-medium ${
+                        row.productivityGap === null
+                          ? "text-gray-500"
+                          : row.productivityGap >= 0
+                            ? "text-green-700"
+                            : "text-red-700"
+                      }`}
+                    >
+                      {row.productivityGap === null
+                        ? "Pending"
+                        : `${row.productivityGap >= 0 ? "+" : ""}${row.productivityGap.toFixed(1)}`}
+                    </td>
+                    <td className="px-3 py-3">
+                      <Input
+                        className="w-24"
+                        type="number"
+                        min="0"
+                        value={row.target_hours_worked}
+                        onChange={(event) =>
+                          handleTargetChange(row.month, "target_hours_worked", Number(event.target.value))
+                        }
+                      />
+                    </td>
+                    <td className="whitespace-nowrap px-3 py-3 text-gray-700">
+                      {row.actual ? `${row.actual.hours_worked}h` : "No real metric"}
+                    </td>
+                    <td
+                      className={`whitespace-nowrap px-3 py-3 font-medium ${
+                        row.hoursGap === null
+                          ? "text-gray-500"
+                          : row.hoursGap <= 0
+                            ? "text-green-700"
+                            : "text-red-700"
+                      }`}
+                    >
+                      {row.hoursGap === null ? "Pending" : `${row.hoursGap >= 0 ? "+" : ""}${row.hoursGap}h`}
+                    </td>
+                    <td className="px-3 py-3">
+                      <Input
+                        className="w-24"
+                        type="number"
+                        min="0"
+                        value={row.target_ai_assistance_hours}
+                        onChange={(event) =>
+                          handleTargetChange(row.month, "target_ai_assistance_hours", Number(event.target.value))
+                        }
+                      />
+                    </td>
+                    <td className="px-3 py-3">
+                      <Input
+                        className="w-24"
+                        type="number"
+                        min="0"
+                        value={row.target_manual_hours}
+                        onChange={(event) =>
+                          handleTargetChange(row.month, "target_manual_hours", Number(event.target.value))
+                        }
+                      />
+                    </td>
+                    <td className="px-3 py-3">
+                      <Input
+                        className="w-48"
+                        value={row.notes ?? ""}
+                        onChange={(event) => handleTargetChange(row.month, "notes", event.target.value)}
+                      />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <Button onClick={handleSaveTargets}>
+            <Save className="h-4 w-4 mr-2" />
+            Save 12 Month Targets
           </Button>
         </CardContent>
       </Card>

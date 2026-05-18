@@ -69,6 +69,23 @@ export default defineSchema({
     .index("by_project_month", ["projectLegacyId", "month"])
     .index("by_month", ["month"])
     .index("by_legacy_id", ["legacyId"]),
+  projectMetricTargets: defineTable({
+    legacyId: v.optional(v.number()),
+    projectLegacyId: v.number(),
+    month: v.string(),
+    targetProgress: v.number(),
+    targetSalesGmv: v.number(),
+    targetProductivityScore: v.number(),
+    targetHoursWorked: v.number(),
+    targetAiAssistanceHours: v.number(),
+    targetManualHours: v.number(),
+    notes: v.optional(v.string()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_project_month", ["projectLegacyId", "month"])
+    .index("by_month", ["month"])
+    .index("by_legacy_id", ["legacyId"]),
   planningCards: defineTable({
     legacyId: v.optional(v.number()),
     projectLegacyId: v.number(),

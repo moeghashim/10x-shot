@@ -114,6 +114,20 @@ export const projectMetricLocalizationValidator = v.object({
   achievements: localizedStringListValidator,
 });
 
+export const projectMetricTargetFields = {
+  project_id: v.number(),
+  month: v.string(),
+  target_progress: v.number(),
+  target_sales_gmv: v.number(),
+  target_productivity_score: v.number(),
+  target_hours_worked: v.number(),
+  target_ai_assistance_hours: v.number(),
+  target_manual_hours: v.number(),
+  notes: v.optional(v.string()),
+} as const;
+
+export const projectMetricTargetInputValidator = v.object(projectMetricTargetFields);
+
 export const planningCardFields = {
   project_id: v.number(),
   column: planningCardColumnValidator,
