@@ -28,14 +28,14 @@ export const futureSpecs: Record<"en" | "ar", FutureSpec> = {
       hero: {
         type: "FutureHero",
         props: {
-          eyebrow: "AI-authored roadmap / Human-operated proof",
+          eyebrow: "AI-authored page / Human-approved spec",
           title: "Future",
           description:
-            "This page is generated from a constrained json-render spec. The AI can choose the shape and content, but the site controls the components, data boundaries, and public contract.",
+            "This page is generated from a constrained json-render spec. The AI can propose structure and copy, but the app enforces the component catalog, data boundaries, and public contract.",
           primaryCta: { label: "View progress", href: "/progress" },
           secondaryCta: { label: "Explore stack", href: "/stack" },
           statusLabel: "Generation mode",
-          statusValue: "Approved spec",
+          statusValue: "Checked-in & reviewed",
         },
       },
       signals: {
@@ -48,14 +48,19 @@ export const futureSpecs: Record<"en" | "ar", FutureSpec> = {
               hint: "Generated, reviewed, then shipped as a stable spec.",
             },
             {
-              label: "Primary question",
-              value: "Can AI compound operations?",
-              hint: "The page tracks future bets that must become measurable work.",
+              label: "Shipped surfaces",
+              value: "Progress + roadmap cards + stack matrix",
+              hint: "Future bets must map back to a public surface we can measure or ship.",
             },
             {
               label: "Public standard",
               value: "Proof over pitch",
               hint: "Claims should resolve into metrics, launches, or rejected assumptions.",
+            },
+            {
+              label: "Data boundary",
+              value: "Public metrics ≠ private projections",
+              hint: "Forecasts can guide decisions, but public pages stay strict about what is real today.",
             },
           ],
         },
@@ -66,7 +71,7 @@ export const futureSpecs: Record<"en" | "ar", FutureSpec> = {
           eyebrow: "Future bets / What gets tested next",
           title: "Bets worth proving",
           description:
-            "The next phase is not about adding more tools. It is about finding which AI workflows survive contact with real customers, revenue, and operating pressure.",
+            "The next phase is not about adding more tools. It is about turning AI workflows into repeatable operations that survive real revenue, real users, and real operating pressure.",
           tone: "white",
         },
         children: ["bet-1", "bet-2", "bet-3"],
@@ -75,17 +80,17 @@ export const futureSpecs: Record<"en" | "ar", FutureSpec> = {
         type: "FutureBet",
         props: {
           label: "Bet 01",
-          title: "Agent-managed launch loops",
+          title: "Roadmap cards become execution loops",
           horizonLabel: "Horizon",
-          horizon: "Next 90 days",
+          horizon: "Next 30 days",
           confidenceLabel: "Confidence",
           confidence: "Medium",
           description:
-            "Codex should move from implementation assistant to launch operator: identify gaps, patch the product surface, verify the work, and prepare the release path.",
+            "Every planning card should be able to become a loop: spec → patch → verify → ship → measure. The bet is that tighter loops beat bigger plans.",
           proof: [
-            "Shorter time from idea to public page",
-            "Fewer manual release checklists",
-            "More fixes discovered through browser verification before deploy",
+            "Roadmap cards link to shipped routes and measurable outcomes",
+            "Validation becomes default: typecheck, lint, build, browser checks",
+            "Fewer “done” cards without a public surface to inspect",
           ],
         },
       },
@@ -99,11 +104,11 @@ export const futureSpecs: Record<"en" | "ar", FutureSpec> = {
           confidenceLabel: "Confidence",
           confidence: "High",
           description:
-            "The strongest view is not one project at a time. The system should compare projects, surface stalled bets, and show where AI leverage is actually compounding.",
+            "The strongest view is not one project at a time. The system should compare projects, surface stalled bets, and show where leverage is compounding across the portfolio.",
           proof: [
             "Project filters produce sharper decisions",
-            "Global sales projections stay separate from public real metrics",
-            "Roadmap cards connect directly to measurable project outcomes",
+            "Stack items stay linked to projects, usage, and reasons",
+            "Projections stay private while public pages stay factual",
           ],
         },
       },
@@ -111,17 +116,17 @@ export const futureSpecs: Record<"en" | "ar", FutureSpec> = {
         type: "FutureBet",
         props: {
           label: "Bet 03",
-          title: "Generated interfaces need editorial gates",
+          title: "Generated pages need editorial + automation gates",
           horizonLabel: "Horizon",
           horizon: "Ongoing",
           confidenceLabel: "Confidence",
           confidence: "High",
           description:
-            "AI-generated UI is useful when the catalog is narrow and the output is reviewed. The future page should prove that generated structure can still feel intentional.",
+            "AI-generated UI is useful when the catalog is narrow and the output is reviewed. The bet is that a monthly refresh loop keeps the page honest without putting generation into runtime.",
           proof: [
             "The renderer accepts only 10 Claws components",
-            "The public page uses a checked-in spec",
-            "Admin generation can come later as a preview-and-approve workflow",
+            "The public page ships a checked-in spec (English + Arabic)",
+            "Draft updates happen on a branch with validation notes",
           ],
         },
       },
@@ -142,18 +147,18 @@ export const futureSpecs: Record<"en" | "ar", FutureSpec> = {
           items: [
             {
               date: "Now",
-              title: "Ship the generated page",
-              description: "Use json-render for a real public route without putting live AI output in the request path.",
+              title: "Keep the public surfaces current",
+              description: "Progress, roadmap cards, and the stack view should stay accurate and easy to inspect.",
             },
             {
               date: "Next",
-              title: "Connect future bets to progress metrics",
-              description: "Turn the strongest bets into measurable cards on the public progress board and admin roadmap.",
+              title: "Refresh the future spec monthly",
+              description: "Review recent commits, update the spec, run validations, and ship as a stable public contract.",
             },
             {
               date: "Later",
-              title: "Add admin generation",
-              description: "Let an admin ask Codex for a new future spec, preview it, approve it, and publish the stable version.",
+              title: "Add an admin preview-and-approve workflow",
+              description: "Generate a draft spec, preview it, approve it, then publish the checked-in version (no runtime generation).",
             },
           ],
         },
@@ -164,7 +169,7 @@ export const futureSpecs: Record<"en" | "ar", FutureSpec> = {
           eyebrow: "Operating rules / What the AI should respect",
           title: "The constraints matter",
           description:
-            "The page is allowed to be generated, but the brand, routing, security posture, and public data rules stay owned by the app.",
+            "The page is allowed to be AI-authored, but the brand, routing, security posture, and public data rules stay owned by the app.",
           tone: "ink",
         },
         children: ["principles"],
@@ -182,6 +187,10 @@ export const futureSpecs: Record<"en" | "ar", FutureSpec> = {
               description: "Admin forecasts can guide decisions, while public pages should keep real metrics clearly separated.",
             },
             {
+              title: "Keep locales aligned",
+              description: "English and Arabic specs ship together so the public contract stays consistent.",
+            },
+            {
               title: "Prefer narrow catalogs",
               description: "A smaller set of components produces a page that feels designed instead of assembled from random parts.",
             },
@@ -196,9 +205,9 @@ export const futureSpecs: Record<"en" | "ar", FutureSpec> = {
         type: "FutureCta",
         props: {
           eyebrow: "Next checkpoint / Follow the proof",
-          title: "The future page is a promise to measure.",
+          title: "The future page is a promise to verify.",
           description:
-            "The useful version of this page is not the copy. It is the loop: generate an opinion, constrain it, ship it, then compare it against what actually happened.",
+            "The useful version of this page is not the copy. It is the loop: propose a bet, constrain it, ship it, then compare it against what actually happened.",
           cta: { label: "Read the progress ledger", href: "/progress" },
         },
       },
@@ -215,14 +224,14 @@ export const futureSpecs: Record<"en" | "ar", FutureSpec> = {
       hero: {
         type: "FutureHero",
         props: {
-          eyebrow: "خارطة طريق يكتبها الذكاء الاصطناعي / إثبات يديره الإنسان",
+          eyebrow: "صفحة يكتبها الذكاء الاصطناعي / مواصفة يعتمدها الإنسان",
           title: "المستقبل",
           description:
-            "هذه الصفحة مولدة من مواصفة json-render مقيّدة. يستطيع الذكاء الاصطناعي اختيار الشكل والمحتوى، بينما يتحكم الموقع بالمكونات وحدود البيانات والعقد العام.",
+            "هذه الصفحة مولدة من مواصفة json-render مقيّدة. يمكن للذكاء الاصطناعي اقتراح البنية والنص، بينما يفرض التطبيق كتالوج المكونات وحدود البيانات والعقد العام.",
           primaryCta: { label: "شاهد التقدم", href: "/progress" },
           secondaryCta: { label: "استكشف التقنيات", href: "/stack" },
           statusLabel: "وضع التوليد",
-          statusValue: "مواصفة معتمدة",
+          statusValue: "مواصفة محفوظة ومراجَعة",
         },
       },
       signals: {
@@ -235,14 +244,19 @@ export const futureSpecs: Record<"en" | "ar", FutureSpec> = {
               hint: "يتم التوليد والمراجعة ثم الشحن كمواصفة مستقرة.",
             },
             {
-              label: "السؤال الرئيسي",
-              value: "هل تتراكم العمليات بالذكاء الاصطناعي؟",
-              hint: "تتابع الصفحة رهانات مستقبلية يجب أن تتحول إلى عمل قابل للقياس.",
+              label: "أسطح تم شحنها",
+              value: "التقدم + بطاقات خارطة الطريق + مصفوفة التقنيات",
+              hint: "يجب أن تعود الرهانات المستقبلية إلى سطح عام يمكن قياسه أو شحنه.",
             },
             {
               label: "المعيار العام",
               value: "الإثبات قبل العرض",
               hint: "يجب أن تتحول الادعاءات إلى مقاييس أو إطلاقات أو افتراضات مرفوضة.",
+            },
+            {
+              label: "حدود البيانات",
+              value: "المقاييس العامة ≠ التوقعات الخاصة",
+              hint: "يمكن للتوقعات أن تقود القرار، بينما تبقى الصفحات العامة صارمة فيما هو حقيقي اليوم.",
             },
           ],
         },
@@ -253,7 +267,7 @@ export const futureSpecs: Record<"en" | "ar", FutureSpec> = {
           eyebrow: "رهانات مستقبلية / ما الذي سنختبره لاحقاً",
           title: "رهانات تستحق الإثبات",
           description:
-            "المرحلة التالية لا تعني إضافة أدوات أكثر. الهدف هو معرفة أي سير عمل بالذكاء الاصطناعي يصمد أمام العملاء والإيراد وضغط التشغيل.",
+            "المرحلة التالية لا تعني إضافة أدوات أكثر. الهدف هو تحويل سير العمل بالذكاء الاصطناعي إلى عمليات قابلة للتكرار تصمد أمام إيراد حقيقي ومستخدمين حقيقيين وضغط تشغيل حقيقي.",
           tone: "white",
         },
         children: ["bet-1", "bet-2", "bet-3"],
@@ -262,17 +276,17 @@ export const futureSpecs: Record<"en" | "ar", FutureSpec> = {
         type: "FutureBet",
         props: {
           label: "رهان 01",
-          title: "حلقات إطلاق يديرها الوكلاء",
+          title: "بطاقات خارطة الطريق تصبح حلقات تنفيذ",
           horizonLabel: "الأفق",
-          horizon: "خلال 90 يوماً",
+          horizon: "خلال 30 يوماً",
           confidenceLabel: "الثقة",
           confidence: "متوسط",
           description:
-            "يجب أن ينتقل Codex من مساعد تنفيذ إلى مشغّل إطلاق: يحدد الفجوات، يصلح سطح المنتج، يتحقق من العمل، ويجهز مسار الإصدار.",
+            "يجب أن تتحول كل بطاقة تخطيط إلى حلقة: مواصفة → إصلاح → تحقق → شحن → قياس. الرهان أن الحلقات الأقصر تتفوق على الخطط الأكبر.",
           proof: [
-            "وقت أقصر من الفكرة إلى الصفحة العامة",
-            "قوائم إصدار يدوية أقل",
-            "اكتشاف أعطال أكثر عبر التحقق في المتصفح قبل النشر",
+            "بطاقات خارطة الطريق ترتبط بمسارات مشحونة ونتائج قابلة للقياس",
+            "التحقق يصبح افتراضياً: فحص الأنواع، lint، build، واختبار المتصفح",
+            "عدد أقل من البطاقات «المكتملة» بلا سطح عام يمكن فحصه",
           ],
         },
       },
@@ -286,11 +300,11 @@ export const futureSpecs: Record<"en" | "ar", FutureSpec> = {
           confidenceLabel: "الثقة",
           confidence: "عال",
           description:
-            "أقوى عرض ليس مشروعاً واحداً في كل مرة. يجب أن يقارن النظام المشاريع، ويظهر الرهانات المتوقفة، ويوضح أين تتراكم رافعة الذكاء الاصطناعي فعلاً.",
+            "أقوى عرض ليس مشروعاً واحداً في كل مرة. يجب أن يقارن النظام المشاريع، ويظهر الرهانات المتوقفة، ويوضح أين تتراكم الرافعة عبر المحفظة.",
           proof: [
             "فلاتر المشاريع تقود قرارات أوضح",
-            "توقعات المبيعات العامة تبقى منفصلة عن المقاييس الحقيقية المنشورة",
-            "بطاقات خارطة الطريق ترتبط بنتائج مشاريع قابلة للقياس",
+            "عناصر التقنية تبقى مرتبطة بالمشاريع والاستخدام وأسباب الاختيار",
+            "التوقعات تبقى خاصة بينما تبقى الصفحات العامة واقعية",
           ],
         },
       },
@@ -298,17 +312,17 @@ export const futureSpecs: Record<"en" | "ar", FutureSpec> = {
         type: "FutureBet",
         props: {
           label: "رهان 03",
-          title: "الواجهات المولدة تحتاج بوابات تحريرية",
+          title: "الصفحات المولدة تحتاج بوابات تحرير + أتمتة",
           horizonLabel: "الأفق",
           horizon: "مستمر",
           confidenceLabel: "الثقة",
           confidence: "عال",
           description:
-            "الواجهة المولدة بالذكاء الاصطناعي مفيدة عندما يكون الكتالوج ضيقاً والمخرج مراجعاً. يجب أن تثبت صفحة المستقبل أن البنية المولدة يمكن أن تبقى مقصودة.",
+            "الواجهة المولدة بالذكاء الاصطناعي مفيدة عندما يكون الكتالوج ضيقاً والمخرج مراجعاً. الرهان أن تحديثاً شهرياً يحافظ على صدق الصفحة من دون وضع التوليد في وقت التشغيل.",
           proof: [
             "العارض يقبل مكونات 10 Claws فقط",
-            "الصفحة العامة تستخدم مواصفة محفوظة في الكود",
-            "يمكن إضافة توليد إداري لاحقاً عبر معاينة واعتماد",
+            "الصفحة العامة تشحن مواصفة محفوظة في الكود (إنجليزي + عربي)",
+            "التحديثات تتم عبر فرع مع ملاحظات تحقق واضحة",
           ],
         },
       },
@@ -328,18 +342,18 @@ export const futureSpecs: Record<"en" | "ar", FutureSpec> = {
           items: [
             {
               date: "الآن",
-              title: "شحن الصفحة المولدة",
-              description: "استخدام json-render لمسار عام حقيقي من دون وضع مخرجات ذكاء اصطناعي مباشرة في مسار الطلب.",
+              title: "إبقاء الأسطح العامة محدثة",
+              description: "التقدم وبطاقات خارطة الطريق وعرض التقنيات يجب أن تبقى دقيقة وسهلة الفحص.",
             },
             {
               date: "التالي",
-              title: "ربط الرهانات المستقبلية بمقاييس التقدم",
-              description: "تحويل أقوى الرهانات إلى بطاقات قابلة للقياس في لوحة التقدم العامة وخارطة الطريق الإدارية.",
+              title: "تحديث مواصفة المستقبل شهرياً",
+              description: "مراجعة آخر التغييرات، تحديث المواصفة، تشغيل التحقق، ثم شحنها كعقد عام مستقر.",
             },
             {
               date: "لاحقاً",
-              title: "إضافة التوليد الإداري",
-              description: "تمكين المدير من طلب مواصفة مستقبلية جديدة من Codex ومعاينتها واعتمادها ثم نشر النسخة المستقرة.",
+              title: "إضافة سير عمل معاينة واعتماد للإدارة",
+              description: "توليد مسودة، معاينتها، اعتمادها، ثم نشر النسخة المحفوظة في الكود (من دون توليد وقت التشغيل).",
             },
           ],
         },
@@ -368,6 +382,10 @@ export const futureSpecs: Record<"en" | "ar", FutureSpec> = {
               description: "يمكن لتوقعات الإدارة أن تقود القرارات، بينما تبقى الصفحات العامة واضحة في فصل المقاييس الحقيقية.",
             },
             {
+              title: "حافظ على اتساق اللغات",
+              description: "يجب أن تُشحن مواصفات الإنجليزي والعربي معاً حتى يبقى العقد العام متسقاً.",
+            },
+            {
               title: "فضّل الكتالوجات الضيقة",
               description: "مجموعة مكونات أصغر تنتج صفحة تبدو مصممة لا مركبة من أجزاء عشوائية.",
             },
@@ -382,9 +400,9 @@ export const futureSpecs: Record<"en" | "ar", FutureSpec> = {
         type: "FutureCta",
         props: {
           eyebrow: "نقطة التحقق التالية / تابع الإثبات",
-          title: "صفحة المستقبل وعد بالقياس.",
+          title: "صفحة المستقبل وعد بالتحقق.",
           description:
-            "النسخة المفيدة من هذه الصفحة ليست النص. إنها الحلقة: توليد رأي، تقييده، شحنه، ثم مقارنته بما حدث فعلاً.",
+            "النسخة المفيدة من هذه الصفحة ليست النص. إنها الحلقة: اقتراح رهان، تقييده، شحنه، ثم مقارنته بما حدث فعلاً.",
           cta: { label: "اقرأ سجل التقدم", href: "/progress" },
         },
       },
