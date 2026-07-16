@@ -28,7 +28,7 @@ export function NewsletterSection() {
           />
         </div>
 
-        <p className="mt-4 text-xs text-gray-500">No spam, unsubscribe at any time. Updates sent weekly.</p>
+        <p className="mt-4 text-xs text-gray-500">No spam, unsubscribe at any time.</p>
       </div>
     </section>
   )
