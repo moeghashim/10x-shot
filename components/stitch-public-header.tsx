@@ -64,6 +64,12 @@ export function StitchPublicHeader({
           >
             {labels.future}
           </Link>
+          <Link
+            className="stitch-mono text-[10px] uppercase tracking-[0.3em] text-black/65 transition-colors hover:text-black"
+            href="/track"
+          >
+            {locale === "ar" ? "المتابعة" : "Track"}
+          </Link>
           <a
             className="stitch-mono text-[10px] uppercase tracking-[0.3em] text-black/65 transition-colors hover:text-black"
             href={getSectionHref(locale, "contact", isHomepage)}
