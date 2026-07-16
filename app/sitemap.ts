@@ -29,6 +29,26 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'daily',
       priority: 0.9,
     },
+    ...(['en', 'ar'] as const).flatMap(locale => [
+      {
+        url: `${baseUrl}/${locale}/track`,
+        lastModified: new Date('2026-07-16'),
+        changeFrequency: 'weekly' as const,
+        priority: 0.8,
+      },
+      {
+        url: `${baseUrl}/${locale}/future`,
+        lastModified: new Date(),
+        changeFrequency: 'monthly' as const,
+        priority: 0.7,
+      },
+      {
+        url: `${baseUrl}/${locale}/stack`,
+        lastModified: new Date(),
+        changeFrequency: 'weekly' as const,
+        priority: 0.7,
+      },
+    ]),
     ...projectUrls,
   ]
 }
