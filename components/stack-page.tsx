@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { ArrowUpRight, Check, Layers3, Table2 } from "lucide-react"
+import { ArrowUpRight, Layers3, Table2 } from "lucide-react"
 import Image from "next/image"
 import { Link } from "@/i18n/routing"
 import { StitchPublicHeader } from "@/components/stitch-public-header"
@@ -18,6 +18,7 @@ type StackPageProps = {
     grade: string
     familiarity: string
     reason: string
+    useCase: string
     category: string
     usage: string
     noProjects: string
@@ -45,15 +46,7 @@ type StackPageProps = {
 }
 
 export function StackPage({ locale, stackItems, strings }: StackPageProps) {
-  const [view, setView] = useState<"cards" | "matrix">("cards")
-  const projects = Array.from(
-    new Map(
-      stackItems
-        .flatMap((item) => item.projects)
-        .map((project) => [project.id, project] as const)
-    ).values()
-  ).sort((left, right) => left.title.localeCompare(right.title))
-
+  const [view, setView] = useState<"cards" | "matrix">("matrix")
   const projectHref = (project: { url?: string | null }) => project.url || `/${locale}#projects`
   const getFamiliarityLabel = (familiarity?: StackFamiliarity) =>
     familiarity ? strings.familiarityLevels[familiarity] : strings.familiarityLevels.learning
@@ -120,12 +113,12 @@ export function StackPage({ locale, stackItems, strings }: StackPageProps) {
             {stackItems.length > 0 ? (
               <Tabs value={view} onValueChange={(value) => setView(value as "cards" | "matrix")} className="space-y-6">
                 <TabsList className="border border-black/15 bg-[#f3f1ed] p-1">
-                  <TabsTrigger value="cards" className="stitch-mono text-[10px] uppercase tracking-[0.28em]">
-                    {strings.views.cards}
-                  </TabsTrigger>
                   <TabsTrigger value="matrix" className="stitch-mono text-[10px] uppercase tracking-[0.28em]">
                     <Table2 className="mr-2 h-3.5 w-3.5" />
                     {strings.views.matrix}
+                  </TabsTrigger>
+                  <TabsTrigger value="cards" className="stitch-mono text-[10px] uppercase tracking-[0.28em]">
+                    {strings.views.cards}
                   </TabsTrigger>
                 </TabsList>
 
@@ -201,6 +194,9 @@ export function StackPage({ locale, stackItems, strings }: StackPageProps) {
                           <th className="sticky left-0 z-20 min-w-[240px] border-r border-black/15 bg-[#f3f1ed] px-4 py-4 text-left">
                             <span className="stitch-mono text-[10px] uppercase tracking-[0.28em] text-black/60">{strings.stack}</span>
                           </th>
+                          <th className="min-w-[180px] border-r border-black/15 px-4 py-4 text-left">
+                            <span className="stitch-mono text-[10px] uppercase tracking-[0.28em] text-black/60">{strings.useCase}</span>
+                          </th>
                           <th className="min-w-[120px] border-r border-black/15 px-4 py-4 text-left">
                             <span className="stitch-mono text-[10px] uppercase tracking-[0.28em] text-black/60">{strings.category}</span>
                           </th>
@@ -213,72 +209,56 @@ export function StackPage({ locale, stackItems, strings }: StackPageProps) {
                           <th className="min-w-[120px] border-r border-black/15 px-4 py-4 text-left">
                             <span className="stitch-mono text-[10px] uppercase tracking-[0.28em] text-black/60">{strings.usage}</span>
                           </th>
-                          {projects.map((project) => (
-                            <th key={project.id} className="min-w-[160px] border-r border-black/15 px-4 py-4 text-left last:border-r-0">
-                              <a
-                                href={projectHref(project)}
-                                target={project.url ? "_blank" : undefined}
-                                rel={project.url ? "noreferrer" : undefined}
-                                className="block transition-colors hover:text-black/70"
-                              >
-                                <p className="text-sm font-medium text-black">{project.title}</p>
-                                {project.url ? <ArrowUpRight className="mt-2 h-3.5 w-3.5 text-black/50" /> : null}
-                              </a>
-                            </th>
-                          ))}
                         </tr>
                       </thead>
                       <tbody>
-                        {stackItems.map((item) => {
-                          const linkedProjectIds = new Set(item.projects.map((project) => project.id))
-
-                          return (
-                            <tr key={item.id} className="border-b border-black/10 last:border-b-0">
-                              <td className="sticky left-0 z-10 border-r border-black/15 bg-white px-4 py-4 align-top">
-                                <div className="space-y-2">
-                                  <p className="font-medium text-black">{item.name}</p>
-                                  {item.reason ? (
-                                    <p className="text-xs leading-6 text-black/70">
-                                      <span className="stitch-mono uppercase tracking-[0.22em] text-black/45">{strings.reason}: </span>
-                                      {item.reason}
-                                    </p>
-                                  ) : null}
-                                  {item.notes ? <p className="text-xs leading-6 text-black/55">{item.notes}</p> : null}
-                                </div>
-                              </td>
-                              <td className="border-r border-black/15 px-4 py-4 align-top">
-                                <span className="stitch-mono inline-flex border border-black/15 px-3 py-2 text-[10px] uppercase tracking-[0.28em] text-black/65">
-                                  {strings.categories[item.category]}
-                                </span>
-                              </td>
-                              <td className="border-r border-black/15 px-4 py-4 align-top">
-                                <span className="stitch-mono inline-flex bg-black px-3 py-2 text-[10px] uppercase tracking-[0.28em] text-white">
-                                  {strings.grade} {item.grade}
-                                </span>
-                              </td>
-                              <td className="border-r border-black/15 px-4 py-4 align-top">
-                                <span className="stitch-mono inline-flex border border-black/15 px-3 py-2 text-[10px] uppercase tracking-[0.28em] text-black/65">
-                                  {getFamiliarityLabel(item.familiarity)}
-                                </span>
-                              </td>
-                              <td className="border-r border-black/15 px-4 py-4 align-top">
-                                <span className="stitch-display text-xl font-semibold uppercase tracking-[-0.08em] text-black">{item.usageCount}</span>
-                              </td>
-                              {projects.map((project) => (
-                                <td
-                                  key={`${item.id}-${project.id}`}
-                                  className="border-r border-black/15 px-4 py-4 text-center align-middle last:border-r-0"
-                                >
-                                  {linkedProjectIds.has(project.id) ? (
-                                    <Check className="mx-auto h-4 w-4 text-black" />
-                                  ) : (
-                                    <span className="text-black/20">-</span>
-                                  )}
-                                </td>
-                              ))}
-                            </tr>
-                          )
-                        })}
+                        {stackItems.map((item) => (
+                          <tr key={item.id} className="border-b border-black/10 last:border-b-0">
+                            <td className="sticky left-0 z-10 border-r border-black/15 bg-white px-4 py-4 align-top">
+                              <div className="space-y-3">
+                                <p className="font-medium text-black">{item.name}</p>
+                                {item.notes ? <p className="text-xs leading-6 text-black/55">{item.notes}</p> : null}
+                                {item.projects.length > 0 ? (
+                                  <div className="flex flex-wrap gap-2 pt-1">
+                                    {item.projects.map((project) => (
+                                      <a
+                                        key={`${item.id}-${project.id}`}
+                                        href={projectHref(project)}
+                                        target={project.url ? "_blank" : undefined}
+                                        rel={project.url ? "noreferrer" : undefined}
+                                        className="stitch-mono inline-flex items-center gap-1.5 border border-black/15 px-2.5 py-1.5 text-[9px] uppercase tracking-[0.22em] text-black transition-colors hover:border-black"
+                                      >
+                                        {project.title}
+                                        {project.url ? <ArrowUpRight className="h-3 w-3" /> : null}
+                                      </a>
+                                    ))}
+                                  </div>
+                                ) : null}
+                              </div>
+                            </td>
+                            <td className="border-r border-black/15 px-4 py-4 align-top">
+                              <p className="text-sm leading-6 text-black/70">{item.reason || "-"}</p>
+                            </td>
+                            <td className="border-r border-black/15 px-4 py-4 align-top">
+                              <span className="stitch-mono inline-flex border border-black/15 px-3 py-2 text-[10px] uppercase tracking-[0.28em] text-black/65">
+                                {strings.categories[item.category]}
+                              </span>
+                            </td>
+                            <td className="border-r border-black/15 px-4 py-4 align-top">
+                              <span className="stitch-mono inline-flex bg-black px-3 py-2 text-[10px] uppercase tracking-[0.28em] text-white">
+                                {strings.grade} {item.grade}
+                              </span>
+                            </td>
+                            <td className="border-r border-black/15 px-4 py-4 align-top">
+                              <span className="stitch-mono inline-flex border border-black/15 px-3 py-2 text-[10px] uppercase tracking-[0.28em] text-black/65">
+                                {getFamiliarityLabel(item.familiarity)}
+                              </span>
+                            </td>
+                            <td className="border-r border-black/15 px-4 py-4 align-top">
+                              <span className="stitch-display text-xl font-semibold uppercase tracking-[-0.08em] text-black">{item.usageCount}</span>
+                            </td>
+                          </tr>
+                        ))}
                       </tbody>
                     </table>
                   </div>
