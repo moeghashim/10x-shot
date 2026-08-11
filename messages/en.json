@@ -233,6 +233,7 @@
     "grade": "Grade",
     "familiarity": "Familiarity",
     "reason": "Why I chose it",
+    "useCase": "Use case",
     "category": "Category",
     "usage": "Projects using it",
     "projects": "Projects",

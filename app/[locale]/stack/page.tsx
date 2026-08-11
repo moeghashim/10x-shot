@@ -49,6 +49,7 @@ export default async function StackRoute({
         grade: t("grade"),
         familiarity: t("familiarity"),
         reason: t("reason"),
+        useCase: t("useCase"),
         category: t("category"),
         usage: t("usage"),
         noProjects: t("noProjects"),
