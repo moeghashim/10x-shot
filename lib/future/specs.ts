@@ -49,8 +49,8 @@ export const futureSpecs: Record<"en" | "ar", FutureSpec> = {
             },
             {
               label: "Shipped surfaces",
-              value: "Progress + roadmap cards + stack matrix",
-              hint: "Future bets must map back to a public surface we can measure or ship.",
+              value: "Progress + track + roadmap cards + stack matrix",
+              hint: "Future bets should map back to a research, delivery, or system surface we can inspect.",
             },
             {
               label: "Public standard",
@@ -80,17 +80,17 @@ export const futureSpecs: Record<"en" | "ar", FutureSpec> = {
         type: "FutureBet",
         props: {
           label: "Bet 01",
-          title: "Roadmap cards become execution loops",
+          title: "Research signals become execution loops",
           horizonLabel: "Horizon",
           horizon: "Next 30 days",
           confidenceLabel: "Confidence",
           confidence: "Medium",
           description:
-            "Every planning card should be able to become a loop: spec → patch → verify → ship → measure. The bet is that tighter loops beat bigger plans.",
+            "The watchlist should not stop at observation. The bet is that stronger research signals can feed planning cards, which then turn into scoped builds, validations, and public proof.",
           proof: [
-            "Roadmap cards link to shipped routes and measurable outcomes",
-            "Validation becomes default: typecheck, lint, build, browser checks",
-            "Fewer “done” cards without a public surface to inspect",
+            "Track updates point to questions worth testing next",
+            "Roadmap cards inherit clearer sources, scope, and decision points",
+            "Validation stays default: typecheck, lint, build, browser checks",
           ],
         },
       },
@@ -107,8 +107,8 @@ export const futureSpecs: Record<"en" | "ar", FutureSpec> = {
             "The strongest view is not one project at a time. The system should compare projects, surface stalled bets, and show where leverage is compounding across the portfolio.",
           proof: [
             "Project filters produce sharper decisions",
-            "Stack items stay linked to projects, usage, and reasons",
-            "Projections stay private while public pages stay factual",
+            "Stack items stay linked to projects, usage, reasons, and use cases",
+            "Admin targets guide planning while public metrics stay factual",
           ],
         },
       },
@@ -148,12 +148,12 @@ export const futureSpecs: Record<"en" | "ar", FutureSpec> = {
             {
               date: "Now",
               title: "Keep the public surfaces current",
-              description: "Progress, roadmap cards, and the stack view should stay accurate and easy to inspect.",
+              description: "Progress, track, roadmap cards, and the stack matrix should stay accurate and easy to inspect.",
             },
             {
               date: "Next",
-              title: "Refresh the future spec monthly",
-              description: "Review recent commits, update the spec, run validations, and ship as a stable public contract.",
+              title: "Connect research to planning decisions",
+              description: "Use new watchlist signals to sharpen planning cards, then update the future spec after the checks pass.",
             },
             {
               date: "Later",
@@ -196,7 +196,7 @@ export const futureSpecs: Record<"en" | "ar", FutureSpec> = {
             },
             {
               title: "Make every claim inspectable",
-              description: "Future bets should point back to progress, stack decisions, experiments, or explicit things not being built yet.",
+              description: "Future bets should point back to track updates, progress, stack decisions, experiments, or explicit things not being built yet.",
             },
           ],
         },
@@ -245,8 +245,8 @@ export const futureSpecs: Record<"en" | "ar", FutureSpec> = {
             },
             {
               label: "أسطح تم شحنها",
-              value: "التقدم + بطاقات خارطة الطريق + مصفوفة التقنيات",
-              hint: "يجب أن تعود الرهانات المستقبلية إلى سطح عام يمكن قياسه أو شحنه.",
+              value: "التقدم + المتابعة + بطاقات خارطة الطريق + مصفوفة التقنيات",
+              hint: "يجب أن تعود الرهانات المستقبلية إلى سطح بحثي أو تنفيذي أو تقني يمكن فحصه.",
             },
             {
               label: "المعيار العام",
@@ -276,17 +276,17 @@ export const futureSpecs: Record<"en" | "ar", FutureSpec> = {
         type: "FutureBet",
         props: {
           label: "رهان 01",
-          title: "بطاقات خارطة الطريق تصبح حلقات تنفيذ",
+          title: "إشارات المتابعة تصبح حلقات تنفيذ",
           horizonLabel: "الأفق",
           horizon: "خلال 30 يوماً",
           confidenceLabel: "الثقة",
           confidence: "متوسط",
           description:
-            "يجب أن تتحول كل بطاقة تخطيط إلى حلقة: مواصفة → إصلاح → تحقق → شحن → قياس. الرهان أن الحلقات الأقصر تتفوق على الخطط الأكبر.",
+            "يجب ألا تتوقف قائمة المتابعة عند المراقبة. الرهان هو أن الإشارات البحثية الأقوى تغذي بطاقات التخطيط، ثم تتحول إلى بناء محدد وتحقق وإثبات عام.",
           proof: [
-            "بطاقات خارطة الطريق ترتبط بمسارات مشحونة ونتائج قابلة للقياس",
-            "التحقق يصبح افتراضياً: فحص الأنواع، lint، build، واختبار المتصفح",
-            "عدد أقل من البطاقات «المكتملة» بلا سطح عام يمكن فحصه",
+            "تحديثات صفحة المتابعة تشير إلى الأسئلة الجديرة بالاختبار",
+            "بطاقات خارطة الطريق ترث مصادر أوضح ونطاقاً أوضح ونقاط قرار أوضح",
+            "التحقق يبقى افتراضياً: فحص الأنواع وlint وbuild واختبار المتصفح",
           ],
         },
       },
@@ -303,8 +303,8 @@ export const futureSpecs: Record<"en" | "ar", FutureSpec> = {
             "أقوى عرض ليس مشروعاً واحداً في كل مرة. يجب أن يقارن النظام المشاريع، ويظهر الرهانات المتوقفة، ويوضح أين تتراكم الرافعة عبر المحفظة.",
           proof: [
             "فلاتر المشاريع تقود قرارات أوضح",
-            "عناصر التقنية تبقى مرتبطة بالمشاريع والاستخدام وأسباب الاختيار",
-            "التوقعات تبقى خاصة بينما تبقى الصفحات العامة واقعية",
+            "عناصر التقنية تبقى مرتبطة بالمشاريع والاستخدام وأسباب الاختيار وحالات الاستخدام",
+            "أهداف الإدارة توجه التخطيط بينما تبقى المقاييس العامة واقعية",
           ],
         },
       },
@@ -343,12 +343,12 @@ export const futureSpecs: Record<"en" | "ar", FutureSpec> = {
             {
               date: "الآن",
               title: "إبقاء الأسطح العامة محدثة",
-              description: "التقدم وبطاقات خارطة الطريق وعرض التقنيات يجب أن تبقى دقيقة وسهلة الفحص.",
+              description: "التقدم والمتابعة وبطاقات خارطة الطريق ومصفوفة التقنيات يجب أن تبقى دقيقة وسهلة الفحص.",
             },
             {
               date: "التالي",
-              title: "تحديث مواصفة المستقبل شهرياً",
-              description: "مراجعة آخر التغييرات، تحديث المواصفة، تشغيل التحقق، ثم شحنها كعقد عام مستقر.",
+              title: "ربط البحث بقرارات التخطيط",
+              description: "استخدام إشارات المتابعة الجديدة لصقل بطاقات التخطيط، ثم تحديث مواصفة المستقبل بعد اجتياز التحقق.",
             },
             {
               date: "لاحقاً",
@@ -391,7 +391,7 @@ export const futureSpecs: Record<"en" | "ar", FutureSpec> = {
             },
             {
               title: "اجعل كل ادعاء قابلاً للفحص",
-              description: "يجب أن تعود الرهانات المستقبلية إلى التقدم أو قرارات التقنية أو التجارب أو الأشياء التي لن نبنيها بعد.",
+              description: "يجب أن تعود الرهانات المستقبلية إلى تحديثات المتابعة أو التقدم أو قرارات التقنية أو التجارب أو الأشياء التي لن نبنيها بعد.",
             },
           ],
         },
