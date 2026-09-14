@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
 import { getTranslations } from "next-intl/server"
+import { AboutContactForm } from "@/components/about-contact-form"
 import { StitchPublicHeader } from "@/components/stitch-public-header"
 import { Link } from "@/i18n/routing"
 import { aboutContent } from "@/lib/about/content"
@@ -60,11 +61,11 @@ export default async function AboutPage({ params }: PageProps) {
             ))}
           </ol>
         </section>
-        <section className="mb-16 bg-black p-8 text-white md:p-12">
+        <section id="contact" className="mb-16 scroll-mt-28 bg-black p-8 text-white md:p-12">
           <h2 className="stitch-display text-3xl font-semibold leading-tight">{content.ctaTitle}</h2>
           <p className="mt-4 leading-7 text-white/70">{content.ctaBody}</p>
+          <AboutContactForm locale={locale} />
           <div className="mt-8 flex flex-wrap gap-4">
-            <Link href="/#contact" className="border border-white bg-white px-6 py-3 font-medium text-black hover:bg-white/90">{content.contact}</Link>
             <Link href="/#projects" className="border border-white/40 px-6 py-3 font-medium hover:bg-white/10">{content.projects}</Link>
           </div>
         </section>
