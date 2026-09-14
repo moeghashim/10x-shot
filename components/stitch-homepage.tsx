@@ -327,6 +327,9 @@ export function StitchHomepage({
             </div>
           </div>
           <div className="flex flex-wrap items-center gap-5">
+            <Link href="/about" className="stitch-mono text-[10px] uppercase tracking-[0.2em] text-black/55 hover:text-black">
+              {locale === "ar" ? "من نحن" : "About us"}
+            </Link>
             <a className="stitch-mono text-[10px] uppercase tracking-[0.28em] text-black/55 transition-colors hover:text-black" href="#projects">
               {t("HomePage.stitch.footer.projects")}
             </a>
