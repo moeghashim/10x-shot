@@ -45,7 +45,10 @@ export function StitchPublicHeader({
           </span>
         </Link>
 
-        <nav className="hidden items-center gap-8 md:flex">
+        <nav className="hidden items-center gap-4 lg:gap-8 md:flex">
+          <Link href="/about" className="stitch-mono text-[10px] uppercase tracking-[0.2em] text-black/65 transition-colors hover:text-black">
+            {locale === "ar" ? "من نحن" : "About us"}
+          </Link>
           <a
             className="stitch-mono text-[10px] uppercase tracking-[0.3em] text-black/65 transition-colors hover:text-black"
             href={getSectionHref(locale, "projects", isHomepage)}
@@ -84,6 +87,9 @@ export function StitchPublicHeader({
             className="stitch-mono hidden border border-black/15 bg-white px-4 py-2 text-[10px] uppercase tracking-[0.28em] text-black transition-colors hover:border-black md:inline-flex"
           >
             {labels.progress}
+          </Link>
+          <Link href="/about" className="text-xs text-black/65 hover:text-black md:hidden">
+            {locale === "ar" ? "من نحن" : "About us"}
           </Link>
           <StitchLocaleToggle />
         </div>
