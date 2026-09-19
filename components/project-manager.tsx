@@ -126,6 +126,10 @@ function ProjectForm({
     aiSkills: project?.aiSkills || [],
     tools: project?.tools || [],
     timeframe: project?.timeframe || "",
+    sector: project?.sector || "",
+    commits: project?.commits,
+    visits: project?.visits,
+    growth: project?.growth,
     url: project?.url || "",
   })
   const [stackFilter, setStackFilter] = useState("")
@@ -239,6 +243,23 @@ function ProjectForm({
           onChange={(e) => setFormData((prev) => ({ ...prev, url: e.target.value }))}
         />
       </div>
+
+      <fieldset className="space-y-3 border border-gray-200 p-4">
+        <legend className="px-1 text-sm font-medium">Project Spotlight</legend>
+        <p className="text-xs text-gray-500">Optional. Fill all four fields to include this project in the homepage spotlight. Clear any field to exclude it. Zero is a valid metric.</p>
+        <label className="block text-sm">Sector
+          <Input value={formData.sector ?? ""} onChange={(e) => setFormData((prev) => ({ ...prev, sector: e.target.value }))} />
+        </label>
+        <div className="grid gap-3 sm:grid-cols-3">
+          {([ ["commits", "Commits"], ["visits", "Monthly visits"], ["growth", "Growth (%)"] ] as const).map(([field, label]) => (
+            <label key={field} className="block text-sm">{label}
+              <Input type="number" min={field === "growth" ? undefined : 0} step={field === "growth" ? "any" : 1}
+                value={formData[field] ?? ""}
+                onChange={(e) => setFormData((prev) => ({ ...prev, [field]: e.target.value === "" ? undefined : e.target.valueAsNumber }))} />
+            </label>
+          ))}
+        </div>
+      </fieldset>
 
       <div className="space-y-4 rounded-lg border border-gray-200 p-4">
         <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">

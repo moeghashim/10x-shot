@@ -52,10 +52,13 @@ export default async function HomePage({
 }) {
   const { locale: routeLocale } = await params
   const locale = (routeLocale === "ar" ? "ar" : "en") as SupportedLocale
-  const { fetchProjects } = await import("@/lib/data-fetching")
-  const { data: projects } = await fetchProjects({ locale })
+  const { fetchProjects, fetchStack } = await import("@/lib/data-fetching")
+  const [{ data: projects }, { data: stackItems }] = await Promise.all([fetchProjects({ locale }), fetchStack()])
   const { data: siteCopy } = await fetchPublicSiteCopy()
   const safeProjects = projects || FALLBACK_PROJECTS
+  // Count canonical tool names so translated aliases do not inflate the Arabic total.
+  const canonicalProjects = locale === "ar" ? (await fetchProjects({ locale: "en" })).data : safeProjects
+  const toolCount = new Set(canonicalProjects.flatMap((project) => project.tools)).size
 
   // Prepare structured data for SEO
   const jsonLd = {
@@ -87,7 +90,7 @@ export default async function HomePage({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <StitchHomepage projects={safeProjects} locale={locale} copy={siteCopy} />
+      <StitchHomepage projects={safeProjects} locale={locale} stackItems={stackItems} toolCount={toolCount} />
     </div>
   )
 }

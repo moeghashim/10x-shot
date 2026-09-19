@@ -72,6 +72,10 @@ export const projectFields = {
   aiSkills: v.array(v.string()),
   tools: v.array(v.string()),
   timeframe: v.optional(v.string()),
+  sector: v.optional(v.string()),
+  commits: v.optional(v.number()),
+  visits: v.optional(v.number()),
+  growth: v.optional(v.number()),
   url: v.optional(v.union(v.null(), v.string())),
 } as const;
 

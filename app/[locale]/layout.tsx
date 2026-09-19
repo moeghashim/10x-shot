@@ -7,7 +7,7 @@ import { routing } from '@/i18n/routing';
 import Script from "next/script"
 import { GeistSans } from "geist/font/sans"
 import { GeistMono } from "geist/font/mono"
-import { Alexandria, Space_Grotesk } from "next/font/google"
+import { Alexandria, Space_Grotesk, Bricolage_Grotesque, JetBrains_Mono } from "next/font/google"
 import { NextIntlClientProvider } from "next-intl"
 import { getMessages } from "next-intl/server"
 import { AgentationToolbar } from "@/components/dev/agentation-toolbar"
@@ -20,6 +20,13 @@ const alexandria = Alexandria({
 const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
   variable: "--font-space-grotesk",
+})
+
+const bricolage = Bricolage_Grotesque({
+  subsets: ["latin"], weight: "variable", axes: ["opsz"], variable: "--font-bricolage", display: "swap",
+})
+const jetbrains = JetBrains_Mono({
+  subsets: ["latin"], weight: ["400", "500"], variable: "--font-jetbrains", display: "swap",
 })
 
 export const metadata: Metadata = {
@@ -58,7 +65,7 @@ export default async function RootLayout({
     <html
       lang={locale}
       dir={dir}
-      className={`scroll-smooth ${GeistSans.variable} ${GeistMono.variable} ${alexandria.variable} ${spaceGrotesk.variable}`}
+      className={`scroll-smooth ${GeistSans.variable} ${GeistMono.variable} ${alexandria.variable} ${spaceGrotesk.variable} ${bricolage.variable} ${jetbrains.variable}`}
     >
       <head>
         <Script async src="https://www.googletagmanager.com/gtag/js?id=G-Y3NM6KM0TR" strategy="lazyOnload" />
