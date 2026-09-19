@@ -197,6 +197,10 @@ function toProject(doc: any, locale: Locale = "en", stackLookup?: StackLookup) {
       doc.objectives || doc.localizedObjectives
         ? pickLocalizedText(doc.localizedObjectives, locale, doc.objectives)
         : undefined,
+    sector: doc.sector,
+    commits: doc.commits,
+    visits: doc.visits,
+    growth: doc.growth,
     progress: doc.progress,
     status: doc.status,
     stackItemIds: stack.stackItemIds,
@@ -299,6 +303,10 @@ export const save = mutation({
       stackItemIds: resolvedStack.stackItemIds,
       aiSkills: resolvedStack.aiSkills,
       tools: resolvedStack.tools,
+      sector: args.project.sector?.trim() || undefined,
+      commits: args.project.commits,
+      visits: args.project.visits,
+      growth: args.project.growth,
     };
 
     const now = Date.now();

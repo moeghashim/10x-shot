@@ -22,8 +22,20 @@ export async function requireAdmin(ctx: QueryCtx | MutationCtx) {
 
 export function assertProjectInput(input: {
   progress: number;
+  commits?: number;
+  visits?: number;
+  growth?: number;
 }) {
-  if (input.progress < 0 || input.progress > 100) {
+  for (const field of ["commits", "visits"] as const) {
+    const value = input[field];
+    if (value !== undefined && (!Number.isSafeInteger(value) || value < 0)) {
+      throw new ConvexError(`${field} must be a non-negative whole number`);
+    }
+  }
+  if (input.growth !== undefined && !Number.isFinite(input.growth)) {
+    throw new ConvexError("Growth must be a finite percentage");
+  }
+  if (!Number.isFinite(input.progress) || input.progress < 0 || input.progress > 100) {
     throw new ConvexError("Project progress must be between 0 and 100");
   }
 }

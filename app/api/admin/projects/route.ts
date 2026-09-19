@@ -43,6 +43,10 @@ function toProjectInput(project: Omit<Project, "id"> | Project, stackItems: Stac
     aiSkills: derivedStack.aiSkills,
     tools: derivedStack.tools,
     timeframe: project.timeframe,
+    sector: project.sector,
+    commits: project.commits,
+    visits: project.visits,
+    growth: project.growth,
     url: project.url ?? null,
   };
 }

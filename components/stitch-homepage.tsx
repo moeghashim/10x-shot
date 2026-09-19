@@ -1,355 +1,192 @@
-import { ArrowUpRight, Mail } from "lucide-react"
-import Image from "next/image"
-import { Link } from "@/i18n/routing"
-import { StitchPublicHeader } from "@/components/stitch-public-header"
-import { StitchTechStack } from "@/components/stitch-tech-stack"
-import { getProjectStatusStyles } from "@/lib/project-status"
-import { getSiteCopyText, type SiteCopyMap } from "@/lib/site-content"
-import type { Project, SupportedLocale } from "@/types/database"
+"use client";
 
-function buildCode(id: number) {
-  return `BUILD_${String(id).padStart(2, "0")}`
+import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
+import { Link } from "@/i18n/routing";
+import { buildCode, formatVisits, gradeSegments, hasSpotlightData, projectTools, projectLaunchUrl, type SpotlightProject } from "@/lib/home/project-presentation";
+import type { Project, StackGrade, StackItem, SupportedLocale } from "@/types/database";
+import "@/styles/claws-home.css";
+
+function useReducedMotion() {
+  const [reduced, setReduced] = useState(false);
+  useEffect(() => {
+    const media = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const update = () => setReduced(media.matches);
+    update();
+    media.addEventListener("change", update);
+    return () => media.removeEventListener("change", update);
+  }, []);
+  return reduced;
 }
 
-function formatProjectStatus(status: Project["status"], t: (key: string) => string) {
-  if (status === "active" || status === "planning" || status === "completed") {
-    return t(`HomePage.stitch.projects.status.${status}`)
-  }
-
-  return t("HomePage.stitch.projects.status.planning")
+function useCount(duration: number, enabled: boolean, reduced: boolean, resetKey = 0) {
+  const [progress, setProgress] = useState(0);
+  useEffect(() => {
+    setProgress(0);
+    if (!enabled) return;
+    if (reduced) { setProgress(1); return; }
+    let frame: number;
+    const start = performance.now();
+    const tick = (now: number) => {
+      const t = Math.min(1, (now - start) / duration);
+      setProgress(1 - Math.pow(1 - t, 3));
+      if (t < 1) frame = requestAnimationFrame(tick);
+    };
+    frame = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(frame);
+  }, [duration, enabled, reduced, resetKey]);
+  return progress;
 }
 
-function isProjectLaunchingSoon(project: Project) {
-  return project.status === "planning" || !project.url
+function GradeBar({ grade, ar, node = false }: { grade?: StackGrade; ar: boolean; node?: boolean }) {
+  const label = grade ? `${ar ? "التقييم" : "Grade"} ${grade}` : ar ? "غير مقيّم" : "Ungraded";
+  return <span className={`claws-grade ${node ? "claws-grade-node" : ""}`} title={label}>
+    <span className="claws-segments" aria-hidden="true">
+      {[1, 2, 3, 4, 5].map((segment) => <span key={segment} data-filled={segment <= gradeSegments(grade)} />)}
+    </span>
+    <span className={node || !grade ? "claws-grade-label" : "sr-only"}>{label}</span>
+  </span>;
 }
 
-export function StitchHomepage({
-  projects,
-  locale,
-  copy,
-}: {
-  projects: Project[]
-  locale: SupportedLocale
-  copy: SiteCopyMap
-}) {
-  const t = (key: string) => getSiteCopyText(copy, locale, key)
-  const totalProjects = projects.length
-  const activeProjects = projects.filter((project) => project.status === "active" || project.status === "completed").length
-  const toolCount = new Set(projects.flatMap((project) => project.tools ?? [])).size
-  const heroTitleLines = t("HomePage.stitch.hero.title").split("\n")
+function Spotlight({ projects, ready, reduced, ar }: { projects: SpotlightProject[]; ready: boolean; reduced: boolean; ar: boolean }) {
+  const [index, setIndex] = useState(0);
+  const [sliding, setSliding] = useState(false);
+  const [paused, setPaused] = useState(false);
+  const [interacting, setInteracting] = useState(false);
+  const transition = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [countReady, setCountReady] = useState(false);
+  useEffect(() => {
+    if (!ready) return;
+    const timer = setTimeout(() => setCountReady(true), reduced ? 0 : 300);
+    return () => clearTimeout(timer);
+  }, [ready, reduced]);
+  useEffect(() => () => { if (transition.current) clearTimeout(transition.current); }, []);
+  const go = (next: number) => {
+    if (transition.current) clearTimeout(transition.current);
+    if (reduced) { setIndex(next); setSliding(false); return; }
+    setSliding(true);
+    transition.current = setTimeout(() => { setIndex(next); setSliding(false); }, 450);
+  };
+  useEffect(() => {
+    if (!countReady || reduced || paused || interacting || sliding || projects.length < 2) return;
+    const timer = setTimeout(() => {
+      setSliding(true);
+      transition.current = setTimeout(() => { setIndex((current) => (current + 1) % projects.length); setSliding(false); }, 450);
+    }, 6000);
+    return () => clearTimeout(timer);
+  }, [countReady, index, interacting, paused, projects.length, reduced, sliding]);
+  const count = useCount(900, countReady, reduced, index);
+  const project = projects[index % projects.length];
+  const growth = project ? Math.round(project.growth * count) : 0;
 
-  return (
-    <div className="min-h-screen bg-[#f7f5f1] text-black selection:bg-black selection:text-white">
-      <StitchPublicHeader
-        locale={locale}
-        isHomepage
-        labels={{
-          projects: t("HomePage.stitch.nav.projects"),
-          stack: t("HomePage.stitch.nav.stack"),
-          future: t("HomePage.stitch.nav.future"),
-          contact: t("HomePage.stitch.nav.contact"),
-          progress: t("HomePage.stitch.nav.progress"),
-        }}
-      />
-
-      <main>
-        <section className="stitch-shell overflow-hidden border-b border-black/15">
-          <div className="mx-auto max-w-7xl px-6 py-16 md:px-10 md:py-24">
-            <div className="grid gap-14 lg:grid-cols-[minmax(0,1fr)_360px] lg:items-end">
-              <div className="max-w-4xl">
-                <div className="mb-8 flex items-center gap-3">
-                  <span className="stitch-mono text-[10px] uppercase tracking-[0.35em] text-black/55">
-                    {t("HomePage.stitch.hero.eyebrow")}
-                  </span>
-                  <span className="h-px flex-1 bg-black/15" />
-                </div>
-
-                <h1 className="stitch-display max-w-4xl text-[clamp(3.4rem,12vw,7.5rem)] font-semibold uppercase leading-[0.9] tracking-[-0.11em] text-black">
-                  {heroTitleLines.map((line) => (
-                    <span key={line} className="block">
-                      {line}
-                    </span>
-                  ))}
-                </h1>
-
-                <div className="mt-8">
-                  <p className="max-w-2xl text-base leading-7 text-black/68 md:text-lg">
-                    {t("HomePage.stitch.hero.description")}
-                  </p>
-                </div>
-              </div>
-
-              <div className="border border-black/15 bg-white p-6 md:p-8">
-                <div className="flex items-center justify-between border-b border-black/10 pb-5">
-                  <p className="stitch-mono text-[10px] uppercase tracking-[0.3em] text-black/45">
-                    {t("HomePage.stitch.hero.statusLabel")}
-                  </p>
-                  <span className="stitch-mono inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.3em] text-black">
-                    <span className="h-2 w-2 bg-emerald-600" />
-                    {t("HomePage.stitch.hero.statusValue")}
-                  </span>
-                </div>
-
-                <div className="mt-6 space-y-6">
-                  <div className="grid gap-4 border-b border-black/10 pb-6 sm:grid-cols-2">
-                    <div>
-                      <p className="stitch-mono text-[10px] uppercase tracking-[0.3em] text-black/45">
-                        {t("HomePage.stitch.overview.totalProjects")}
-                      </p>
-                      <p className="stitch-display mt-3 text-4xl font-semibold uppercase tracking-[-0.08em]">
-                        {totalProjects}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="stitch-mono text-[10px] uppercase tracking-[0.3em] text-black/45">
-                        {t("HomePage.stitch.overview.activeProjects")}
-                      </p>
-                      <p className="stitch-display mt-3 text-4xl font-semibold uppercase tracking-[-0.08em]">
-                        {activeProjects}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center justify-between">
-                    <p className="stitch-mono text-[10px] uppercase tracking-[0.3em] text-black/45">
-                      {t("HomePage.stitch.overview.toolsIntegrated")}
-                    </p>
-                    <p className="stitch-mono text-xs uppercase tracking-[0.24em] text-black">{toolCount}</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="mt-14 grid gap-px border-y border-black/15 bg-black/15 md:grid-cols-3">
-              {[
-                { label: t("HomePage.stitch.overview.totalProjects"), value: totalProjects.toString() },
-                { label: t("HomePage.stitch.overview.activeProjects"), value: activeProjects.toString() },
-                { label: t("HomePage.stitch.overview.toolsIntegrated"), value: toolCount.toString() },
-              ].map((item) => (
-                <div key={item.label} className="bg-[#f7f5f1] px-4 py-4">
-                  <p className="stitch-mono text-[10px] uppercase tracking-[0.28em] text-black/45">{item.label}</p>
-                  <p className="stitch-display mt-2 text-2xl font-semibold uppercase tracking-[-0.08em]">{item.value}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <section id="projects" className="border-b border-black/15 bg-white">
-          <div className="mx-auto max-w-7xl px-6 py-12 md:px-10 md:py-16">
-            <div className="flex flex-col gap-6 border-b border-black/15 pb-6 md:flex-row md:items-end md:justify-between">
-              <div>
-                <p className="stitch-mono text-[10px] uppercase tracking-[0.35em] text-black/55">
-                  {t("HomePage.stitch.projects.eyebrow")}
-                </p>
-                <h2 className="stitch-display mt-3 text-4xl font-semibold uppercase tracking-[-0.08em] text-black md:text-6xl">
-                  {t("HomePage.stitch.projects.title")}
-                </h2>
-              </div>
-              <p className="max-w-xl text-sm leading-6 text-black/65 md:text-base">
-                {t("HomePage.stitch.projects.description")}
-              </p>
-            </div>
-
-            <div className="mt-8 grid gap-px border border-black/15 bg-black/15 lg:grid-cols-2">
-              {projects.map((project) => {
-                const launchingSoon = isProjectLaunchingSoon(project)
-                const { badge: statusBadgeClass } = getProjectStatusStyles(project.status)
-
-                return (
-                  <article key={project.id} className="flex h-full flex-col bg-white p-6 md:p-8">
-                    <div className="flex items-start justify-between gap-4">
-                      <div>
-                        <p className="stitch-mono text-[10px] uppercase tracking-[0.32em] text-black/45">
-                          {t("HomePage.stitch.projects.buildId")} {buildCode(project.id)}
-                        </p>
-                        <h3 className="stitch-display mt-4 text-3xl font-semibold uppercase tracking-[-0.08em] text-black md:text-4xl">
-                          {project.title}
-                        </h3>
-                      </div>
-                      <span className={`stitch-mono shrink-0 border px-3 py-1 text-[10px] uppercase tracking-[0.25em] ${statusBadgeClass}`}>
-                        {formatProjectStatus(project.status, t)}
-                      </span>
-                    </div>
-
-                    <div className="relative mt-8">
-                      <div className={launchingSoon ? "select-none blur-[3px] opacity-45" : ""}>
-                        <div>
-                          <p className="text-sm leading-6 text-black/68">{project.description}</p>
-
-                          {project.timeframe ? (
-                            <div className="mt-6">
-                              <p className="stitch-mono text-[10px] uppercase tracking-[0.28em] text-black/38">
-                                {t("HomePage.stitch.projects.timeframe")}
-                              </p>
-                              <p className="stitch-mono mt-2 text-xs uppercase tracking-[0.18em] text-black">{project.timeframe}</p>
-                            </div>
-                          ) : null}
-
-                          <div className="mt-6">
-                            <div className="mb-2 flex items-center justify-between">
-                              <p className="stitch-mono text-[10px] uppercase tracking-[0.28em] text-black/38">
-                                {t("HomePage.stitch.projects.progress")}
-                              </p>
-                              <p className="stitch-mono text-[10px] uppercase tracking-[0.24em] text-black">
-                                {project.progress}%
-                              </p>
-                            </div>
-                            <div className="h-1 bg-black/8">
-                              <div className="h-full bg-black" style={{ width: `${project.progress}%` }} />
-                            </div>
-                          </div>
-
-                          {project.aiSkills.length > 0 ? (
-                            <div className="mt-6 flex flex-wrap gap-2 border-t border-black/10 pt-5">
-                              {project.aiSkills.slice(0, 3).map((skill) => (
-                                <span
-                                  key={`${project.id}-${skill}`}
-                                  className="stitch-mono border border-black/15 px-3 py-2 text-[10px] uppercase tracking-[0.24em] text-black/70"
-                                >
-                                  {skill}
-                                </span>
-                              ))}
-                            </div>
-                          ) : null}
-                        </div>
-
-                        <div className="mt-6 border-t border-black/10 pt-6">
-                          <div className="flex flex-wrap gap-2">
-                            {project.tools.slice(0, 4).map((tool) => (
-                              <span
-                                key={`${project.id}-${tool}`}
-                                className="stitch-mono border border-black/15 px-3 py-2 text-[10px] uppercase tracking-[0.24em] text-black/70"
-                              >
-                                {tool}
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-
-                      {launchingSoon ? (
-                        <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-                          <span className="stitch-mono border border-black/15 bg-[#f7f5f1]/95 px-4 py-3 text-[10px] uppercase tracking-[0.34em] text-black shadow-[0_10px_30px_rgba(0,0,0,0.08)]">
-                            {t("HomePage.stitch.projects.launchingSoon")}
-                          </span>
-                        </div>
-                      ) : null}
-                    </div>
-
-                    <div className="mt-auto border-t border-black/10 pt-6">
-                      {launchingSoon ? (
-                        <div
-                          aria-disabled="true"
-                          className="stitch-mono inline-flex h-11 w-full items-center justify-between border border-black/15 bg-black/5 px-4 text-[10px] uppercase tracking-[0.3em] text-black/40"
-                        >
-                          <span>{t("HomePage.stitch.projects.launchingSoon")}</span>
-                        </div>
-                      ) : (
-                        <a
-                          href={project.url!}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="stitch-mono inline-flex h-11 w-full items-center justify-between bg-black px-4 text-[10px] uppercase tracking-[0.3em] text-white transition-transform hover:-translate-y-0.5"
-                        >
-                          <span>{t("HomePage.stitch.projects.launch")}</span>
-                          <ArrowUpRight className="h-3.5 w-3.5" />
-                        </a>
-                      )}
-                    </div>
-                  </article>
-                )
-              })}
-            </div>
-          </div>
-        </section>
-
-        <StitchTechStack
-          projects={projects.map((project) => ({
-            id: project.id,
-            title: project.title,
-            tools: project.tools,
-            aiSkills: project.aiSkills,
-          }))}
-          strings={{
-            eyebrow: t("HomePage.stitch.stack.eyebrow"),
-            title: t("HomePage.stitch.stack.title"),
-            description: t("HomePage.stitch.stack.description"),
-            noData: t("HomePage.stitch.stack.noData"),
-          }}
-        />
-
-        <section id="contact" className="border-t border-black/15 bg-white">
-          <div className="mx-auto max-w-5xl px-6 py-16 text-center md:px-10 md:py-20">
-            <div className="inline-flex items-center gap-2 border border-black/15 bg-[#f7f5f1] px-4 py-2">
-              <Mail className="h-4 w-4" />
-              <span className="stitch-mono text-[10px] uppercase tracking-[0.35em] text-black/75">
-                {t("HomePage.newsletter.stayUpdated")}
-              </span>
-            </div>
-            <h2 className="stitch-display mx-auto mt-5 max-w-3xl text-4xl font-semibold uppercase leading-[0.92] tracking-[-0.09em] text-black md:text-6xl">
-              {t("HomePage.newsletter.title")}
-            </h2>
-            <p className="mx-auto mt-5 max-w-2xl text-sm leading-6 text-black/65 md:text-base">
-              {t("HomePage.newsletter.description")}
-            </p>
-            <div className="mt-10 flex justify-center overflow-x-auto">
-              <iframe
-                src="https://buildinpublic.substack.com/embed"
-                width="480"
-                height="320"
-                style={{ border: "1px solid #EEE", background: "white" }}
-                frameBorder="0"
-                scrolling="no"
-                title={t("HomePage.newsletter.iframeTitle")}
-              />
-            </div>
-            <p className="stitch-mono mt-5 text-[10px] uppercase tracking-[0.32em] text-black/45">
-              {t("HomePage.newsletter.noSpam")}
-            </p>
-          </div>
-        </section>
-      </main>
-
-      <footer className="border-t border-black/15 bg-[#f7f5f1]">
-        <div className="mx-auto flex max-w-7xl flex-col gap-5 px-6 py-6 md:flex-row md:items-center md:justify-between md:px-10">
-          <div className="flex items-center gap-3">
-            <Image
-              src="/10claws.svg"
-              alt="10 Claws logo"
-              width={40}
-              height={40}
-              className="h-10 w-10"
-            />
-            <div>
-              <p className="stitch-display text-xl font-semibold uppercase tracking-[-0.08em] text-black">10 Claws</p>
-              <p className="mt-2 text-sm text-black/62">{t("HomePage.stitch.footer.tagline")}</p>
-            </div>
-          </div>
-          <div className="flex flex-wrap items-center gap-5">
-            <Link href="/about" className="stitch-mono text-[10px] uppercase tracking-[0.2em] text-black/55 hover:text-black">
-              {locale === "ar" ? "من نحن" : "About us"}
-            </Link>
-            <a className="stitch-mono text-[10px] uppercase tracking-[0.28em] text-black/55 transition-colors hover:text-black" href="#projects">
-              {t("HomePage.stitch.footer.projects")}
-            </a>
-            <Link className="stitch-mono text-[10px] uppercase tracking-[0.28em] text-black/55 transition-colors hover:text-black" href="/stack">
-              {t("HomePage.stitch.footer.stack")}
-            </Link>
-            <Link className="stitch-mono text-[10px] uppercase tracking-[0.28em] text-black/55 transition-colors hover:text-black" href="/progress">
-              {t("HomePage.stitch.footer.progress")}
-            </Link>
-            <a
-              className="stitch-mono text-[10px] uppercase tracking-[0.28em] text-black/55 transition-colors hover:text-black"
-              href="https://x.com/moeghashim"
-              target="_blank"
-              rel="noreferrer"
-            >
-              X / Twitter
-            </a>
-          </div>
-        </div>
-      </footer>
+  return <div className="claws-spotlight" data-ready={ready} inert={!ready}
+    onMouseEnter={() => setInteracting(true)} onMouseLeave={() => setInteracting(false)}
+    onFocusCapture={() => setInteracting(true)} onBlurCapture={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) setInteracting(false); }}
+    aria-label={ar ? "المشروع المميز" : "Project Spotlight"}>
+    <div className="claws-spotlight-label claws-label">
+      <span>{ar ? "تحت الضوء" : "Spotlight"}{project ? <> / <bdi>{buildCode(project.id)}</bdi></> : ""}</span>
+      {projects.length > 1 && <div className="claws-spotlight-controls">
+        <button type="button" className="claws-pause" aria-pressed={paused} onClick={() => setPaused(!paused)}>{paused ? (ar ? "تشغيل" : "Play") : (ar ? "إيقاف" : "Pause")}</button>
+        {projects.map((item, i) => <button type="button" key={item.id} className="claws-dot" aria-label={`${ar ? "عرض" : "Show"} ${item.title}`} aria-pressed={i === index} onClick={() => go(i)}><span /></button>)}
+      </div>}
     </div>
-  )
+    {project ? <div className="claws-spotlight-slide" data-sliding={sliding}>
+      <div className="claws-spotlight-title"><h2>{project.title}</h2><span className="claws-label">{project.sector}</span></div>
+      <div className="claws-spotlight-metrics">
+        {[
+          [Math.round(project.commits * count).toString(), ar ? "التحديثات" : "Commits"],
+          [formatVisits(Math.round(project.visits * count)), ar ? "زيارة / شهر" : "Visits / mo"],
+          [`${growth >= 0 ? "+" : ""}${growth}%`, ar ? "النمو" : "Growth"],
+        ].map(([value, label], i) => <div key={label}><span className={`claws-metric ${i === 2 ? "claws-growth" : ""}`} dir="ltr">{value}</span><span className="claws-label">{label}</span></div>)}
+      </div>
+    </div> : <div className="claws-spotlight-empty"><h2>{ar ? "القادم يستحق المتابعة." : "More to come."}</h2><p>{ar ? "ستظهر هنا أرقام المشاريع عند توفرها." : "Project insights will appear here as they become available."}</p></div>}
+  </div>;
+}
+
+export function StitchHomepage({ projects, stackItems, locale, toolCount }: { projects: Project[]; stackItems: StackItem[]; locale: SupportedLocale; toolCount?: number }) {
+  const ar = locale === "ar";
+  const [theme, setTheme] = useState<"light" | "dark">("light");
+  const [density, setDensity] = useState("comfortable");
+  const [bars, setBars] = useState(true);
+  const [selectedId, setSelectedId] = useState(projects.find((p) => p.status === "active")?.id ?? projects[0]?.id);
+  const reduced = useReducedMotion();
+  const count = useCount(1400, true, reduced);
+  const ready = count === 1;
+  const selected = projects.find((p) => p.id === selectedId) ?? projects[0];
+  const selectedTools = selected ? projectTools(selected, stackItems) : [];
+  const spots = projects.filter(hasSpotlightData);
+  const stats = [
+    { value: projects.length, label: ar ? "إجمالي المشاريع" : "Total projects" },
+    { value: projects.filter((p) => p.status === "active").length, label: ar ? "مشاريع نشطة" : "Active builds" },
+    { value: toolCount ?? new Set(projects.flatMap((p) => p.tools)).size, label: ar ? "أدوات مدمجة" : "Tools integrated" },
+  ];
+  const nav = <>
+    <Link href="/about">{ar ? "من نحن" : "About us"}</Link>
+    <a href="#projects">{ar ? "المشاريع" : "Projects"}</a>
+    <a href="#stack">{ar ? "الأدوات" : "Stack"}</a>
+    <Link href="/future">{ar ? "المستقبل" : "Future"}</Link>
+    <Link href="/track">{ar ? "المتابعة" : "Track"}</Link>
+  </>;
+
+  return <div className="claws-home" data-theme={theme} data-density={density}>
+    <a className="claws-skip" href="#main">{ar ? "انتقل إلى المحتوى" : "Skip to content"}</a>
+    <header className="claws-header">
+      <Link href="/" className="claws-brand"><Image src="/10claws.svg" width={28} height={28} alt="" priority /><span dir="ltr">10 Claws</span></Link>
+      <nav aria-label={ar ? "التنقل الرئيسي" : "Main navigation"}>{nav}</nav>
+      <Link href="/" locale={ar ? "en" : "ar"} className="claws-language" aria-label={ar ? "Switch to English" : "التبديل إلى العربية"}>{ar ? "EN" : "AR"}</Link>
+    </header>
+    <main id="main">
+      <section className="claws-hero" aria-label={ar ? "التجربة" : "The experiment"}>
+        <div className="claws-hero-copy">
+          <div className="claws-kicker claws-label"><span>{ar ? "معظم المشاريع تفشل" : "Most projects fail"}</span><span>/</span><span>{ar ? "التجربة تنجح" : "The experiment wins"}</span></div>
+          <div><h1>{ar ? <>أعيش<br /><em>ذلك</em> الحلم.</> : <>Living<br /><em>the</em> dream.</>}</h1><p>{ar ? "أبني كل فكرة لطالما حلمت بها." : "Building every idea I've ever dreamed of."}</p></div>
+        </div>
+        <div className="claws-hero-data">
+          <div className="claws-stats" data-ready={ready}>
+            {stats.map((stat) => <div key={stat.label}><span className="claws-stat" aria-label={String(stat.value)}><span aria-hidden="true">{Math.round(stat.value * count)}</span></span><span className="claws-label">{stat.label}</span></div>)}
+          </div>
+          <Spotlight projects={spots} ready={ready} reduced={reduced} ar={ar} />
+        </div>
+      </section>
+      <section id="projects" className="claws-ledger" aria-label={ar ? "المشاريع" : "Projects"}>
+        <div className="claws-ledger-head claws-label" aria-hidden="true">{(ar ? ["البناء", "المشروع", "نبذة / الأدوات", "الحالة", "التقدم", "الرابط"] : ["Build", "Project", "Brief / Stack", "Status", "Progress", "Link"]).map((label) => <span key={label}>{label}</span>)}</div>
+        {projects.map((project) => <article className="claws-row" key={project.id}>
+          <span className="claws-build" dir="ltr">{buildCode(project.id)}</span>
+          <h2 className="claws-project-name">{project.title}</h2>
+          <div className="claws-brief"><p>{project.description}</p><div className="claws-tags">{projectTools(project, stackItems).map((tool) => <span className="claws-tool" key={tool.name}>{tool.name}<GradeBar grade={tool.grade} ar={ar} /></span>)}</div></div>
+          <span className="claws-status" data-status={project.status}><span aria-hidden="true" />{ar ? ({ active: "نشط", planning: "مخطط", completed: "مكتمل" })[project.status] : project.status}</span>
+          <div className="claws-progress"><div><span>{project.progress}%</span><span>{project.timeframe}</span></div>{bars && <div className="claws-progress-track" role="progressbar" aria-label={`${project.title} ${ar ? "التقدم" : "progress"}`} aria-valuemin={0} aria-valuemax={100} aria-valuenow={project.progress}><span style={{ width: `${project.progress}%` }} /></div>}</div>
+          <div className="claws-launch">{projectLaunchUrl(project) ? <a href={projectLaunchUrl(project)!} target="_blank" rel="noreferrer" aria-label={`${ar ? "افتح" : "Launch"} ${project.title}`}>{ar ? "افتح ↗" : "Launch ↗"}</a> : <span>{ar ? "قريباً" : "Soon"}</span>}</div>
+        </article>)}
+      </section>
+      <section id="stack" className="claws-stack" aria-label={ar ? "الأدوات التقنية" : "Tech Stack"}>
+        <div className="claws-stack-copy">
+          <div className="claws-label">{ar ? "مكونات النظام / شبكة الأدوات" : "System components / Tool lattice"}</div>
+          <h2>{ar ? "الأدوات التقنية" : "Tech Stack"}</h2>
+          <p>{ar ? "اكتشف الأدوات ومهارات الذكاء الاصطناعي وراء كل تجربة. اختر مشروعاً لاستعراض أدواته." : "Explore the tools and AI skills behind each experiment. The active project selector drives the stack preview below."}</p>
+          <div className="claws-project-selector">{projects.map((project) => <button type="button" key={project.id} aria-pressed={selected?.id === project.id} aria-controls="stack-nodes" onClick={() => setSelectedId(project.id)}><span>{project.title}</span><span aria-hidden="true" dir="ltr">{selected?.id === project.id ? "●" : buildCode(project.id)}</span></button>)}</div>
+        </div>
+        <div className="claws-stack-preview" id="stack-nodes" aria-live="polite">
+          <div className="claws-stack-heading claws-label"><span>{selected ? <><bdi>{buildCode(selected.id)}</bdi> / {selected.title}</> : (ar ? "لا توجد مشاريع" : "No projects yet")}</span><span>{selectedTools.length} {ar ? "أدوات" : "nodes"}</span></div>
+          <div className="claws-nodes">{selectedTools.map((tool, index) => <div className="claws-node" key={tool.name}><span className="claws-label">{ar ? "أداة" : "node"} {index}</span><div><h3 title={tool.name}>{tool.name}</h3><GradeBar grade={tool.grade} ar={ar} node /></div></div>)}{!selectedTools.length && <p className="claws-empty">{ar ? "لم تُسجّل أدوات بعد." : "No tools logged yet."}</p>}</div>
+        </div>
+      </section>
+      <section id="contact" className="claws-newsletter">
+        <div><span className="claws-label">{ar ? "ابقَ على اطلاع" : "Stay updated"}</span><h2>{ar ? "احصل على آخر المستجدات" : "Get the Latest Updates"}</h2></div>
+        <div><p>{ar ? "تابع توثيقي للأثر الحقيقي للذكاء الاصطناعي على الإنتاجية. رؤى ودروس وتحديثات من وراء الكواليس لكل مشروع." : "Follow along as I document the real impact of AI on productivity. Get insights, lessons learned, and behind-the-scenes updates from each project."}</p>
+          <form action="https://buildinpublic.substack.com/subscribe" method="get"><input name="email" type="email" autoComplete="email" required placeholder="you@domain.com" aria-label={ar ? "البريد الإلكتروني" : "Email address"} /><button type="submit">{ar ? "اشترك" : "Subscribe"}</button></form>
+          <p className="claws-newsletter-note">{ar ? "أكمل الاشتراك على Substack. بلا رسائل مزعجة، ويمكنك الإلغاء في أي وقت." : "Continue on Substack. No spam, unsubscribe at any time."}</p>
+        </div>
+      </section>
+    </main>
+    <footer className="claws-footer">
+      <div className="claws-footer-brand"><Link href="/" className="claws-brand"><Image src="/10claws.svg" alt="" width={18} height={18} /><span dir="ltr">10 Claws</span></Link><p>{ar ? "قياس الأثر الحقيقي للذكاء الاصطناعي على الإنتاجية عبر 10 مشاريع متنوعة." : "Measuring the real impact of AI on productivity across 10 diverse projects."}</p></div>
+      <nav aria-label={ar ? "روابط التذييل" : "Footer navigation"}>{nav}<a href="https://x.com/moeghashim" target="_blank" rel="noreferrer">X / Twitter</a></nav>
+      <details className="claws-tweaks"><summary>{ar ? "إعدادات العرض" : "Display settings"}</summary><div>
+        <label>{ar ? "المظهر" : "Theme"}<select value={theme} onChange={(event) => setTheme(event.target.value as "light" | "dark")}><option value="light">{ar ? "فاتح" : "Light"}</option><option value="dark">{ar ? "داكن" : "Dark"}</option></select></label>
+        <label>{ar ? "كثافة الصفوف" : "Ledger density"}<select value={density} onChange={(event) => setDensity(event.target.value)}><option value="comfortable">{ar ? "مريح" : "Comfortable"}</option><option value="compact">{ar ? "مضغوط" : "Compact"}</option></select></label>
+        <label><input type="checkbox" checked={bars} onChange={(event) => setBars(event.target.checked)} />{ar ? "أشرطة التقدم" : "Progress bars"}</label>
+      </div></details>
+    </footer>
+  </div>;
 }

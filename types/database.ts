@@ -66,6 +66,10 @@ export interface Project {
   aiSkills: string[]
   tools: string[]
   timeframe?: string
+  sector?: string
+  commits?: number
+  visits?: number
+  growth?: number
   url?: string | null
 }
 
