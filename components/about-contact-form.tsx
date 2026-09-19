@@ -12,7 +12,7 @@ export function AboutContactForm({ locale }: { locale: SupportedLocale }) {
       acceptCharset="UTF-8"
       className="mt-8 max-w-3xl space-y-6"
       aria-label={content.contact}
-      aria-describedby="contact-delivery contact-captcha"
+      aria-describedby="contact-captcha"
     >
       <input type="hidden" name="_subject" value="10 Claws — About Us enquiry" />
       <input type="hidden" name="_captcha" value="true" />
@@ -39,7 +39,6 @@ export function AboutContactForm({ locale }: { locale: SupportedLocale }) {
       </div>
       <div className="space-y-2 text-sm leading-6 text-white/70">
         <p id="contact-captcha">{content.form.captcha}</p>
-        <p id="contact-delivery">{content.form.delivery}</p>
       </div>
       <button type="submit" className="border border-white bg-white px-6 py-3 font-medium text-black hover:bg-white/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white">
         {content.contact}
