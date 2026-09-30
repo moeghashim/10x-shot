@@ -4,6 +4,7 @@ import { unstable_cache } from "next/cache";
 import { api } from "@/convex/_generated/api";
 import { PROGRESS_CACHE_TAG, PROJECTS_CACHE_TAG, STACK_CACHE_TAG } from "@/lib/cache-tags";
 import { FALLBACK_PROJECTS } from "@/lib/constants";
+import { sortProjectsByLaunchDate } from "@/lib/launch-date";
 import {
   fetchConvexAuthMutation,
   fetchConvexAuthQuery,
@@ -152,12 +153,12 @@ export async function fetchProjects(opts?: {
 
   const { data, errorMessage } = await fetchProjectsFromDbCached(locale);
   if (data) {
-    return { data, error: null };
+    return { data: sortProjectsByLaunchDate(data), error: null };
   }
 
   if (allowFallback) {
     console.warn("Falling back to local project data:", errorMessage ?? "Unknown project fetch failure");
-    return { data: FALLBACK_PROJECTS, error: errorMessage };
+    return { data: sortProjectsByLaunchDate(FALLBACK_PROJECTS), error: errorMessage };
   }
 
   return { data: [], error: errorMessage };

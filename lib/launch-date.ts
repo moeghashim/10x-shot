@@ -18,3 +18,21 @@ export function formatLaunchDate(value?: string, locale = "en"): string {
     timeZone: "UTC",
   }).format(new Date(`${monthOnly ? `${value}-01` : value}T00:00:00.000Z`));
 }
+
+export function sortProjectsByLaunchDate<T extends { id: number; launchDate?: string }>(
+  projects: readonly T[],
+  now = new Date(),
+): T[] {
+  const today = now.toISOString().slice(0, 10);
+  return projects.map((project) => {
+    const date = project.launchDate && isLaunchDate(project.launchDate) ? project.launchDate : "";
+    // A month-only date retains its precision. Future launches remain below
+    // launches that have already happened; missing dates come last.
+    const group = !date ? 2 : date <= today.slice(0, date.length) ? 0 : 1;
+    return { project, date, group };
+  }).sort((a, b) => {
+    if (a.group !== b.group) return a.group - b.group;
+    const dateOrder = a.group === 0 ? b.date.localeCompare(a.date) : a.date.localeCompare(b.date);
+    return dateOrder || a.project.id - b.project.id;
+  }).map(({ project }) => project);
+}

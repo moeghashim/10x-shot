@@ -164,4 +164,6 @@ The project remains linked to its original [v0 workspace](https://v0.dev/chat/pr
 
 Project launch dates use an optional `launchDate` calendar date (`YYYY-MM-DD`) or month (`YYYY-MM`). Set or clear it in the project editor; unknown dates display **TBA** (Arabic: **يُحدد لاحقاً**). Project summaries no longer show completion percentages or progress bars. Existing percentage values and monthly metric history remain stored.
 
+Public project lists show launched projects first, newest launch first. Future launches follow in upcoming-date order, then projects without a valid launch date. Matching dates use Build ID order.
+
 Magic follow entries are curated in `lib/magic-follow/content.ts`, with a name, X handle (without `@`), and English/Arabic reasons. An empty list displays a coming-soon message. Former `/en/about` and `/ar/about` URLs redirect permanently to the corresponding Magic follow page.
