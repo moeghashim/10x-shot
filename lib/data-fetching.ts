@@ -4,6 +4,7 @@ import { unstable_cache } from "next/cache";
 import { api } from "@/convex/_generated/api";
 import { PROGRESS_CACHE_TAG, PROJECTS_CACHE_TAG, STACK_CACHE_TAG } from "@/lib/cache-tags";
 import { FALLBACK_PROJECTS } from "@/lib/constants";
+import { sortProjectsByLaunchDate } from "@/lib/launch-date";
 import {
   fetchConvexAuthMutation,
   fetchConvexAuthQuery,
@@ -50,7 +51,7 @@ const fetchProjectsFromDbCached = unstable_cache(
       };
     }
   },
-  ["projects:v4"],
+  ["projects:v5"],
   { revalidate: 60, tags: [PROJECTS_CACHE_TAG] }
 );
 
@@ -134,6 +135,7 @@ const fetchPlanningCardsCached = unstable_cache(
 
 function deriveProjectStack(project: Omit<Project, "id"> | Project, stackItems: StackItem[]) {
   const selectedIds = project.stackItemIds ?? []
+  if (selectedIds.length === 0) return { aiSkills: project.aiSkills, tools: project.tools };
   const selectedItems = stackItems.filter((item) => selectedIds.includes(item.id));
 
   return {
@@ -151,12 +153,12 @@ export async function fetchProjects(opts?: {
 
   const { data, errorMessage } = await fetchProjectsFromDbCached(locale);
   if (data) {
-    return { data, error: null };
+    return { data: sortProjectsByLaunchDate(data), error: null };
   }
 
   if (allowFallback) {
     console.warn("Falling back to local project data:", errorMessage ?? "Unknown project fetch failure");
-    return { data: FALLBACK_PROJECTS, error: errorMessage };
+    return { data: sortProjectsByLaunchDate(FALLBACK_PROJECTS), error: errorMessage };
   }
 
   return { data: [], error: errorMessage };
@@ -368,6 +370,7 @@ export async function saveProject(
         description: project.description,
         objectives: project.objectives,
         progress: project.progress,
+        launchDate: project.launchDate,
         status: project.status,
         stackItemIds: project.stackItemIds,
         aiSkills: derivedStack.aiSkills,

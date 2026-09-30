@@ -1,4 +1,44 @@
-import type { Project, StackGrade, StackItem } from "@/types/database";
+import type { Project, StackGrade, StackItem, StackProjectReference } from "@/types/database";
+
+export type PublicStackItem = Omit<StackItem, "id" | "grade"> & {
+  id: string;
+  grade?: StackGrade;
+  projects: StackProjectReference[];
+  usageCount: number;
+};
+
+// Build the public inventory from actual project assignments. Catalog records
+// enrich ratings and notes; unused records remain available in the admin catalog.
+export function buildPublicStack(projects: Project[], catalog: StackItem[]): PublicStackItem[] {
+  const items = new Map<string, PublicStackItem>();
+  const keyFor = (item: Pick<StackItem, "name" | "category">) => `${item.category}:${item.name.trim().toLowerCase()}`;
+  const byId = new Map(catalog.map(item => [item.id, item]));
+  const byName = new Map(catalog.map(item => [keyFor(item), item]));
+
+  for (const project of projects) {
+    const linked = (project.stackItemIds ?? []).flatMap(id => byId.has(id) ? [byId.get(id)!] : []);
+    const assignments = linked.length ? linked : [
+      ...project.tools.map(name => ({ name, category: "tool" as const })),
+      ...project.aiSkills.map(name => ({ name, category: "ai_skill" as const })),
+    ];
+    for (const assignment of assignments) {
+      const name = assignment.name.trim();
+      if (!name) continue;
+      const key = keyFor(assignment);
+      const record = byName.get(key);
+      let item = items.get(key);
+      if (!item) {
+        item = { ...record, id: key, name: record?.name ?? name, category: record?.category ?? assignment.category, projects: [], usageCount: 0 };
+        items.set(key, item);
+      }
+      if (!item.projects.some(entry => entry.id === project.id)) {
+        item.projects.push({ id: project.id, title: project.title, status: project.status, url: projectLaunchUrl(project) });
+        item.usageCount = item.projects.length;
+      }
+    }
+  }
+  return [...items.values()].sort((a, b) => b.usageCount - a.usageCount || a.name.localeCompare(b.name));
+}
 
 export type ProjectTool = { name: string; grade?: StackGrade };
 export type SpotlightProject = Project & {

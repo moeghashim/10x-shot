@@ -135,7 +135,7 @@
   "ProgressPage": {
     "nav": {
       "home": "Home",
-      "progress": "Progress",
+      "launchDate": "Launch date",
       "newsletter": "Newsletter"
     },
     "back": "Back to Home",

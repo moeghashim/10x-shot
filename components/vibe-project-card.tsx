@@ -1,3 +1,4 @@
+import { LaunchDate } from "@/components/launch-date"
 import { SkillsDisplay } from "@/components/skills-display"
 import { Clock, TrendingUp, Play, Pause, ExternalLink } from "lucide-react"
 import { getProjectStatusStyles } from "@/lib/project-status"
@@ -5,9 +6,10 @@ import type { Project } from "@/types/database"
 
 interface VibeProjectCardProps {
   project: Project
+  locale?: "en" | "ar"
   labels: {
     objectives: string
-    progress: string
+    launchDate: string
     launch: string
     launchingSoon: string
     status: Record<"active" | "planning" | "completed", string>
@@ -22,7 +24,7 @@ function isProjectLaunchingSoon(project: Project) {
   return project.status === "planning" || !project.url
 }
 
-export function VibeProjectCard({ project, labels, skillLabels }: VibeProjectCardProps) {
+export function VibeProjectCard({ project, labels, skillLabels, locale = "en" }: VibeProjectCardProps) {
   const { status, badge: statusBadgeClass, icon: statusIconClass } = getProjectStatusStyles(project.status)
   const launchingSoon = isProjectLaunchingSoon(project)
 
@@ -60,17 +62,9 @@ export function VibeProjectCard({ project, labels, skillLabels }: VibeProjectCar
             </div>
           )}
 
-          <div className="space-y-2">
-            <div className="flex justify-between text-[10px] font-black uppercase tracking-widest">
-              <span>{labels.progress}</span>
-              <span>{project.progress}%</span>
-            </div>
-            <div className="h-3 border border-dashed border-gray-300 bg-gray-50 p-0.5 overflow-hidden">
-              <div
-                className="h-full bg-black transition-all duration-500"
-                style={{ width: `${project.progress}%` }}
-              />
-            </div>
+          <div className="flex justify-between text-[10px] font-black uppercase tracking-widest">
+            <span>{labels.launchDate}</span>
+            <LaunchDate value={project.launchDate} locale={locale} />
           </div>
 
           {project.timeframe && (

@@ -1,12 +1,13 @@
 import { VibeProjectCard } from "@/components/vibe-project-card"
 import type { Project } from "@/types/database"
-import { getTranslations } from "next-intl/server"
+import { getLocale, getTranslations } from "next-intl/server"
 
 interface VibeProjectGridProps {
   projects: Project[]
 }
 
 export async function VibeProjectGrid({ projects }: VibeProjectGridProps) {
+  const locale = (await getLocale()) === "ar" ? "ar" : "en"
   const t = await getTranslations("HomePage.projects")
   const tSkills = await getTranslations("HomePage.skills")
 
@@ -30,9 +31,10 @@ export async function VibeProjectGrid({ projects }: VibeProjectGridProps) {
             <VibeProjectCard
               key={project.id}
               project={project}
+              locale={locale}
               labels={{
                 objectives: t("objectives"),
-                progress: t("progress"),
+                launchDate: locale === "ar" ? "تاريخ الإطلاق" : "Launch date",
                 launch: t("launch"),
                 launchingSoon: t("launchingSoon"),
                 status: {

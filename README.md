@@ -12,12 +12,12 @@ All public pages are available in English and Arabic through the `app/[locale]/`
 
 | Route | Purpose | Source of truth |
 | --- | --- | --- |
-| `/en` · `/ar` | Portfolio homepage with project status, progress, tools, and AI skills | Convex, with checked-in fallback projects |
+| `/en` · `/ar` | Portfolio homepage with project status, launch dates, tools, and AI skills | Convex, with checked-in fallback projects |
 | `/en/progress` · `/ar/progress` | Public metrics, achievements, and roadmap cards | Convex |
 | `/en/stack` · `/ar/stack` | Tool and AI-skill inventory with grades, familiarity, and project usage | Convex |
 | `/en/future` · `/ar/future` | Reviewed future bets rendered through a constrained component catalog | `lib/future/specs.ts` |
 | `/en/track` · `/ar/track` | Curated updates for coding agents, infrastructure, and agentic commerce | `lib/track/data.ts` |
-| `/en/about` · `/ar/about` | Company overview and CAPTCHA-protected enquiry form | `lib/about/content.ts` and FormSubmit |
+| `/en/magic-follow` · `/ar/magic-follow` | People to follow on X: name, handle, and reasons | `lib/magic-follow/content.ts` |
 | `/en/admin` · `/ar/admin` | Authenticated management for projects, stack, metrics, roadmap, copy, and users | Convex + Better Auth |
 
 The Future page does not generate content at runtime. Its English and Arabic JSON-render specs are checked in, validated against `lib/future/catalog.ts`, reviewed, and then deployed. Track follows a similar reviewed-content model so scheduled research updates can safely modify one typed data module.
@@ -161,3 +161,13 @@ npx convex deploy
 Do not assume a Vercel deployment also publishes Convex schema or function changes.
 
 The project remains linked to its original [v0 workspace](https://v0.dev/chat/projects/Jj03MH9lC8M). Coordinate edits made in v0 with this repository to avoid source drift.
+
+Project launch dates use an optional `launchDate` calendar date (`YYYY-MM-DD`) or month (`YYYY-MM`). Set or clear it in the project editor; unknown dates display **TBA** (Arabic: **يُحدد لاحقاً**). Project summaries no longer show completion percentages or progress bars. Existing percentage values and monthly metric history remain stored.
+
+Public project lists show launched projects first, newest launch first. Future launches follow in upcoming-date order, then projects without a valid launch date. Matching dates use Build ID order.
+
+Magic follow entries are curated in `lib/magic-follow/content.ts`, with a name, X handle (without `@`), and English/Arabic reasons. An empty list displays a coming-soon message. Former `/en/about` and `/ar/about` URLs redirect permanently to the corresponding Magic follow page.
+
+Public pages share `StitchPublicHeader`: Projects, Stack, Future, Track, and a language toggle that retains the current route. Magic follow remains in footer navigation. Stack opens the dedicated catalog page.
+
+The public Stack inventory is derived from canonical project assignments, including legacy tool/skill names. Catalog records provide grades, familiarity, and notes; unknown ratings remain ungraded. Names are deduplicated within each category without regard to casing, and usage counts unique projects. Unassigned catalog entries stay in the admin catalog but are omitted from the public inventory. The homepage tool count uses the same inventory.

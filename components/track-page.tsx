@@ -107,26 +107,14 @@ function TechnologyCard({
   )
 }
 
-export function TrackPage({
-  locale,
-  navLabels,
-}: {
-  locale: SupportedLocale
-  navLabels: {
-    projects: string
-    stack: string
-    future: string
-    contact: string
-    progress: string
-  }
-}) {
+export function TrackPage({ locale }: { locale: SupportedLocale }) {
   const content = trackContent[locale]
   const updateCount = content.technologies.reduce((total, item) => total + item.updates.length, 0)
   const categories: TrackedTechnology["category"][] = ["agents", "infrastructure", "commerce"]
 
   return (
     <div className="stitch-shell min-h-screen text-black selection:bg-black selection:text-white">
-      <StitchPublicHeader locale={locale} labels={navLabels} />
+      <StitchPublicHeader locale={locale} />
 
       <main>
         <section className="border-b border-black/15">

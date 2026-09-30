@@ -1,5 +1,7 @@
 "use client"
 
+import { useLocale } from "next-intl"
+import { LaunchDate } from "@/components/launch-date"
 import { useMemo, useState } from "react"
 import {
   Area,
@@ -49,7 +51,7 @@ type ProgressDashboardStrings = {
     columns: Record<PlanningCardColumn, string>
   }
   project: string
-  progress: string
+  launchDate: string
 }
 
 type ChartPoint = {
@@ -140,6 +142,7 @@ export function ProgressDashboard({
   planningCards: PlanningCard[]
   strings: ProgressDashboardStrings
 }) {
+  const locale = useLocale()
   const [selectedProjectId, setSelectedProjectId] = useState<number | "all">("all")
   const projectById = useMemo(() => getProjectMap(projects), [projects])
   const chartData = useMemo(
@@ -412,12 +415,10 @@ export function ProgressDashboard({
                               </div>
                               <div>
                                 <div className="flex items-center justify-between gap-3 text-[11px] text-black/50">
-                                  <span>{strings.progress}</span>
-                                  <span>{project.progress}%</span>
+                                  <span>{strings.launchDate}</span>
+                                  <span><LaunchDate value={project.launchDate} locale={locale} /></span>
                                 </div>
-                                <div className="mt-2 h-1.5 bg-black/10">
-                                  <div className="h-full bg-black" style={{ width: `${project.progress}%` }} />
-                                </div>
+
                               </div>
                               {project.timeframe ? (
                                 <p className="stitch-mono text-[10px] uppercase tracking-[0.2em] text-black/45">
