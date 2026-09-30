@@ -50,7 +50,7 @@ const fetchProjectsFromDbCached = unstable_cache(
       };
     }
   },
-  ["projects:v4"],
+  ["projects:v5"],
   { revalidate: 60, tags: [PROJECTS_CACHE_TAG] }
 );
 
@@ -134,6 +134,7 @@ const fetchPlanningCardsCached = unstable_cache(
 
 function deriveProjectStack(project: Omit<Project, "id"> | Project, stackItems: StackItem[]) {
   const selectedIds = project.stackItemIds ?? []
+  if (selectedIds.length === 0) return { aiSkills: project.aiSkills, tools: project.tools };
   const selectedItems = stackItems.filter((item) => selectedIds.includes(item.id));
 
   return {
@@ -368,6 +369,7 @@ export async function saveProject(
         description: project.description,
         objectives: project.objectives,
         progress: project.progress,
+        launchDate: project.launchDate,
         status: project.status,
         stackItemIds: project.stackItemIds,
         aiSkills: derivedStack.aiSkills,

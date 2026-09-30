@@ -1,3 +1,4 @@
+import { isLaunchDate } from "../lib/launch-date";
 import { ConvexError } from "convex/values";
 import type { MutationCtx, QueryCtx } from "./_generated/server";
 import { authComponent } from "./auth";
@@ -21,7 +22,8 @@ export async function requireAdmin(ctx: QueryCtx | MutationCtx) {
 }
 
 export function assertProjectInput(input: {
-  progress: number;
+  progress?: number;
+  launchDate?: string;
   commits?: number;
   visits?: number;
   growth?: number;
@@ -35,7 +37,10 @@ export function assertProjectInput(input: {
   if (input.growth !== undefined && !Number.isFinite(input.growth)) {
     throw new ConvexError("Growth must be a finite percentage");
   }
-  if (!Number.isFinite(input.progress) || input.progress < 0 || input.progress > 100) {
+  if (input.launchDate && !isLaunchDate(input.launchDate)) {
+    throw new ConvexError("Launch date must be a valid YYYY-MM-DD calendar date");
+  }
+  if (input.progress !== undefined && (!Number.isFinite(input.progress) || input.progress < 0 || input.progress > 100)) {
     throw new ConvexError("Project progress must be between 0 and 100");
   }
 }

@@ -12,7 +12,7 @@ All public pages are available in English and Arabic through the `app/[locale]/`
 
 | Route | Purpose | Source of truth |
 | --- | --- | --- |
-| `/en` · `/ar` | Portfolio homepage with project status, progress, tools, and AI skills | Convex, with checked-in fallback projects |
+| `/en` · `/ar` | Portfolio homepage with project status, launch dates, tools, and AI skills | Convex, with checked-in fallback projects |
 | `/en/progress` · `/ar/progress` | Public metrics, achievements, and roadmap cards | Convex |
 | `/en/stack` · `/ar/stack` | Tool and AI-skill inventory with grades, familiarity, and project usage | Convex |
 | `/en/future` · `/ar/future` | Reviewed future bets rendered through a constrained component catalog | `lib/future/specs.ts` |
@@ -161,3 +161,5 @@ npx convex deploy
 Do not assume a Vercel deployment also publishes Convex schema or function changes.
 
 The project remains linked to its original [v0 workspace](https://v0.dev/chat/projects/Jj03MH9lC8M). Coordinate edits made in v0 with this repository to avoid source drift.
+
+Project launch dates use an optional `launchDate` calendar date (`YYYY-MM-DD`). Set or clear it in the project editor; unknown dates display **TBA** (Arabic: **يُحدد لاحقاً**). Project summaries no longer show completion percentages or progress bars. Existing percentage values and monthly metric history remain stored.

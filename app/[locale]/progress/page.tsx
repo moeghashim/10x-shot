@@ -132,7 +132,7 @@ export default async function ProgressPage({
                   },
                 },
                 project: t("ProgressPage.project"),
-                progress: t("ProgressPage.progress"),
+                launchDate: t("ProgressPage.launchDate"),
               }}
             />
           </div>

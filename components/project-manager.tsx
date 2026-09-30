@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { Progress } from "@/components/ui/progress"
+import { LaunchDate } from "@/components/launch-date"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { getProjectStatusStyles } from "@/lib/project-status"
@@ -120,7 +120,8 @@ function ProjectForm({
     title: project?.title || "",
     description: project?.description || "",
     objectives: project?.objectives || "",
-    progress: project?.progress || 0,
+    progress: project?.progress,
+    launchDate: project?.launchDate || "",
     status: project?.status || "planning",
     stackItemIds: project?.stackItemIds || [],
     aiSkills: project?.aiSkills || [],
@@ -133,10 +134,12 @@ function ProjectForm({
     url: project?.url || "",
   })
   const [stackFilter, setStackFilter] = useState("")
+  const [stackChanged, setStackChanged] = useState(false)
 
   const selectedStack = deriveProjectStack(stackItems, formData.stackItemIds)
 
   const toggleStackItem = (stackItemId: number) => {
+    setStackChanged(true)
     setFormData((prev) => ({
       ...prev,
       stackItemIds: prev.stackItemIds.includes(stackItemId)
@@ -150,8 +153,8 @@ function ProjectForm({
 
     const nextProject = {
       ...formData,
-      aiSkills: selectedStack.aiSkills,
-      tools: selectedStack.tools,
+      aiSkills: !stackChanged && !formData.stackItemIds.length ? formData.aiSkills : selectedStack.aiSkills,
+      tools: !stackChanged && !formData.stackItemIds.length ? formData.tools : selectedStack.tools,
     }
 
     if (project) {
@@ -199,14 +202,17 @@ function ProjectForm({
 
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="text-sm font-medium">Progress (%)</label>
+          <label htmlFor="project-launch-date" className="text-sm font-medium">Launch date</label>
           <Input
-            type="number"
-            min="0"
-            max="100"
-            value={formData.progress}
-            onChange={(e) => setFormData((prev) => ({ ...prev, progress: Number(e.target.value) }))}
+            id="project-launch-date"
+            type="date"
+            min="0001-01-01"
+            max="9999-12-31"
+            value={formData.launchDate || ""}
+            onChange={(e) => setFormData((prev) => ({ ...prev, launchDate: e.target.value }))}
+            aria-describedby="launch-date-help"
           />
+          <p id="launch-date-help" className="mt-1 text-xs text-gray-500">Leave blank to show TBA.</p>
         </div>
         <div>
           <label className="text-sm font-medium">Status</label>
@@ -467,10 +473,9 @@ export function ProjectManager() {
                     <div className="space-y-3">
                       <div>
                         <div className="mb-1 flex justify-between text-sm">
-                          <span>Progress</span>
-                          <span>{project.progress}%</span>
+                          <span>Launch date</span>
+                          <LaunchDate value={project.launchDate} />
                         </div>
-                        <Progress value={project.progress} />
                       </div>
 
                       <div className="space-y-2">

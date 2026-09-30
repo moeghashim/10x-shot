@@ -22,6 +22,7 @@ function revalidateProjectViews() {
 
 function deriveProjectStack(project: Omit<Project, "id"> | Project, stackItems: StackItem[]) {
   const selectedIds = project.stackItemIds ?? []
+  if (selectedIds.length === 0) return { aiSkills: project.aiSkills, tools: project.tools };
   const selectedItems = stackItems.filter((item) => selectedIds.includes(item.id));
 
   return {
@@ -38,6 +39,7 @@ function toProjectInput(project: Omit<Project, "id"> | Project, stackItems: Stac
     description: project.description,
     objectives: project.objectives,
     progress: project.progress,
+    launchDate: project.launchDate,
     status: project.status,
     stackItemIds: project.stackItemIds,
     aiSkills: derivedStack.aiSkills,

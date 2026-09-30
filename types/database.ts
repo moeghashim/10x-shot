@@ -60,7 +60,9 @@ export interface Project {
   title: string
   description: string
   objectives?: string
-  progress: number
+  /** Legacy value retained for historical data; project UI uses launchDate. */
+  progress?: number
+  launchDate?: string
   status: ProjectStatus
   stackItemIds: number[]
   aiSkills: string[]
@@ -220,7 +222,9 @@ export interface DbProject {
   title: string
   description: string
   objectives?: string
-  progress: number
+  /** Legacy value retained for historical data; project UI uses launchDate. */
+  progress?: number
+  launch_date?: string
   status: string
   stack_item_ids?: number[]
   ai_skills: string[]

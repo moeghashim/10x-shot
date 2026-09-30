@@ -27,6 +27,7 @@ function toProjectInput(project: Project | Omit<Project, "id">) {
     description: project.description,
     objectives: project.objectives,
     progress: project.progress,
+    launchDate: project.launchDate,
     status: project.status,
     stackItemIds: project.stackItemIds,
     aiSkills: project.aiSkills,

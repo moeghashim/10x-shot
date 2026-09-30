@@ -84,7 +84,7 @@
 .claws-ledger-head, .claws-row { display: grid; grid-template-columns: 72px minmax(0, 1.2fr) minmax(0, 2fr) 100px 140px 120px; gap: 16px; }
 .claws-ledger-head { padding: 10px var(--claws-pad); border-bottom: 1px solid var(--claws-line); letter-spacing: .14em; }
 .claws-ledger-head > :last-child { text-align: end; }
-.claws-row { grid-template-areas: "id name brief status prog link"; align-items: start; padding: var(--claws-row-pad) var(--claws-pad); border-bottom: 1px solid var(--claws-line); transition: background .15s; }
+.claws-row { grid-template-areas: "id name brief status date link"; align-items: start; padding: var(--claws-row-pad) var(--claws-pad); border-bottom: 1px solid var(--claws-line); transition: background .15s; }
 .claws-row:hover { background: var(--claws-hover); }
 .claws-row > * { min-width: 0; }
 .claws-build { grid-area: id; color: var(--claws-muted); font-size: 12px; }
@@ -102,11 +102,8 @@
 .claws-status { grid-area: status; display: flex; align-items: center; gap: 7px; font-size: 11px; text-transform: uppercase; letter-spacing: .1em; color: var(--claws-muted); }
 .claws-status[data-status="active"], .claws-status[data-status="completed"] { color: var(--claws-ink); }
 .claws-status > span { width: 6px; height: 6px; flex: none; background: currentColor; }
-.claws-progress { grid-area: prog; display: flex; flex-direction: column; gap: 6px; }
-.claws-progress > div:first-child { display: flex; justify-content: space-between; gap: 6px; font-size: 11px; }
-.claws-progress > div:first-child > span:last-child { color: var(--claws-muted); text-align: end; }
-.claws-progress-track { height: 4px; background: var(--claws-line); }
-.claws-progress-track > span { display: block; height: 100%; background: var(--claws-ink); }
+.claws-launch-date { grid-area: date; font-size: 11px; display: flex; flex-direction: column; gap: 4px; }
+.claws-date-label { display: none; }
 .claws-launch { grid-area: link; text-align: end; font-size: 11px; text-transform: uppercase; letter-spacing: .1em; }
 .claws-launch a { border-bottom: 1px solid var(--claws-ink); }
 .claws-launch > span { color: var(--claws-muted); }
@@ -175,8 +172,9 @@ html[dir="rtl"] .claws-home :is(.claws-label, .claws-status, .claws-launch, .cla
   .claws-stats > div { padding-inline: 14px; }
   .claws-stat { font-size: 40px; }
   .claws-ledger-head { display: none; }
-  .claws-row { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "id status" "name name" "brief brief" "prog prog" "link link"; gap: 12px; }
+  .claws-row { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "id status" "name name" "brief brief" "date date" "link link"; gap: 12px; }
   .claws-launch { text-align: start; }
+  .claws-date-label { display: block; color: var(--claws-muted); }
   .claws-stack-copy { border-inline-end: 0; border-bottom: 1px solid var(--claws-line); }
   .claws-nodes { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
   .claws-node { padding: 12px; gap: 6px; min-height: 0; }

@@ -135,7 +135,7 @@
   "ProgressPage": {
     "nav": {
       "home": "الرئيسية",
-      "progress": "التقدم",
+      "launchDate": "تاريخ الإطلاق",
       "newsletter": "النشرة"
     },
     "back": "العودة إلى الرئيسية",
