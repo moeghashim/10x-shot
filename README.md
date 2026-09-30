@@ -162,4 +162,4 @@ Do not assume a Vercel deployment also publishes Convex schema or function chang
 
 The project remains linked to its original [v0 workspace](https://v0.dev/chat/projects/Jj03MH9lC8M). Coordinate edits made in v0 with this repository to avoid source drift.
 
-Project launch dates use an optional `launchDate` calendar date (`YYYY-MM-DD`). Set or clear it in the project editor; unknown dates display **TBA** (Arabic: **يُحدد لاحقاً**). Project summaries no longer show completion percentages or progress bars. Existing percentage values and monthly metric history remain stored.
+Project launch dates use an optional `launchDate` calendar date (`YYYY-MM-DD`) or month (`YYYY-MM`). Set or clear it in the project editor; unknown dates display **TBA** (Arabic: **يُحدد لاحقاً**). Project summaries no longer show completion percentages or progress bars. Existing percentage values and monthly metric history remain stored.

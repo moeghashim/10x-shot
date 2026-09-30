@@ -17,6 +17,15 @@ test("unknown dates use localized TBA without inferring a launch", () => {
   assert.equal(formatLaunchDate("2026-02-29", "ar"), "يُحدد لاحقاً");
 });
 
+test("month-only launches preserve their precision", () => {
+  assert.equal(isLaunchDate("2026-09"), true);
+  for (const value of ["2026-00", "2026-13", "0000-09", "2026-9"]) {
+    assert.equal(isLaunchDate(value), false);
+  }
+  assert.equal(formatLaunchDate("2026-09"), "September 2026");
+  assert.equal(formatLaunchDate("2026-09", "ar"), "سبتمبر 2026");
+});
+
 test("launch dates retain the calendar day in every viewer timezone", () => {
   const previous = process.env.TZ;
   try {

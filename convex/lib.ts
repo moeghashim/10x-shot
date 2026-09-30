@@ -38,7 +38,7 @@ export function assertProjectInput(input: {
     throw new ConvexError("Growth must be a finite percentage");
   }
   if (input.launchDate && !isLaunchDate(input.launchDate)) {
-    throw new ConvexError("Launch date must be a valid YYYY-MM-DD calendar date");
+    throw new ConvexError("Launch date must be a valid YYYY-MM month or YYYY-MM-DD calendar date");
   }
   if (input.progress !== undefined && (!Number.isFinite(input.progress) || input.progress < 0 || input.progress > 100)) {
     throw new ConvexError("Project progress must be between 0 and 100");

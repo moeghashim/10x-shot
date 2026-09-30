@@ -135,6 +135,9 @@ function ProjectForm({
   })
   const [stackFilter, setStackFilter] = useState("")
   const [stackChanged, setStackChanged] = useState(false)
+  const [launchPrecision, setLaunchPrecision] = useState<"date" | "month">(
+    project?.launchDate?.length === 7 ? "month" : "date"
+  )
 
   const selectedStack = deriveProjectStack(stackItems, formData.stackItemIds)
 
@@ -203,11 +206,27 @@ function ProjectForm({
       <div className="grid grid-cols-2 gap-4">
         <div>
           <label htmlFor="project-launch-date" className="text-sm font-medium">Launch date</label>
+          <select
+            aria-label="Launch date precision"
+            className="mb-2 block w-full border border-gray-200 bg-white px-3 py-2 text-sm"
+            value={launchPrecision}
+            onChange={(e) => {
+              const precision = e.target.value as "date" | "month"
+              setLaunchPrecision(precision)
+              setFormData((prev) => ({
+                ...prev,
+                launchDate: precision === "month" ? prev.launchDate?.slice(0, 7) || "" : "",
+              }))
+            }}
+          >
+            <option value="date">Exact date</option>
+            <option value="month">Month only</option>
+          </select>
           <Input
             id="project-launch-date"
-            type="date"
-            min="0001-01-01"
-            max="9999-12-31"
+            type={launchPrecision}
+            min={launchPrecision === "month" ? "0001-01" : "0001-01-01"}
+            max={launchPrecision === "month" ? "9999-12" : "9999-12-31"}
             value={formData.launchDate || ""}
             onChange={(e) => setFormData((prev) => ({ ...prev, launchDate: e.target.value }))}
             aria-describedby="launch-date-help"
