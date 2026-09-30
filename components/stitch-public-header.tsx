@@ -1,87 +1,26 @@
-import Image from "next/image"
-import { Link } from "@/i18n/routing"
-import { StitchLocaleToggle } from "@/components/stitch-locale-toggle"
-import type { SupportedLocale } from "@/types/database"
+"use client";
 
-type StitchPublicHeaderProps = {
-  locale: SupportedLocale
-  labels: {
-    projects: string
-    stack: string
-    future: string
-    contact: string
-    progress: string
-  }
-  isHomepage?: boolean
+import Image from "next/image";
+import { Link, usePathname } from "@/i18n/routing";
+import type { SupportedLocale } from "@/types/database";
+import "@/styles/claws-home.css";
+
+export function PublicNavigation({ locale, isHomepage = false }: { locale: SupportedLocale; isHomepage?: boolean }) {
+  const ar = locale === "ar";
+  return <>
+    <Link href={isHomepage ? "#projects" : "/#projects"}>{ar ? "المشاريع" : "Projects"}</Link>
+    <Link href="/stack">{ar ? "الأدوات" : "Stack"}</Link>
+    <Link href="/future">{ar ? "المستقبل" : "Future"}</Link>
+    <Link href="/track">{ar ? "المتابعة" : "Track"}</Link>
+  </>;
 }
 
-function getSectionHref(locale: SupportedLocale, section: "projects", isHomepage: boolean) {
-  if (isHomepage) {
-    return `#${section}`
-  }
-
-  return `/${locale}#${section}`
-}
-
-export function StitchPublicHeader({
-  locale,
-  labels,
-  isHomepage = false,
-}: StitchPublicHeaderProps) {
-  return (
-    <header className="sticky top-0 z-50 border-b border-black/15 bg-[#f7f5f1]/90 backdrop-blur-xl">
-      <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-4 md:px-10">
-        <Link href="/" className="group inline-flex items-center gap-3">
-          <Image
-            src="/10claws.svg"
-            alt="10 Claws logo"
-            width={42}
-            height={42}
-            className="h-10 w-10"
-            priority
-          />
-          <span className="stitch-display text-lg font-semibold uppercase tracking-[-0.08em] text-black md:text-xl">
-            10 Claws
-          </span>
-        </Link>
-
-        <nav className="hidden items-center gap-4 lg:gap-8 md:flex">
-          <a
-            className="stitch-mono text-[10px] uppercase tracking-[0.3em] text-black/65 transition-colors hover:text-black"
-            href={getSectionHref(locale, "projects", isHomepage)}
-          >
-            {labels.projects}
-          </a>
-          <Link
-            className="stitch-mono text-[10px] uppercase tracking-[0.3em] text-black/65 transition-colors hover:text-black"
-            href="/stack"
-          >
-            {labels.stack}
-          </Link>
-          <Link
-            className="stitch-mono text-[10px] uppercase tracking-[0.3em] text-black/65 transition-colors hover:text-black"
-            href="/future"
-          >
-            {labels.future}
-          </Link>
-          <Link
-            className="stitch-mono text-[10px] uppercase tracking-[0.3em] text-black/65 transition-colors hover:text-black"
-            href="/track"
-          >
-            {locale === "ar" ? "المتابعة" : "Track"}
-          </Link>
-        </nav>
-
-        <div className="flex items-center gap-3">
-          <Link
-            href="/progress"
-            className="stitch-mono hidden border border-black/15 bg-white px-4 py-2 text-[10px] uppercase tracking-[0.28em] text-black transition-colors hover:border-black md:inline-flex"
-          >
-            {labels.progress}
-          </Link>
-          <StitchLocaleToggle />
-        </div>
-      </div>
-    </header>
-  )
+export function StitchPublicHeader({ locale, isHomepage = false }: { locale: SupportedLocale; isHomepage?: boolean }) {
+  const ar = locale === "ar";
+  const pathname = usePathname();
+  return <header className="claws-header">
+    <Link href="/" className="claws-brand"><Image src="/10claws.svg" width={28} height={28} alt="" priority /><span dir="ltr">10 Claws</span></Link>
+    <nav aria-label={ar ? "التنقل الرئيسي" : "Main navigation"}><PublicNavigation locale={locale} isHomepage={isHomepage} /></nav>
+    <Link href={pathname || "/"} locale={ar ? "en" : "ar"} className="claws-language" aria-label={ar ? "Switch to English" : "التبديل إلى العربية"}>{ar ? "EN" : "AR"}</Link>
+  </header>;
 }

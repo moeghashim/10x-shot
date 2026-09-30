@@ -1,5 +1,4 @@
 import type { Metadata } from "next"
-import { getTranslations } from "next-intl/server"
 import { TrackPage } from "@/components/track-page"
 import { trackContent } from "@/lib/track/data"
 import type { SupportedLocale } from "@/types/database"
@@ -33,18 +32,8 @@ export default async function TrackRoute({
 }) {
   const { locale: routeLocale } = await params
   const locale = (routeLocale === "ar" ? "ar" : "en") as SupportedLocale
-  const nav = await getTranslations({ locale, namespace: "HomePage.stitch.nav" })
 
   return (
-    <TrackPage
-      locale={locale}
-      navLabels={{
-        projects: nav("projects"),
-        stack: nav("stack"),
-        future: nav("future"),
-        contact: nav("contact"),
-        progress: nav("progress"),
-      }}
-    />
+    <TrackPage locale={locale} />
   )
 }

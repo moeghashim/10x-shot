@@ -1,11 +1,13 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { GradeBar } from "@/components/grade-bar";
 import { LaunchDate } from "@/components/launch-date";
 import Image from "next/image";
+import { StitchPublicHeader, PublicNavigation } from "@/components/stitch-public-header";
 import { Link } from "@/i18n/routing";
-import { buildCode, formatVisits, gradeSegments, hasSpotlightData, projectTools, projectLaunchUrl, type SpotlightProject } from "@/lib/home/project-presentation";
-import type { Project, StackGrade, StackItem, SupportedLocale } from "@/types/database";
+import { buildCode, formatVisits, hasSpotlightData, projectTools, projectLaunchUrl, type SpotlightProject } from "@/lib/home/project-presentation";
+import type { Project, StackItem, SupportedLocale } from "@/types/database";
 import "@/styles/claws-home.css";
 
 function useReducedMotion() {
@@ -39,15 +41,6 @@ function useCount(duration: number, enabled: boolean, reduced: boolean, resetKey
   return progress;
 }
 
-function GradeBar({ grade, ar, node = false }: { grade?: StackGrade; ar: boolean; node?: boolean }) {
-  const label = grade ? `${ar ? "التقييم" : "Grade"} ${grade}` : ar ? "غير مقيّم" : "Ungraded";
-  return <span className={`claws-grade ${node ? "claws-grade-node" : ""}`} title={label}>
-    <span className="claws-segments" aria-hidden="true">
-      {[1, 2, 3, 4, 5].map((segment) => <span key={segment} data-filled={segment <= gradeSegments(grade)} />)}
-    </span>
-    <span className={node || !grade ? "claws-grade-label" : "sr-only"}>{label}</span>
-  </span>;
-}
 
 function Spotlight({ projects, ready, reduced, ar }: { projects: SpotlightProject[]; ready: boolean; reduced: boolean; ar: boolean }) {
   const [index, setIndex] = useState(0);
@@ -120,20 +113,11 @@ export function StitchHomepage({ projects, stackItems, locale, toolCount }: { pr
     { value: projects.filter((p) => p.status === "active").length, label: ar ? "مشاريع نشطة" : "Active builds" },
     { value: toolCount ?? new Set(projects.flatMap((p) => p.tools)).size, label: ar ? "أدوات مدمجة" : "Tools integrated" },
   ];
-  const nav = <>
-    <a href="#projects">{ar ? "المشاريع" : "Projects"}</a>
-    <a href="#stack">{ar ? "الأدوات" : "Stack"}</a>
-    <Link href="/future">{ar ? "المستقبل" : "Future"}</Link>
-    <Link href="/track">{ar ? "المتابعة" : "Track"}</Link>
-  </>;
+  const nav = <PublicNavigation locale={locale} isHomepage />;
 
   return <div className="claws-home" data-theme={theme} data-density={density}>
     <a className="claws-skip" href="#main">{ar ? "انتقل إلى المحتوى" : "Skip to content"}</a>
-    <header className="claws-header">
-      <Link href="/" className="claws-brand"><Image src="/10claws.svg" width={28} height={28} alt="" priority /><span dir="ltr">10 Claws</span></Link>
-      <nav aria-label={ar ? "التنقل الرئيسي" : "Main navigation"}>{nav}</nav>
-      <Link href="/" locale={ar ? "en" : "ar"} className="claws-language" aria-label={ar ? "Switch to English" : "التبديل إلى العربية"}>{ar ? "EN" : "AR"}</Link>
-    </header>
+    <StitchPublicHeader locale={locale} isHomepage />
     <main id="main">
       <section className="claws-hero" aria-label={ar ? "التجربة" : "The experiment"}>
         <div className="claws-hero-copy">

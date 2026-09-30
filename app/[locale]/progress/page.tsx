@@ -30,16 +30,7 @@ export default async function ProgressPage({
 
   return (
     <div className="min-h-screen bg-[#f7f5f1] text-black">
-      <StitchPublicHeader
-        locale={locale}
-        labels={{
-          projects: t("HomePage.stitch.nav.projects"),
-          stack: t("HomePage.stitch.nav.stack"),
-          future: t("HomePage.stitch.nav.future"),
-          contact: t("HomePage.stitch.nav.contact"),
-          progress: t("HomePage.stitch.nav.progress"),
-        }}
-      />
+      <StitchPublicHeader locale={locale} />
 
       <main>
         <section className="stitch-shell border-b border-black/15">

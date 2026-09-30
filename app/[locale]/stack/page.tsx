@@ -1,7 +1,8 @@
 import type { Metadata } from "next"
 import { getTranslations } from "next-intl/server"
 import { StackPage } from "@/components/stack-page"
-import { fetchStack } from "@/lib/data-fetching"
+import { fetchProjects, fetchStack } from "@/lib/data-fetching"
+import { buildPublicStack } from "@/lib/home/project-presentation"
 import type { SupportedLocale } from "@/types/database"
 
 export async function generateMetadata({
@@ -34,9 +35,13 @@ export default async function StackRoute({
   const { locale: routeLocale } = await params
   const locale = (routeLocale === "ar" ? "ar" : "en") as SupportedLocale
   const t = await getTranslations({ locale, namespace: "StackPage" })
-  const nav = await getTranslations({ locale, namespace: "HomePage.stitch.nav" })
   const progressNav = await getTranslations({ locale, namespace: "ProgressPage.nav" })
-  const { data: stackItems } = await fetchStack()
+  // Product/tool names are canonical; translated legacy lists may be stale.
+  const [{ data: catalog }, { data: projects }] = await Promise.all([
+    fetchStack(),
+    fetchProjects({ locale: "en", allowFallback: false }),
+  ])
+  const stackItems = buildPublicStack(projects, catalog)
 
   return (
     <StackPage
@@ -71,12 +76,8 @@ export default async function StackRoute({
           expert: t("familiarityLevels.expert"),
         },
         nav: {
-          projects: nav("projects"),
-          stack: nav("stack"),
-          future: nav("future"),
-          contact: nav("contact"),
-          progress: nav("progress"),
           home: progressNav("home"),
+          progress: locale === "ar" ? "التقدم" : "Progress",
         },
       }}
     />

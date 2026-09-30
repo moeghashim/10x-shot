@@ -6,11 +6,13 @@ import Image from "next/image"
 import { Link } from "@/i18n/routing"
 import { StitchPublicHeader } from "@/components/stitch-public-header"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import type { StackFamiliarity, StackItemWithProjects, SupportedLocale } from "@/types/database"
+import type { StackFamiliarity, SupportedLocale } from "@/types/database"
+import type { PublicStackItem } from "@/lib/home/project-presentation"
+import { GradeBar } from "@/components/grade-bar"
 
 type StackPageProps = {
   locale: SupportedLocale
-  stackItems: StackItemWithProjects[]
+  stackItems: PublicStackItem[]
   strings: {
     title: string
     description: string
@@ -35,10 +37,6 @@ type StackPageProps = {
     }
     familiarityLevels: Record<StackFamiliarity, string>
     nav: {
-      projects: string
-      stack: string
-      future: string
-      contact: string
       progress: string
       home: string
     }
@@ -49,20 +47,11 @@ export function StackPage({ locale, stackItems, strings }: StackPageProps) {
   const [view, setView] = useState<"cards" | "matrix">("matrix")
   const projectHref = (project: { url?: string | null }) => project.url || `/${locale}#projects`
   const getFamiliarityLabel = (familiarity?: StackFamiliarity) =>
-    familiarity ? strings.familiarityLevels[familiarity] : strings.familiarityLevels.learning
+    familiarity ? strings.familiarityLevels[familiarity] : (locale === "ar" ? "غير مسجّل" : "Not recorded")
 
   return (
     <div className="min-h-screen bg-[#f7f5f1] text-black selection:bg-black selection:text-white">
-      <StitchPublicHeader
-        locale={locale}
-        labels={{
-          projects: strings.nav.projects,
-          stack: strings.nav.stack,
-          future: strings.nav.future,
-          contact: strings.nav.contact,
-          progress: strings.nav.progress,
-        }}
-      />
+      <StitchPublicHeader locale={locale} />
 
       <main>
         <section className="border-b border-black/15">
@@ -137,9 +126,7 @@ export function StackPage({ locale, stackItems, strings }: StackPageProps) {
                             <span className="stitch-mono inline-flex border border-black/15 px-3 py-2 text-[10px] uppercase tracking-[0.28em] text-black/65">
                               {strings.categories[item.category]}
                             </span>
-                            <span className="stitch-mono inline-flex bg-black px-3 py-2 text-[10px] uppercase tracking-[0.28em] text-white">
-                              {strings.grade} {item.grade}
-                            </span>
+                            <GradeBar grade={item.grade} ar={locale === "ar"} node />
                             <span className="stitch-mono inline-flex border border-black bg-[#f3f1ed] px-3 py-2 text-[10px] uppercase tracking-[0.28em] text-black">
                               {getFamiliarityLabel(item.familiarity)}
                             </span>
@@ -245,9 +232,7 @@ export function StackPage({ locale, stackItems, strings }: StackPageProps) {
                               </span>
                             </td>
                             <td className="border-r border-black/15 px-4 py-4 align-top">
-                              <span className="stitch-mono inline-flex bg-black px-3 py-2 text-[10px] uppercase tracking-[0.28em] text-white">
-                                {strings.grade} {item.grade}
-                              </span>
+                              <GradeBar grade={item.grade} ar={locale === "ar"} node />
                             </td>
                             <td className="border-r border-black/15 px-4 py-4 align-top">
                               <span className="stitch-mono inline-flex border border-black/15 px-3 py-2 text-[10px] uppercase tracking-[0.28em] text-black/65">

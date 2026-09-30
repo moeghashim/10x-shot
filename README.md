@@ -167,3 +167,7 @@ Project launch dates use an optional `launchDate` calendar date (`YYYY-MM-DD`) o
 Public project lists show launched projects first, newest launch first. Future launches follow in upcoming-date order, then projects without a valid launch date. Matching dates use Build ID order.
 
 Magic follow entries are curated in `lib/magic-follow/content.ts`, with a name, X handle (without `@`), and English/Arabic reasons. An empty list displays a coming-soon message. Former `/en/about` and `/ar/about` URLs redirect permanently to the corresponding Magic follow page.
+
+Public pages share `StitchPublicHeader`: Projects, Stack, Future, Track, and a language toggle that retains the current route. Magic follow remains in footer navigation. Stack opens the dedicated catalog page.
+
+The public Stack inventory is derived from canonical project assignments, including legacy tool/skill names. Catalog records provide grades, familiarity, and notes; unknown ratings remain ungraded. Names are deduplicated within each category without regard to casing, and usage counts unique projects. Unassigned catalog entries stay in the admin catalog but are omitted from the public inventory. The homepage tool count uses the same inventory.

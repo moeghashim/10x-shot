@@ -1,5 +1,6 @@
 import { StitchHomepage } from "@/components/stitch-homepage"
 import { FALLBACK_PROJECTS } from "@/lib/constants"
+import { buildPublicStack } from "@/lib/home/project-presentation"
 import { fetchPublicSiteCopy, getSiteCopyText } from "@/lib/site-content"
 import type { SupportedLocale } from "@/types/database"
 
@@ -58,7 +59,7 @@ export default async function HomePage({
   const safeProjects = projects || FALLBACK_PROJECTS
   // Count canonical tool names so translated aliases do not inflate the Arabic total.
   const canonicalProjects = locale === "ar" ? (await fetchProjects({ locale: "en" })).data : safeProjects
-  const toolCount = new Set(canonicalProjects.flatMap((project) => project.tools)).size
+  const toolCount = buildPublicStack(canonicalProjects, stackItems).filter(item => item.category === "tool").length
 
   // Prepare structured data for SEO
   const jsonLd = {

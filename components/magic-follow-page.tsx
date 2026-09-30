@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { StitchPublicHeader, PublicNavigation } from "@/components/stitch-public-header";
 import { Link } from "@/i18n/routing";
 import { magicFollowContent, type MagicFollowPerson } from "@/lib/magic-follow/content";
 import type { SupportedLocale } from "@/types/database";
@@ -8,19 +9,10 @@ import "@/styles/magic-follow.css";
 export function MagicFollowPage({ locale, people }: { locale: SupportedLocale; people: MagicFollowPerson[] }) {
   const ar = locale === "ar";
   const content = magicFollowContent[locale];
-  const nav = <>
-    <Link href="/#projects">{ar ? "المشاريع" : "Projects"}</Link>
-    <Link href="/#stack">{ar ? "الأدوات" : "Stack"}</Link>
-    <Link href="/future">{ar ? "المستقبل" : "Future"}</Link>
-    <Link href="/track">{ar ? "المتابعة" : "Track"}</Link>
-  </>;
+  const nav = <PublicNavigation locale={locale} />;
   return <div className="claws-home magic-follow" data-theme="light">
     <a className="claws-skip" href="#main">{ar ? "انتقل إلى المحتوى" : "Skip to content"}</a>
-    <header className="claws-header">
-      <Link href="/" className="claws-brand"><Image src="/10claws.svg" width={28} height={28} alt="" priority /><span dir="ltr">10 Claws</span></Link>
-      <nav aria-label={ar ? "التنقل الرئيسي" : "Main navigation"}>{nav}</nav>
-      <Link href="/magic-follow" locale={ar ? "en" : "ar"} className="claws-language" aria-label={ar ? "Switch to English" : "التبديل إلى العربية"}>{ar ? "EN" : "AR"}</Link>
-    </header>
+    <StitchPublicHeader locale={locale} />
     <main id="main">
       <section className="magic-follow-intro">
         <p className="claws-label">{content.kicker}</p>
