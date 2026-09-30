@@ -1,10 +1,14 @@
 # Magic follow
 
-Replaces the About Us page with a curated X directory: name, linked handle, and a reason to follow each person. English and Arabic content lives in `lib/magic-follow/content.ts`. The list is intentionally empty until the owner supplies accounts; the public page shows a localized empty state.
+Replaces the About Us page with a curated X directory: name, linked handle, and a reason to follow each person. English and Arabic content lives in `lib/magic-follow/content.ts`. The ten owner-supplied accounts appear in the supplied order, with lightly edited English reasons and Arabic translations preserving the personal tone.
 
 The former About content and FormSubmit enquiry form are removed. Homepage and shared public navigation now link to Magic follow. Both localized About URLs redirect permanently (308), and the sitemap lists the new routes.
 
-Validation: lint, TypeScript, and production builds pass. Redirect status and destinations checked for both languages; sitemap checked for the replacement URLs. English desktop and Arabic mobile layouts checked for navigation, column labels, empty state, and horizontal overflow. Profile rows cannot be verified against real people until the list is supplied.
+Validation: lint, TypeScript, and production builds pass. Redirect status and destinations checked for both languages; sitemap checked for the replacement URLs. The original empty state was verified before the owner supplied the list.
+
+The populated production page was checked on 30 September 2026: all ten rows and exact supplied X handles are present in order. English desktop and Arabic mobile (390px) render without horizontal overflow; screenshots below show the populated directory.
+
+Names were checked against public profiles and personal sites, including [Matt Pocock](https://github.com/mattpocock), [Ian Nuttall](https://ian.is/), [Kun Chen](https://github.com/kunchenguid), [Mario Zechner](https://huggingface.co/badlogicgames), [Ahmad Osman](https://theahmadosman.world/), [Steve Sewell](https://github.com/steve8708), [Dan McAteer](https://x.com/daniel_mac8/status/2015424424863003135), [Trevin Chow](https://trev.in/), and [Kieran Klaassen](https://github.com/kieranklaassen). Potato retains the supplied public alias; direct X profile fetches were unavailable. Reasons are the owner's recommendations.
 
 ![Magic follow desktop](screenshots/magic-follow-desktop.png)
 
