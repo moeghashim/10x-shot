@@ -121,7 +121,7 @@ export function StitchHomepage({ projects, stackItems, locale, toolCount }: { pr
     { value: toolCount ?? new Set(projects.flatMap((p) => p.tools)).size, label: ar ? "أدوات مدمجة" : "Tools integrated" },
   ];
   const nav = <>
-    <Link href="/about">{ar ? "من نحن" : "About us"}</Link>
+    <Link href="/magic-follow"><bdi>Magic follow</bdi></Link>
     <a href="#projects">{ar ? "المشاريع" : "Projects"}</a>
     <a href="#stack">{ar ? "الأدوات" : "Stack"}</a>
     <Link href="/future">{ar ? "المستقبل" : "Future"}</Link>

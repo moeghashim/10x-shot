@@ -46,8 +46,8 @@ export function StitchPublicHeader({
         </Link>
 
         <nav className="hidden items-center gap-4 lg:gap-8 md:flex">
-          <Link href="/about" className="stitch-mono text-[10px] uppercase tracking-[0.2em] text-black/65 transition-colors hover:text-black">
-            {locale === "ar" ? "من نحن" : "About us"}
+          <Link href="/magic-follow" className="stitch-mono text-[10px] uppercase tracking-[0.2em] text-black/65 transition-colors hover:text-black">
+            <bdi>Magic follow</bdi>
           </Link>
           <a
             className="stitch-mono text-[10px] uppercase tracking-[0.3em] text-black/65 transition-colors hover:text-black"
@@ -82,8 +82,8 @@ export function StitchPublicHeader({
           >
             {labels.progress}
           </Link>
-          <Link href="/about" className="text-xs text-black/65 hover:text-black md:hidden">
-            {locale === "ar" ? "من نحن" : "About us"}
+          <Link href="/magic-follow" className="text-xs text-black/65 hover:text-black md:hidden">
+            <bdi>Magic follow</bdi>
           </Link>
           <StitchLocaleToggle />
         </div>

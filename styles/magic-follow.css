@@ -1,0 +1,30 @@
+.magic-follow { display: flex; flex-direction: column; }
+.magic-follow main { flex: 1; }
+.magic-follow-intro { padding: 64px var(--claws-pad) 48px; border-bottom: 1px solid var(--claws-line); }
+.magic-follow-intro h1 { margin-block: 24px; font-size: clamp(44px, 6vw, 88px); font-weight: 600; line-height: 1.05; letter-spacing: -.03em; }
+.magic-follow-description { max-width: 56ch; color: var(--claws-muted); line-height: 1.8; }
+.magic-follow table { width: 100%; border-collapse: collapse; table-layout: fixed; text-align: start; }
+.magic-follow th, .magic-follow td { padding: 24px var(--claws-pad); border-bottom: 1px solid var(--claws-line); vertical-align: top; text-align: start; overflow-wrap: anywhere; }
+.magic-follow thead th { padding-block: 12px; color: var(--claws-muted); font-size: 10px; font-weight: 400; text-transform: uppercase; letter-spacing: .12em; }
+.magic-follow thead th:nth-child(1) { width: 25%; }
+.magic-follow thead th:nth-child(2) { width: 25%; }
+.magic-follow-person th { font-family: var(--font-bricolage), var(--font-alexandria), sans-serif; font-size: 28px; font-weight: 500; line-height: 1.2; }
+.magic-follow-person:hover { background: var(--claws-hover); }
+.magic-follow-person a { display: inline-block; border-bottom: 1px solid var(--claws-line); }
+.magic-follow-person p { max-width: 65ch; line-height: 1.8; }
+.magic-follow-mobile-label { display: none; }
+.magic-follow td.magic-follow-empty { padding-block: 64px 88px; }
+.magic-follow-empty h2 { font-size: 28px; font-weight: 500; }
+.magic-follow-empty p { margin-top: 16px; color: var(--claws-muted); }
+.magic-follow [aria-current="page"] { text-decoration: underline; text-underline-offset: 5px; }
+@media (width < 760px) {
+  .magic-follow-intro { padding-block: 40px 32px; }
+  .magic-follow thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+  .magic-follow tbody, .magic-follow tr { display: block; }
+  .magic-follow-person { padding: 24px var(--claws-pad); border-bottom: 1px solid var(--claws-line); }
+  .magic-follow-person th, .magic-follow-person td { display: block; padding: 0; border: 0; }
+  .magic-follow-person td { margin-top: 12px; }
+  .magic-follow-person td:last-child { margin-top: 24px; }
+  .magic-follow-mobile-label { display: block; margin-bottom: 6px; }
+  .magic-follow td.magic-follow-empty { display: block; padding-block: 40px 64px; }
+}

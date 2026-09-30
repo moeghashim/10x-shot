@@ -17,7 +17,7 @@ All public pages are available in English and Arabic through the `app/[locale]/`
 | `/en/stack` · `/ar/stack` | Tool and AI-skill inventory with grades, familiarity, and project usage | Convex |
 | `/en/future` · `/ar/future` | Reviewed future bets rendered through a constrained component catalog | `lib/future/specs.ts` |
 | `/en/track` · `/ar/track` | Curated updates for coding agents, infrastructure, and agentic commerce | `lib/track/data.ts` |
-| `/en/about` · `/ar/about` | Company overview and CAPTCHA-protected enquiry form | `lib/about/content.ts` and FormSubmit |
+| `/en/magic-follow` · `/ar/magic-follow` | People to follow on X: name, handle, and reasons | `lib/magic-follow/content.ts` |
 | `/en/admin` · `/ar/admin` | Authenticated management for projects, stack, metrics, roadmap, copy, and users | Convex + Better Auth |
 
 The Future page does not generate content at runtime. Its English and Arabic JSON-render specs are checked in, validated against `lib/future/catalog.ts`, reviewed, and then deployed. Track follows a similar reviewed-content model so scheduled research updates can safely modify one typed data module.
@@ -163,3 +163,5 @@ Do not assume a Vercel deployment also publishes Convex schema or function chang
 The project remains linked to its original [v0 workspace](https://v0.dev/chat/projects/Jj03MH9lC8M). Coordinate edits made in v0 with this repository to avoid source drift.
 
 Project launch dates use an optional `launchDate` calendar date (`YYYY-MM-DD`) or month (`YYYY-MM`). Set or clear it in the project editor; unknown dates display **TBA** (Arabic: **يُحدد لاحقاً**). Project summaries no longer show completion percentages or progress bars. Existing percentage values and monthly metric history remain stored.
+
+Magic follow entries are curated in `lib/magic-follow/content.ts`, with a name, X handle (without `@`), and English/Arabic reasons. An empty list displays a coming-soon message. Former `/en/about` and `/ar/about` URLs redirect permanently to the corresponding Magic follow page.
