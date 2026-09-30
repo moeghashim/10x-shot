@@ -9,7 +9,6 @@ export function MagicFollowPage({ locale, people }: { locale: SupportedLocale; p
   const ar = locale === "ar";
   const content = magicFollowContent[locale];
   const nav = <>
-    <Link href="/magic-follow" aria-current="page"><bdi>Magic follow</bdi></Link>
     <Link href="/#projects">{ar ? "المشاريع" : "Projects"}</Link>
     <Link href="/#stack">{ar ? "الأدوات" : "Stack"}</Link>
     <Link href="/future">{ar ? "المستقبل" : "Future"}</Link>
@@ -45,7 +44,7 @@ export function MagicFollowPage({ locale, people }: { locale: SupportedLocale; p
     </main>
     <footer className="claws-footer">
       <Link href="/" className="claws-brand"><Image src="/10claws.svg" width={18} height={18} alt="" /><span dir="ltr">10 Claws</span></Link>
-      <nav aria-label={ar ? "روابط التذييل" : "Footer navigation"}>{nav}</nav>
+      <nav aria-label={ar ? "روابط التذييل" : "Footer navigation"}><Link href="/magic-follow" aria-current="page"><bdi>Magic follow</bdi></Link>{nav}</nav>
     </footer>
   </div>;
 }

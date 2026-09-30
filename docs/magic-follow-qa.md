@@ -2,7 +2,7 @@
 
 Replaces the About Us page with a curated X directory: name, linked handle, and a reason to follow each person. English and Arabic content lives in `lib/magic-follow/content.ts`. The eleven owner-supplied accounts appear in the supplied order, with lightly edited English reasons and Arabic translations preserving the personal tone.
 
-The former About content and FormSubmit enquiry form are removed. Homepage and shared public navigation now link to Magic follow. Both localized About URLs redirect permanently (308), and the sitemap lists the new routes.
+The former About content and FormSubmit enquiry form are removed. Magic follow is linked only from the homepage and directory footers; desktop and mobile header menus omit it. Both localized About URLs redirect permanently (308), and the sitemap lists the new routes.
 
 Validation: lint, TypeScript, and production builds pass. Redirect status and destinations checked for both languages; sitemap checked for the replacement URLs. The original empty state was verified before the owner supplied the list.
 
@@ -13,3 +13,7 @@ Names were checked against public profiles and personal sites, including [Matt P
 ![Magic follow desktop](screenshots/magic-follow-desktop.png)
 
 ![Magic follow Arabic mobile](screenshots/magic-follow-mobile-ar.png)
+
+Footer-only navigation was verified on the live homepage and directory, plus the shared header on Arabic mobile Future. Lint, TypeScript, and the production build pass.
+
+![Magic follow in the footer only](screenshots/magic-follow-footer-only.png)

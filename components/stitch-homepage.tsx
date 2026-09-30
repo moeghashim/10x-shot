@@ -121,7 +121,6 @@ export function StitchHomepage({ projects, stackItems, locale, toolCount }: { pr
     { value: toolCount ?? new Set(projects.flatMap((p) => p.tools)).size, label: ar ? "أدوات مدمجة" : "Tools integrated" },
   ];
   const nav = <>
-    <Link href="/magic-follow"><bdi>Magic follow</bdi></Link>
     <a href="#projects">{ar ? "المشاريع" : "Projects"}</a>
     <a href="#stack">{ar ? "الأدوات" : "Stack"}</a>
     <Link href="/future">{ar ? "المستقبل" : "Future"}</Link>
@@ -181,7 +180,7 @@ export function StitchHomepage({ projects, stackItems, locale, toolCount }: { pr
     </main>
     <footer className="claws-footer">
       <div className="claws-footer-brand"><Link href="/" className="claws-brand"><Image src="/10claws.svg" alt="" width={18} height={18} /><span dir="ltr">10 Claws</span></Link><p>{ar ? `قياس الأثر الحقيقي للذكاء الاصطناعي على الإنتاجية عبر ${projects.length} مشاريع متنوعة.` : `Measuring the real impact of AI on productivity across ${projects.length} diverse projects.`}</p></div>
-      <nav aria-label={ar ? "روابط التذييل" : "Footer navigation"}>{nav}<a href="https://x.com/moeghashim" target="_blank" rel="noreferrer">X / Twitter</a></nav>
+      <nav aria-label={ar ? "روابط التذييل" : "Footer navigation"}><Link href="/magic-follow"><bdi>Magic follow</bdi></Link>{nav}<a href="https://x.com/moeghashim" target="_blank" rel="noreferrer">X / Twitter</a></nav>
       <details className="claws-tweaks"><summary>{ar ? "إعدادات العرض" : "Display settings"}</summary><div>
         <label>{ar ? "المظهر" : "Theme"}<select value={theme} onChange={(event) => setTheme(event.target.value as "light" | "dark")}><option value="light">{ar ? "فاتح" : "Light"}</option><option value="dark">{ar ? "داكن" : "Dark"}</option></select></label>
         <label>{ar ? "كثافة الصفوف" : "Ledger density"}<select value={density} onChange={(event) => setDensity(event.target.value)}><option value="comfortable">{ar ? "مريح" : "Comfortable"}</option><option value="compact">{ar ? "مضغوط" : "Compact"}</option></select></label>
