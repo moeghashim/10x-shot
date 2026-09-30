@@ -88,6 +88,14 @@ export const magicFollowPeople: MagicFollowPerson[] = [
       ar: "رفيق الرحلة في Compound Engineering.",
     },
   },
+  {
+    name: "Quinn Slack",
+    handle: "sqs",
+    why: {
+      en: "Amp CEO, which is enough. Read what he publishes. He's six months ahead of us.",
+      ar: "الرئيس التنفيذي لـ Amp، وهذا يكفي. اقرأ ما ينشره؛ فهو يسبقنا بستة أشهر.",
+    },
+  },
 ];
 
 export const magicFollowContent = {
