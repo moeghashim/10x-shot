@@ -101,11 +101,9 @@ The current local runtime configuration points at production Convex URLs, while 
 | `npx convex deploy` | Deploy Convex functions and schema to production |
 | `npx convex env set --prod NAME VALUE` | Set a production Convex environment variable |
 
-`next.config.mjs` currently allows production builds to continue when TypeScript or ESLint errors exist. A successful build is therefore not a substitute for `pnpm exec tsc --noEmit` and targeted browser checks.
+Production builds fail on TypeScript and ESLint errors. A successful build is still not a substitute for targeted browser checks.
 
-Run `pnpm lint` separately as part of validation; the current Next.js ESLint checks pass with the installed configuration.
-
-There is no general unit-test runner configured. The `tests/` directory contains standalone integration scripts, including a persisted project-update check that requires `.env.local` and a TypeScript-capable runner.
+`pnpm test` runs the Node test runner over `tests/*.test.mjs`. The tests use an in-memory database and never touch a Convex deployment. CI runs `pnpm typecheck`, `pnpm test`, and `pnpm build` on every push.
 
 For a public-page change, the expected verification path is:
 
