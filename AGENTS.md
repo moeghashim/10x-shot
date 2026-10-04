@@ -12,6 +12,8 @@
 - `pnpm build` produces a production build.
 - `pnpm start` serves the production build.
 - `pnpm lint` runs Next.js ESLint checks.
+- `pnpm typecheck` runs `tsc --noEmit`.
+- `pnpm test` runs the Node test runner over `tests/*.test.mjs`.
 - `npx convex dev` pushes Convex changes to the configured dev deployment.
 - `npx convex deploy` pushes Convex changes to the production deployment.
 
@@ -21,8 +23,8 @@
 - Use path aliases like `@/components`, `@/lib`, and `@/types` instead of deep relative paths.
 
 ## Testing Guidelines
-- No `test` script is defined; tests are standalone scripts in `tests/`.
-- Example: `tests/project-update.test.ts` checks persisted project updates and requires `.env.local`. Run via a TS-capable runner.
+- Tests live in `tests/*.test.mjs` and run with `pnpm test`; CI runs typecheck, tests, and a production build on every push.
+- Tests must not touch a real Convex deployment. Use `tests/helpers/convex-memory.mjs` to run Convex handlers against an in-memory database.
 
 ## Commit & Pull Request Guidelines
 - Recent commits use short, imperative subjects with optional prefixes (e.g., `feat: add RTL support`). Keep messages concise.
@@ -33,4 +35,5 @@
 - Store secrets only in `.env.local` (do not commit).
 - The app runtime envs currently point at production Convex URLs, while the Convex CLI defaults to the dev deployment for local iteration.
 - Use `npx convex deploy` and `npx convex env set --prod ...` for production backend changes.
-- Builds ignore ESLint/TS errors (see `next.config.mjs`), so run `pnpm lint` and fix issues before merging.
+- Builds fail on ESLint and TypeScript errors.
+- Admin access uses Better Auth with Convex-backed sessions. The dashboard is at `/admin`; every admin Convex function must call `requireAdmin` from `convex/lib.ts`.
