@@ -1,6 +1,7 @@
 import { StitchHomepage } from "@/components/stitch-homepage"
 import { FALLBACK_PROJECTS } from "@/lib/constants"
 import { buildPublicStack } from "@/lib/home/project-presentation"
+import { serializeJsonLd } from "@/lib/json-ld"
 import { fetchPublicSiteCopy, getSiteCopyText } from "@/lib/site-content"
 import type { SupportedLocale } from "@/types/database"
 
@@ -89,7 +90,7 @@ export default async function HomePage({
     <div className="selection:bg-black selection:text-white">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
       />
       <StitchHomepage projects={safeProjects} locale={locale} stackItems={stackItems} toolCount={toolCount} />
     </div>

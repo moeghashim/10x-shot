@@ -1,6 +1,8 @@
 import { convexBetterAuthNextJs } from "@convex-dev/better-auth/nextjs";
 import type { FunctionReference } from "convex/server";
 import { fetchAction, fetchMutation, fetchQuery } from "convex/nextjs";
+import { api } from "@/convex/_generated/api";
+import { isAuthError } from "./auth-error";
 
 export function hasConvexEnv() {
   return Boolean(
@@ -9,13 +11,7 @@ export function hasConvexEnv() {
   );
 }
 
-export function isAuthError(error: unknown) {
-  if (!(error instanceof Error)) {
-    return false;
-  }
-
-  return /unauthenticated|unauthorized|authentication/i.test(error.message);
-}
+export { isAuthError };
 
 export const convexAuthNextJs = hasConvexEnv()
   ? convexBetterAuthNextJs({
@@ -92,4 +88,10 @@ export async function fetchConvexAuthAction<Action extends FunctionReference<"ac
   }
 
   return convexAuthNextJs.fetchAuthAction(action, args as Action["_args"]);
+}
+
+// Rejects a caller without an active admin session. Call it before any work
+// that costs money or has side effects outside Convex, such as translation.
+export async function requireAdminSession() {
+  return fetchConvexAuthQuery(api.adminUsers.current, {});
 }

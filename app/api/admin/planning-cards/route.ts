@@ -5,6 +5,7 @@ import {
   fetchConvexAuthMutation,
   fetchConvexAuthQuery,
   isAuthError,
+  requireAdminSession,
 } from "@/lib/auth-server";
 import { PROGRESS_CACHE_TAG } from "@/lib/cache-tags";
 import { localizePlanningCardContent } from "@/lib/translation";
@@ -39,6 +40,7 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
+    await requireAdminSession();
     const card: PlanningCard = await request.json();
     const previous = card.id
       ? await fetchConvexAuthQuery(api.planningCards.getAdminById, { id: card.id })

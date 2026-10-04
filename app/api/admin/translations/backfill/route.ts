@@ -5,6 +5,7 @@ import {
   fetchConvexAuthMutation,
   fetchConvexAuthQuery,
   isAuthError,
+  requireAdminSession,
 } from "@/lib/auth-server";
 import { PROJECTS_CACHE_TAG, SITE_COPY_CACHE_TAG, STACK_CACHE_TAG } from "@/lib/cache-tags";
 import { localizeGlobalMetricContent, localizeProjectContent } from "@/lib/translation";
@@ -33,12 +34,17 @@ function toProjectInput(project: Project | Omit<Project, "id">) {
     aiSkills: project.aiSkills,
     tools: project.tools,
     timeframe: project.timeframe,
+    sector: project.sector,
+    commits: project.commits,
+    visits: project.visits,
+    growth: project.growth,
     url: project.url ?? null,
   };
 }
 
 export async function POST() {
   try {
+    await requireAdminSession();
     const projects = await fetchConvexAuthQuery(api.projects.listAdmin, {});
     const metrics = await fetchConvexAuthQuery(api.globalMetrics.list, { locale: "en" });
 

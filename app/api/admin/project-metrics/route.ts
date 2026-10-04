@@ -5,6 +5,7 @@ import {
   fetchConvexAuthMutation,
   fetchConvexAuthQuery,
   isAuthError,
+  requireAdminSession,
 } from "@/lib/auth-server";
 import { PROGRESS_CACHE_TAG } from "@/lib/cache-tags";
 import { localizeProjectMetricContent } from "@/lib/translation";
@@ -42,6 +43,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    await requireAdminSession();
     const metric: Omit<ProjectMetric, "id" | "created_at"> = await request.json();
     const previous = await fetchConvexAuthQuery(api.projectMetrics.getAdminByProjectMonth, {
       projectId: metric.project_id,

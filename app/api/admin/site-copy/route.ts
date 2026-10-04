@@ -6,6 +6,7 @@ import {
   fetchConvexAuthQuery,
   hasConvexEnv,
   isAuthError,
+  requireAdminSession,
 } from "@/lib/auth-server";
 import { SITE_COPY_CACHE_TAG } from "@/lib/cache-tags";
 import { DEFAULT_SITE_COPY, mergeSiteCopyEntries } from "@/lib/site-content";
@@ -54,6 +55,7 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
+    await requireAdminSession();
     const { key, en } = (await request.json()) as { key?: string; en?: string };
 
     if (!key || typeof en !== "string") {

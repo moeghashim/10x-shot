@@ -5,6 +5,7 @@ import {
   fetchConvexAuthMutation,
   fetchConvexAuthQuery,
   isAuthError,
+  requireAdminSession,
 } from "@/lib/auth-server";
 import { PROJECTS_CACHE_TAG, STACK_CACHE_TAG } from "@/lib/cache-tags";
 import { localizeProjectContent } from "@/lib/translation";
@@ -77,6 +78,7 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
+    await requireAdminSession();
     const project: Omit<Project, "id"> | Project = await request.json();
     const stackItems = await fetchConvexAuthQuery(api.stack.listAdmin, {});
     const projectForLocalization = {

@@ -5,6 +5,7 @@ import {
   fetchConvexAuthMutation,
   fetchConvexAuthQuery,
   isAuthError,
+  requireAdminSession,
 } from "@/lib/auth-server";
 import { localizeGlobalMetricContent } from "@/lib/translation";
 import type { GlobalMetric } from "@/types/database";
@@ -31,6 +32,7 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
+    await requireAdminSession();
     const metric: Omit<GlobalMetric, "id" | "created_at"> = await request.json();
     const previous = await fetchConvexAuthQuery(api.globalMetrics.getAdminByMonth, {
       month: metric.month,
