@@ -31,7 +31,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
     ...(['en', 'ar'] as const).flatMap(locale => [
       {
-        url: `${baseUrl}/${locale}/about`,
+        url: `${baseUrl}/${locale}/magic-follow`,
         changeFrequency: 'monthly' as const,
         priority: 0.7,
       },

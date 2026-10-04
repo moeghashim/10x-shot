@@ -4,19 +4,8 @@ import {
   fetchConvexAuthAction,
   fetchConvexAuthMutation,
   fetchConvexAuthQuery,
-  isAuthError,
 } from "@/lib/auth-server";
-
-function handleRouteError(error: unknown) {
-  if (isAuthError(error)) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
-  return NextResponse.json(
-    { error: error instanceof Error ? error.message : "Unexpected server error" },
-    { status: 500 }
-  );
-}
+import { handleRouteError } from "@/lib/route-error";
 
 export async function GET() {
   try {

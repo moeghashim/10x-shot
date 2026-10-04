@@ -129,14 +129,14 @@ function resolveStackLists(
   };
 }
 
-function resolveRequiredStackLists(stackItemIds: number[] | undefined, stackLookup: StackLookup) {
+function resolveRequiredStackLists(stackItemIds: number[] | undefined, stackLookup: StackLookup, fallback: { aiSkills: string[]; tools: string[] }) {
   const normalizedIds = normalizeStackItemIds(stackItemIds);
   const missingIds = normalizedIds.filter((id) => !stackLookup.has(id));
   if (missingIds.length > 0) {
     throw new ConvexError(`Unknown stack item ids: ${missingIds.join(", ")}`);
   }
 
-  return resolveStackLists(normalizedIds, stackLookup);
+  return resolveStackLists(normalizedIds, stackLookup, fallback);
 }
 
 function toLocalizationBundle(doc: any) {
@@ -202,6 +202,7 @@ function toProject(doc: any, locale: Locale = "en", stackLookup?: StackLookup) {
     visits: doc.visits,
     growth: doc.growth,
     progress: doc.progress,
+    launchDate: doc.launchDate,
     status: doc.status,
     stackItemIds: stack.stackItemIds,
     aiSkills: pickLocalizedList(doc.localizedAiSkills, locale, stack.aiSkills),
@@ -296,13 +297,14 @@ export const save = mutation({
 
     const stackDocs = await ctx.db.query("stackItems").collect();
     const stackLookup = buildStackLookup(stackDocs);
-    const resolvedStack = resolveRequiredStackLists(args.project.stackItemIds, stackLookup);
+    const resolvedStack = resolveRequiredStackLists(args.project.stackItemIds, stackLookup, args.project);
 
     const persistedProject = {
       ...args.project,
       stackItemIds: resolvedStack.stackItemIds,
       aiSkills: resolvedStack.aiSkills,
       tools: resolvedStack.tools,
+      ...(args.project.launchDate !== undefined ? { launchDate: args.project.launchDate || undefined } : {}),
       sector: args.project.sector?.trim() || undefined,
       commits: args.project.commits,
       visits: args.project.visits,
@@ -401,8 +403,18 @@ export const remove = mutation({
       .withIndex("by_project_month", (q) => q.eq("projectLegacyId", args.id))
       .collect();
 
-    for (const metric of metrics) {
-      await ctx.db.delete(metric._id);
+    // Legacy ids are reused after a delete, so everything keyed by this id must go with it.
+    const targets = await ctx.db
+      .query("projectMetricTargets")
+      .withIndex("by_project_month", (q) => q.eq("projectLegacyId", args.id))
+      .collect();
+    const planningCards = await ctx.db
+      .query("planningCards")
+      .withIndex("by_project", (q) => q.eq("projectLegacyId", args.id))
+      .collect();
+
+    for (const dependent of [...metrics, ...targets, ...planningCards]) {
+      await ctx.db.delete(dependent._id);
     }
 
     await ctx.db.delete(project._id);

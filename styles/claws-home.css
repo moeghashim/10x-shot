@@ -40,12 +40,16 @@
 .claws-label { color: var(--claws-muted); font-size: 10px; text-transform: uppercase; letter-spacing: .12em; }
 .claws-skip { position: fixed; inset-inline-start: 20px; top: -80px; padding: 12px; background: var(--claws-bg); z-index: 100; }
 .claws-skip:focus { top: 12px; }
-.claws-header { position: sticky; top: 0; z-index: 40; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 16px; padding: 14px var(--claws-pad); border-bottom: 1px solid var(--claws-line); background: var(--claws-bg); font-size: 12px; }
+.claws-header { position: sticky; top: 0; z-index: 40; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 16px; padding: 14px var(--claws-pad, 32px); border-bottom: 1px solid var(--claws-line, #E2E2E2); background: var(--claws-bg, #FFFFFF); color: var(--claws-ink, #0A0A0A); font-family: var(--font-jetbrains), var(--font-alexandria), monospace; font-size: 12px; line-height: 1.5; }
+.claws-header a { color: inherit; text-decoration: none; transition: opacity .15s; }
+.claws-header a:hover { opacity: .6; }
+.claws-header a:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
+html[dir="rtl"] .claws-header nav { letter-spacing: 0; }
 .claws-brand { display: inline-flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 500; letter-spacing: .06em; text-transform: uppercase; }
 .claws-brand img { flex: none; }
 .claws-home[data-theme="dark"] .claws-brand img { filter: invert(1); }
 .claws-header nav { display: flex; flex-wrap: wrap; gap: 10px 20px; font-size: 12px; text-transform: uppercase; letter-spacing: .08em; }
-.claws-language { border: 1px solid var(--claws-line); padding: 4px 10px; letter-spacing: .08em; }
+.claws-language { border: 1px solid var(--claws-line, #E2E2E2); padding: 4px 10px; letter-spacing: .08em; }
 .claws-hero { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); border-bottom: 1px solid var(--claws-line); }
 .claws-hero-copy { padding: 40px var(--claws-pad) 36px; border-inline-end: 1px solid var(--claws-line); display: flex; flex-direction: column; justify-content: space-between; gap: 32px; }
 .claws-kicker { display: flex; flex-wrap: wrap; gap: 8px 16px; font-size: 11px; }
@@ -84,7 +88,7 @@
 .claws-ledger-head, .claws-row { display: grid; grid-template-columns: 72px minmax(0, 1.2fr) minmax(0, 2fr) 100px 140px 120px; gap: 16px; }
 .claws-ledger-head { padding: 10px var(--claws-pad); border-bottom: 1px solid var(--claws-line); letter-spacing: .14em; }
 .claws-ledger-head > :last-child { text-align: end; }
-.claws-row { grid-template-areas: "id name brief status prog link"; align-items: start; padding: var(--claws-row-pad) var(--claws-pad); border-bottom: 1px solid var(--claws-line); transition: background .15s; }
+.claws-row { grid-template-areas: "id name brief status date link"; align-items: start; padding: var(--claws-row-pad) var(--claws-pad); border-bottom: 1px solid var(--claws-line); transition: background .15s; }
 .claws-row:hover { background: var(--claws-hover); }
 .claws-row > * { min-width: 0; }
 .claws-build { grid-area: id; color: var(--claws-muted); font-size: 12px; }
@@ -96,17 +100,14 @@
 .claws-tool { display: inline-flex; align-items: center; flex-wrap: wrap; gap: 7px; font-size: 10px; letter-spacing: .06em; padding: 2px 7px; border: 1px solid var(--claws-line); color: var(--claws-muted); max-width: 100%; overflow-wrap: anywhere; }
 .claws-grade { display: inline-flex; align-items: center; gap: 7px; }
 .claws-segments { display: inline-flex; gap: 2px; flex: none; }
-.claws-segments > span { width: 3px; height: 9px; background: var(--claws-line); }
-.claws-segments > span[data-filled="true"] { background: var(--claws-green); }
+.claws-segments > span { width: 3px; height: 9px; background: var(--claws-line, #E2E2E2); }
+.claws-segments > span[data-filled="true"] { background: var(--claws-green, #1F9D55); }
 .claws-grade-label { font-size: 10px; color: var(--claws-muted); }
 .claws-status { grid-area: status; display: flex; align-items: center; gap: 7px; font-size: 11px; text-transform: uppercase; letter-spacing: .1em; color: var(--claws-muted); }
 .claws-status[data-status="active"], .claws-status[data-status="completed"] { color: var(--claws-ink); }
 .claws-status > span { width: 6px; height: 6px; flex: none; background: currentColor; }
-.claws-progress { grid-area: prog; display: flex; flex-direction: column; gap: 6px; }
-.claws-progress > div:first-child { display: flex; justify-content: space-between; gap: 6px; font-size: 11px; }
-.claws-progress > div:first-child > span:last-child { color: var(--claws-muted); text-align: end; }
-.claws-progress-track { height: 4px; background: var(--claws-line); }
-.claws-progress-track > span { display: block; height: 100%; background: var(--claws-ink); }
+.claws-launch-date { grid-area: date; font-size: 11px; display: flex; flex-direction: column; gap: 4px; }
+.claws-date-label { display: none; }
 .claws-launch { grid-area: link; text-align: end; font-size: 11px; text-transform: uppercase; letter-spacing: .1em; }
 .claws-launch a { border-bottom: 1px solid var(--claws-ink); }
 .claws-launch > span { color: var(--claws-muted); }
@@ -165,6 +166,7 @@ html[dir="rtl"] .claws-home :is(.claws-label, .claws-status, .claws-launch, .cla
   .claws-header nav { gap: 10px 14px; }
 }
 @media (width < 760px) {
+  .claws-header { padding-inline: 20px; }
   .claws-home { --claws-pad: 20px; }
   .claws-home section { scroll-margin-top: 120px; }
   .claws-header nav { order: 3; flex-basis: 100%; }
@@ -175,8 +177,9 @@ html[dir="rtl"] .claws-home :is(.claws-label, .claws-status, .claws-launch, .cla
   .claws-stats > div { padding-inline: 14px; }
   .claws-stat { font-size: 40px; }
   .claws-ledger-head { display: none; }
-  .claws-row { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "id status" "name name" "brief brief" "prog prog" "link link"; gap: 12px; }
+  .claws-row { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "id status" "name name" "brief brief" "date date" "link link"; gap: 12px; }
   .claws-launch { text-align: start; }
+  .claws-date-label { display: block; color: var(--claws-muted); }
   .claws-stack-copy { border-inline-end: 0; border-bottom: 1px solid var(--claws-line); }
   .claws-nodes { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
   .claws-node { padding: 12px; gap: 6px; min-height: 0; }

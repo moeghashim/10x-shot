@@ -4,8 +4,9 @@ import { api } from "@/convex/_generated/api";
 import {
   fetchConvexAuthMutation,
   fetchConvexAuthQuery,
-  isAuthError,
+  requireAdminSession,
 } from "@/lib/auth-server";
+import { handleRouteError } from "@/lib/route-error";
 import { PROGRESS_CACHE_TAG } from "@/lib/cache-tags";
 import { localizePlanningCardContent } from "@/lib/translation";
 import type { PlanningCard } from "@/types/database";
@@ -15,17 +16,6 @@ function revalidateProgressViews() {
   revalidatePath("/progress");
   revalidatePath("/en/progress");
   revalidatePath("/ar/progress");
-}
-
-function handleRouteError(error: unknown) {
-  if (isAuthError(error)) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
-  return NextResponse.json(
-    { error: error instanceof Error ? error.message : "Unexpected server error" },
-    { status: 500 }
-  );
 }
 
 export async function GET() {
@@ -39,6 +29,7 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
+    await requireAdminSession();
     const card: PlanningCard = await request.json();
     const previous = card.id
       ? await fetchConvexAuthQuery(api.planningCards.getAdminById, { id: card.id })

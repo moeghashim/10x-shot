@@ -38,7 +38,6 @@ export default async function FuturePage({
   const { locale: routeLocale } = await params
   const locale = (routeLocale === "ar" ? "ar" : "en") as SupportedLocale
   const page = await getTranslations({ locale, namespace: "FuturePage" })
-  const nav = await getTranslations({ locale, namespace: "HomePage.stitch.nav" })
   const spec = normalizeFutureSpec(futureSpecs[locale])
   const validation = futureCatalog.validate(spec)
 
@@ -48,16 +47,7 @@ export default async function FuturePage({
 
   return (
     <div className="min-h-screen bg-[#f7f5f1] text-black selection:bg-black selection:text-white">
-      <StitchPublicHeader
-        locale={locale}
-        labels={{
-          projects: nav("projects"),
-          stack: nav("stack"),
-          future: nav("future"),
-          contact: nav("contact"),
-          progress: nav("progress"),
-        }}
-      />
+      <StitchPublicHeader locale={locale} />
 
       <main>
         <div className="border-b border-black/15 bg-white">

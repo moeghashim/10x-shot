@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Progress } from "@/components/ui/progress"
+import { LaunchDate } from "@/components/launch-date"
 import { SkillsDisplay } from "@/components/skills-display"
 import { Clock, TrendingUp, Play, Pause, ExternalLink } from "lucide-react"
 import { getProjectStatusStyles } from "@/lib/project-status"
@@ -49,10 +49,9 @@ export function ProjectCard({ project }: ProjectCardProps) {
 
         <div className="space-y-2">
           <div className="flex justify-between text-sm">
-            <span className="text-gray-600">Progress</span>
-            <span className="text-black font-medium">{project.progress}%</span>
+            <span className="text-gray-600">Launch date</span>
+            <span className="text-black font-medium"><LaunchDate value={project.launchDate} /></span>
           </div>
-          <Progress value={project.progress} className="h-2" />
         </div>
 
         {project.timeframe && (

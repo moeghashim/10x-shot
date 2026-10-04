@@ -5,8 +5,9 @@ import {
   fetchConvexAuthMutation,
   fetchConvexAuthQuery,
   hasConvexEnv,
-  isAuthError,
+  requireAdminSession,
 } from "@/lib/auth-server";
+import { handleRouteError } from "@/lib/route-error";
 import { SITE_COPY_CACHE_TAG } from "@/lib/cache-tags";
 import { DEFAULT_SITE_COPY, mergeSiteCopyEntries } from "@/lib/site-content";
 import { localizeSiteCopyEntry } from "@/lib/translation";
@@ -18,19 +19,6 @@ function revalidateSiteCopy() {
   revalidatePath("/ar");
   revalidatePath("/en/progress");
   revalidatePath("/ar/progress");
-}
-
-function handleRouteError(error: unknown) {
-  if (isAuthError(error)) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
-  return NextResponse.json(
-    {
-      error: error instanceof Error ? error.message : "Unexpected server error",
-    },
-    { status: 500 }
-  );
 }
 
 export async function GET() {
@@ -54,6 +42,7 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
+    await requireAdminSession();
     const { key, en } = (await request.json()) as { key?: string; en?: string };
 
     if (!key || typeof en !== "string") {

@@ -1,5 +1,7 @@
 "use client"
 
+import { useLocale } from "next-intl"
+import { LaunchDate } from "@/components/launch-date"
 import { useMemo, useState } from "react"
 import {
   Area,
@@ -10,7 +12,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts"
-import { format, parseISO } from "date-fns"
+import { format, isValid, parseISO } from "date-fns"
 import { BarChart3, CheckCircle2, DollarSign, Layers3, TrendingUp, Users } from "lucide-react"
 import type { GlobalMetric, PlanningCard, PlanningCardColumn, Project, ProjectMetric } from "@/types/database"
 
@@ -49,7 +51,7 @@ type ProgressDashboardStrings = {
     columns: Record<PlanningCardColumn, string>
   }
   project: string
-  progress: string
+  launchDate: string
 }
 
 type ChartPoint = {
@@ -67,8 +69,10 @@ type AchievementItem = {
 
 const columnOrder: PlanningCardColumn[] = ["todo", "doing", "done"]
 
-function parseMetricMonth(month: string) {
-  return parseISO(month.length === 7 ? `${month}-01` : month)
+// Months saved before write-time validation may be unparseable; show them as stored instead of throwing.
+function formatMetricMonth(month: string, pattern: string) {
+  const date = parseISO(month.length === 7 ? `${month}-01` : month)
+  return isValid(date) ? format(date, pattern) : month
 }
 
 function formatCurrency(value: number) {
@@ -103,7 +107,7 @@ function buildChartData(metrics: ProjectMetric[], selectedProjectId: number | "a
     .sort(([a], [b]) => a.localeCompare(b))
     .map(([month, sales]) => ({
       month,
-      label: format(parseMetricMonth(month), "MMM yyyy"),
+      label: formatMetricMonth(month, "MMM yyyy"),
       sales,
     }))
 }
@@ -119,7 +123,7 @@ function buildAchievements(
     .flatMap((metric) =>
       metric.achievements.map((achievement) => ({
         month: metric.month,
-        label: format(parseMetricMonth(metric.month), "MMMM yyyy"),
+        label: formatMetricMonth(metric.month, "MMMM yyyy"),
         projectTitle: projectById.get(metric.project_id)?.title ?? `Project ${metric.project_id}`,
         achievement,
       }))
@@ -140,6 +144,7 @@ export function ProgressDashboard({
   planningCards: PlanningCard[]
   strings: ProgressDashboardStrings
 }) {
+  const locale = useLocale()
   const [selectedProjectId, setSelectedProjectId] = useState<number | "all">("all")
   const projectById = useMemo(() => getProjectMap(projects), [projects])
   const chartData = useMemo(
@@ -412,12 +417,10 @@ export function ProgressDashboard({
                               </div>
                               <div>
                                 <div className="flex items-center justify-between gap-3 text-[11px] text-black/50">
-                                  <span>{strings.progress}</span>
-                                  <span>{project.progress}%</span>
+                                  <span>{strings.launchDate}</span>
+                                  <span><LaunchDate value={project.launchDate} locale={locale} /></span>
                                 </div>
-                                <div className="mt-2 h-1.5 bg-black/10">
-                                  <div className="h-full bg-black" style={{ width: `${project.progress}%` }} />
-                                </div>
+
                               </div>
                               {project.timeframe ? (
                                 <p className="stitch-mono text-[10px] uppercase tracking-[0.2em] text-black/45">
