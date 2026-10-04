@@ -1,6 +1,6 @@
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
-import { requireAdmin, toIsoString } from "./lib";
+import { assertMetricMonth, requireAdmin, toIsoString } from "./lib";
 import {
   globalMetricInputValidator,
   globalMetricLocalizationValidator,
@@ -107,6 +107,7 @@ export const save = mutation({
   },
   handler: async (ctx, args) => {
     const { profile } = await requireAdmin(ctx);
+    assertMetricMonth(args.metric.month);
     const now = Date.now();
     const existing = await ctx.db
       .query("globalMetrics")

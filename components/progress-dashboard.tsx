@@ -12,7 +12,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts"
-import { format, parseISO } from "date-fns"
+import { format, isValid, parseISO } from "date-fns"
 import { BarChart3, CheckCircle2, DollarSign, Layers3, TrendingUp, Users } from "lucide-react"
 import type { GlobalMetric, PlanningCard, PlanningCardColumn, Project, ProjectMetric } from "@/types/database"
 
@@ -69,8 +69,10 @@ type AchievementItem = {
 
 const columnOrder: PlanningCardColumn[] = ["todo", "doing", "done"]
 
-function parseMetricMonth(month: string) {
-  return parseISO(month.length === 7 ? `${month}-01` : month)
+// Months saved before write-time validation may be unparseable; show them as stored instead of throwing.
+function formatMetricMonth(month: string, pattern: string) {
+  const date = parseISO(month.length === 7 ? `${month}-01` : month)
+  return isValid(date) ? format(date, pattern) : month
 }
 
 function formatCurrency(value: number) {
@@ -105,7 +107,7 @@ function buildChartData(metrics: ProjectMetric[], selectedProjectId: number | "a
     .sort(([a], [b]) => a.localeCompare(b))
     .map(([month, sales]) => ({
       month,
-      label: format(parseMetricMonth(month), "MMM yyyy"),
+      label: formatMetricMonth(month, "MMM yyyy"),
       sales,
     }))
 }
@@ -121,7 +123,7 @@ function buildAchievements(
     .flatMap((metric) =>
       metric.achievements.map((achievement) => ({
         month: metric.month,
-        label: format(parseMetricMonth(metric.month), "MMMM yyyy"),
+        label: formatMetricMonth(metric.month, "MMMM yyyy"),
         projectTitle: projectById.get(metric.project_id)?.title ?? `Project ${metric.project_id}`,
         achievement,
       }))

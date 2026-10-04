@@ -1,6 +1,6 @@
 import { mutation, query } from "./_generated/server";
 import { ConvexError, v } from "convex/values";
-import { assertProjectMetricInput, requireAdmin, toIsoString } from "./lib";
+import { assertMetricMonth, assertProjectMetricInput, requireAdmin, toIsoString } from "./lib";
 import {
   projectMetricInputValidator,
   projectMetricLocalizationValidator,
@@ -34,7 +34,8 @@ function toLocalizationBundle(doc: any) {
   };
 }
 
-function toMetric(doc: any, locale: "en" | "ar" = "en") {
+// Notes are admin-only, so the public shape leaves them out.
+function toPublicMetric(doc: any, locale: "en" | "ar" = "en") {
   return {
     id: doc.legacyId,
     project_id: doc.projectLegacyId,
@@ -46,9 +47,12 @@ function toMetric(doc: any, locale: "en" | "ar" = "en") {
     ai_assistance_hours: doc.aiAssistanceHours,
     manual_hours: doc.manualHours,
     achievements: pickLocalizedList(doc.localizedAchievements, locale, doc.achievements ?? []),
-    notes: doc.notes,
     created_at: toIsoString(doc.createdAt),
   };
+}
+
+function toMetric(doc: any) {
+  return { ...toPublicMetric(doc), notes: doc.notes };
 }
 
 export const list = query({
@@ -80,7 +84,7 @@ export const listPublic = query({
     }
     return docs
       .sort((a, b) => b.month.localeCompare(a.month))
-      .map((doc) => toMetric(doc, locale));
+      .map((doc) => toPublicMetric(doc, locale));
   },
 });
 
@@ -117,6 +121,7 @@ export const save = mutation({
   },
   handler: async (ctx, args) => {
     const { profile } = await requireAdmin(ctx);
+    assertMetricMonth(args.metric.month);
     assertProjectMetricInput(args.metric);
 
     const now = Date.now();

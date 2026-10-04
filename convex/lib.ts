@@ -99,3 +99,11 @@ export function toIsoString(timestamp?: number | null) {
   }
   return new Date(timestamp).toISOString();
 }
+
+// Metric months are stored as strings and formatted on public pages, so an
+// unparseable value must be rejected at write time.
+export function assertMetricMonth(month: string) {
+  if (!isLaunchDate(month)) {
+    throw new ConvexError("Month must be a valid YYYY-MM month");
+  }
+}

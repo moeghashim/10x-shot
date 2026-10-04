@@ -403,8 +403,18 @@ export const remove = mutation({
       .withIndex("by_project_month", (q) => q.eq("projectLegacyId", args.id))
       .collect();
 
-    for (const metric of metrics) {
-      await ctx.db.delete(metric._id);
+    // Legacy ids are reused after a delete, so everything keyed by this id must go with it.
+    const targets = await ctx.db
+      .query("projectMetricTargets")
+      .withIndex("by_project_month", (q) => q.eq("projectLegacyId", args.id))
+      .collect();
+    const planningCards = await ctx.db
+      .query("planningCards")
+      .withIndex("by_project", (q) => q.eq("projectLegacyId", args.id))
+      .collect();
+
+    for (const dependent of [...metrics, ...targets, ...planningCards]) {
+      await ctx.db.delete(dependent._id);
     }
 
     await ctx.db.delete(project._id);

@@ -4,8 +4,8 @@ import { api } from "@/convex/_generated/api";
 import {
   fetchConvexAuthMutation,
   fetchConvexAuthQuery,
-  isAuthError,
 } from "@/lib/auth-server";
+import { handleRouteError } from "@/lib/route-error";
 import { PROJECTS_CACHE_TAG, STACK_CACHE_TAG } from "@/lib/cache-tags";
 import type { StackItem } from "@/types/database";
 
@@ -22,19 +22,6 @@ function revalidateStackViews() {
   revalidatePath("/ar");
   revalidatePath("/en/stack");
   revalidatePath("/ar/stack");
-}
-
-function handleRouteError(error: unknown) {
-  if (isAuthError(error)) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
-  return NextResponse.json(
-    {
-      error: error instanceof Error ? error.message : "Unexpected server error",
-    },
-    { status: 500 }
-  );
 }
 
 export async function GET() {
