@@ -29,7 +29,13 @@ function pathProxy(path) {
   });
 }
 
-export class AuthError extends Error {}
+// What requireAdmin throws for a caller with no session, as production returns it.
+function unauthenticated() {
+  const { ConvexError } = realRequire("convex/values");
+  const error = new ConvexError("[Request ID: test] Server Error");
+  error.data = "Unauthenticated";
+  return error;
+}
 
 // Convex queries with no requireAdmin guard. They answer a signed-out caller.
 const PUBLIC_QUERIES = { "siteContent.getByKey": () => null, "globalMetrics.list": () => [] };
@@ -42,12 +48,14 @@ export function adminRouteModules({ signedIn, convex = {}, translation = {} }) {
     const path = String(ref);
     calls.push({ path, args });
     if (!signedIn && path in PUBLIC_QUERIES) return PUBLIC_QUERIES[path](args);
-    if (!signedIn) throw new AuthError("Unauthenticated");
+    if (!signedIn) throw unauthenticated();
     if (!(path in convex)) throw new Error(`No mock for ${path}`);
     return convex[path](args);
   };
+  const nextServer = { NextResponse: { json: (body, init) => ({ body, status: init?.status ?? 200 }) } };
   const modules = {
-    "next/server": { NextResponse: { json: (body, init) => ({ body, status: init?.status ?? 200 }) } },
+    "next/server": nextServer,
+    "@/lib/route-error": loadModule("lib/route-error.ts", { "next/server": nextServer }),
     "next/cache": { revalidatePath() {}, revalidateTag() {} },
     "@/convex/_generated/api": { api: pathProxy("") },
     "@/lib/auth-server": {
@@ -56,7 +64,6 @@ export function adminRouteModules({ signedIn, convex = {}, translation = {} }) {
       fetchConvexAuthAction: run,
       requireAdminSession: () => run("adminUsers.current", {}),
       hasConvexEnv: () => true,
-      isAuthError: (error) => error instanceof AuthError,
     },
     "@/lib/cache-tags": {},
     "@/lib/site-content": { DEFAULT_SITE_COPY: {}, mergeSiteCopyEntries: (entries) => entries },

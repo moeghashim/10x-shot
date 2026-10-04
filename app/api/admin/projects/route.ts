@@ -4,9 +4,9 @@ import { api } from "@/convex/_generated/api";
 import {
   fetchConvexAuthMutation,
   fetchConvexAuthQuery,
-  isAuthError,
   requireAdminSession,
 } from "@/lib/auth-server";
+import { handleRouteError } from "@/lib/route-error";
 import { PROJECTS_CACHE_TAG, STACK_CACHE_TAG } from "@/lib/cache-tags";
 import { localizeProjectContent } from "@/lib/translation";
 import type { Project, StackItem } from "@/types/database";
@@ -52,19 +52,6 @@ function toProjectInput(project: Omit<Project, "id"> | Project, stackItems: Stac
     growth: project.growth,
     url: project.url ?? null,
   };
-}
-
-function handleRouteError(error: unknown) {
-  if (isAuthError(error)) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
-  return NextResponse.json(
-    {
-      error: error instanceof Error ? error.message : "Unexpected server error",
-    },
-    { status: 500 }
-  );
 }
 
 export async function GET() {

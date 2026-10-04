@@ -11,8 +11,6 @@ export function hasConvexEnv() {
   );
 }
 
-export { isAuthError };
-
 export const convexAuthNextJs = hasConvexEnv()
   ? convexBetterAuthNextJs({
       convexUrl: process.env.NEXT_PUBLIC_CONVEX_URL!,
