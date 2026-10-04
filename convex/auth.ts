@@ -1,5 +1,5 @@
 import { components, internal } from "./_generated/api";
-import { action, internalAction, query } from "./_generated/server";
+import { internalAction, query } from "./_generated/server";
 import { createClient, type GenericCtx } from "@convex-dev/better-auth";
 import { convex } from "@convex-dev/better-auth/plugins";
 import { betterAuth, type BetterAuthOptions } from "better-auth/minimal";
@@ -37,8 +37,10 @@ export const createAuthOptions = (ctx: GenericCtx<DataModel>) => {
       ].filter((origin): origin is string => Boolean(origin))
     )
   );
-  const secret =
-    process.env.BETTER_AUTH_SECRET || "change-me-before-production";
+  const secret = process.env.BETTER_AUTH_SECRET;
+  if (!secret) {
+    throw new Error("BETTER_AUTH_SECRET is not set on this Convex deployment");
+  }
 
   return {
     baseURL: siteUrl,
@@ -74,22 +76,6 @@ export const getCurrentUser = query({
   args: {},
   handler: async (ctx) => {
     return authComponent.safeGetAuthUser(ctx);
-  },
-});
-
-export const signInWithEmail = action({
-  args: {
-    email: v.string(),
-    password: v.string(),
-  },
-  handler: async (ctx, args) => {
-    const auth = createAuth(ctx);
-    return auth.api.signInEmail({
-      body: {
-        email: args.email,
-        password: args.password,
-      },
-    });
   },
 });
 

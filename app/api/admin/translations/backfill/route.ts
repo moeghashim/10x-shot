@@ -4,22 +4,12 @@ import { api } from "@/convex/_generated/api";
 import {
   fetchConvexAuthMutation,
   fetchConvexAuthQuery,
-  isAuthError,
+  requireAdminSession,
 } from "@/lib/auth-server";
+import { handleRouteError } from "@/lib/route-error";
 import { PROJECTS_CACHE_TAG, SITE_COPY_CACHE_TAG, STACK_CACHE_TAG } from "@/lib/cache-tags";
 import { localizeGlobalMetricContent, localizeProjectContent } from "@/lib/translation";
 import type { GlobalMetric, Project } from "@/types/database";
-
-function handleRouteError(error: unknown) {
-  if (isAuthError(error)) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
-  return NextResponse.json(
-    { error: error instanceof Error ? error.message : "Unexpected server error" },
-    { status: 500 }
-  );
-}
 
 function toProjectInput(project: Project | Omit<Project, "id">) {
   return {
@@ -33,12 +23,17 @@ function toProjectInput(project: Project | Omit<Project, "id">) {
     aiSkills: project.aiSkills,
     tools: project.tools,
     timeframe: project.timeframe,
+    sector: project.sector,
+    commits: project.commits,
+    visits: project.visits,
+    growth: project.growth,
     url: project.url ?? null,
   };
 }
 
 export async function POST() {
   try {
+    await requireAdminSession();
     const projects = await fetchConvexAuthQuery(api.projects.listAdmin, {});
     const metrics = await fetchConvexAuthQuery(api.globalMetrics.list, { locale: "en" });
 

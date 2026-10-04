@@ -4,22 +4,12 @@ import { api } from "@/convex/_generated/api";
 import {
   fetchConvexAuthMutation,
   fetchConvexAuthQuery,
-  isAuthError,
+  requireAdminSession,
 } from "@/lib/auth-server";
+import { handleRouteError } from "@/lib/route-error";
 import { PROGRESS_CACHE_TAG } from "@/lib/cache-tags";
 import { localizeProjectMetricContent } from "@/lib/translation";
 import type { ProjectMetric } from "@/types/database";
-
-function handleRouteError(error: unknown) {
-  if (isAuthError(error)) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
-  return NextResponse.json(
-    { error: error instanceof Error ? error.message : "Unexpected server error" },
-    { status: 500 }
-  );
-}
 
 function revalidateProgressViews() {
   revalidateTag(PROGRESS_CACHE_TAG);
@@ -42,6 +32,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    await requireAdminSession();
     const metric: Omit<ProjectMetric, "id" | "created_at"> = await request.json();
     const previous = await fetchConvexAuthQuery(api.projectMetrics.getAdminByProjectMonth, {
       projectId: metric.project_id,

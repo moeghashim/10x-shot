@@ -74,6 +74,14 @@ export const updateProfile = mutation({
       throw new ConvexError("Admin user not found");
     }
 
+    if (existing.isActive && !args.isActive) {
+      const profiles = await ctx.db.query("adminProfiles").collect();
+      const otherActiveAdmin = profiles.some((candidate) => candidate.isActive && candidate._id !== existing._id);
+      if (!otherActiveAdmin) {
+        throw new ConvexError("Cannot deactivate the last active admin");
+      }
+    }
+
     await ctx.db.patch(existing._id, {
       fullName: args.fullName,
       isActive: args.isActive,

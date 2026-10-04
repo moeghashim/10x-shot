@@ -4,21 +4,11 @@ import { api } from "@/convex/_generated/api";
 import {
   fetchConvexAuthMutation,
   fetchConvexAuthQuery,
-  isAuthError,
+  requireAdminSession,
 } from "@/lib/auth-server";
+import { handleRouteError } from "@/lib/route-error";
 import { localizeGlobalMetricContent } from "@/lib/translation";
 import type { GlobalMetric } from "@/types/database";
-
-function handleRouteError(error: unknown) {
-  if (isAuthError(error)) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
-  return NextResponse.json(
-    { error: error instanceof Error ? error.message : "Unexpected server error" },
-    { status: 500 }
-  );
-}
 
 export async function GET() {
   try {
@@ -31,6 +21,7 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
+    await requireAdminSession();
     const metric: Omit<GlobalMetric, "id" | "created_at"> = await request.json();
     const previous = await fetchConvexAuthQuery(api.globalMetrics.getAdminByMonth, {
       month: metric.month,

@@ -1,6 +1,6 @@
 import { mutation, query } from "./_generated/server";
 import { ConvexError, v } from "convex/values";
-import { assertProjectMetricTargetInput, requireAdmin, toIsoString } from "./lib";
+import { assertMetricMonth, assertProjectMetricTargetInput, requireAdmin, toIsoString } from "./lib";
 import { projectMetricTargetInputValidator } from "./validators";
 
 function toTarget(doc: any) {
@@ -44,6 +44,7 @@ export const saveMany = mutation({
     const now = Date.now();
 
     for (const target of args.targets) {
+      assertMetricMonth(target.month);
       assertProjectMetricTargetInput(target);
 
       const existing = await ctx.db
