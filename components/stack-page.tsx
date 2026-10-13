@@ -1,282 +1,140 @@
 "use client"
 
-import { useState } from "react"
-import { ArrowUpRight, Layers3, Table2 } from "lucide-react"
+import { useRef, useState } from "react"
 import Image from "next/image"
 import { Link } from "@/i18n/routing"
 import { StitchPublicHeader } from "@/components/stitch-public-header"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Sheet, SheetClose, SheetContent, SheetDescription, SheetTitle } from "@/components/ui/sheet"
+import { GradeBar } from "@/components/grade-bar"
+import { getStackLogo } from "@/lib/stack-logos"
 import type { StackFamiliarity, SupportedLocale } from "@/types/database"
 import type { PublicStackItem } from "@/lib/home/project-presentation"
-import { GradeBar } from "@/components/grade-bar"
+import "@/styles/stack-tier.css"
 
 type StackPageProps = {
   locale: SupportedLocale
   stackItems: PublicStackItem[]
   strings: {
-    title: string
-    description: string
-    eyebrow: string
-    grade: string
-    familiarity: string
-    reason: string
-    useCase: string
-    category: string
-    usage: string
-    noProjects: string
-    empty: string
-    backToProjects: string
-    stack: string
-    views: {
-      cards: string
-      matrix: string
-    }
-    categories: {
-      tool: string
-      ai_skill: string
-    }
+    title: string; description: string; eyebrow: string; grade: string
+    familiarity: string; reason: string; useCase: string; category: string
+    usage: string; noProjects: string; empty: string; backToProjects: string
+    stack: string; views: { cards: string; matrix: string }
+    categories: { tool: string; ai_skill: string }
     familiarityLevels: Record<StackFamiliarity, string>
-    nav: {
-      progress: string
-      home: string
-    }
+    nav: { progress: string; home: string }
   }
 }
 
 export function StackPage({ locale, stackItems, strings }: StackPageProps) {
-  const [view, setView] = useState<"cards" | "matrix">("matrix")
-  const projectHref = (project: { url?: string | null }) => project.url || `/${locale}#projects`
-  const getFamiliarityLabel = (familiarity?: StackFamiliarity) =>
-    familiarity ? strings.familiarityLevels[familiarity] : (locale === "ar" ? "غير مسجّل" : "Not recorded")
+  const ar = locale === "ar"
+  const [category, setCategory] = useState("all")
+  const [selected, setSelected] = useState<PublicStackItem | null>(null)
+  const triggerRef = useRef<HTMLButtonElement | null>(null)
+  const copy = ar ? {
+    all: "الكل", tools: "الأدوات", skills: "مهارات الذكاء الاصطناعي", ungraded: "غير مقيّم",
+    hint: "اختر أداة لمعرفة أين وكيف أستخدمها.", unrated: "لم تُقيّم الأدوات في هذا المستوى بعد.",
+    close: "إغلاق", follow: "متابعات مميزة", skill: "مهارة مخصصة", details: "تفاصيل الأداة",
+    ratings: "التقييمات من كتالوج الأدوات. الأدوات غير المقيّمة تظهر في صف مستقل.",
+  } : {
+    all: "All", tools: "Tools", skills: "AI skills", ungraded: "Ungraded",
+    hint: "Select a tool to see where and how I use it.", unrated: "No tools rated in this tier yet.",
+    close: "Close", follow: "Magic follow", skill: "Custom skill", details: "Tool details",
+    ratings: "Ratings come from the Stack Catalog. Unrated tools live in their own row.",
+  }
+  const filtered = stackItems.filter((item) => category === "all" || item.category === category)
+  const tiers = ["A", "B", "C", "D", "E", ...(stackItems.some((item) => item.grade === "F") ? ["F"] : []), "U"]
+  const logo = selected ? getStackLogo(selected.name) : null
 
   return (
-    <div className="min-h-screen bg-[#f7f5f1] text-black selection:bg-black selection:text-white">
+    <div className="claws-home stack-tier-page" data-theme="dark" dir={ar ? "rtl" : "ltr"}>
+      <a className="claws-skip" href="#stack-board">{strings.stack}</a>
       <StitchPublicHeader locale={locale} />
-
       <main>
-        <section className="border-b border-black/15">
-          <div className="mx-auto max-w-7xl px-6 py-16 md:px-10 md:py-24">
-            <div className="grid gap-12 lg:grid-cols-[minmax(0,1fr)_320px] lg:items-end">
-              <div>
-                <p className="stitch-mono text-[10px] uppercase tracking-[0.35em] text-black/55">{strings.eyebrow}</p>
-                <h1 className="stitch-display mt-4 text-[clamp(3rem,11vw,6.5rem)] font-semibold uppercase leading-[0.9] tracking-[-0.11em] text-black">
-                  {strings.title}
-                </h1>
-                <p className="mt-6 max-w-2xl text-base leading-7 text-black/68 md:text-lg">{strings.description}</p>
-              </div>
-
-              <div className="border border-black/15 bg-white p-6 md:p-8">
-                <div className="flex items-center justify-between border-b border-black/10 pb-5">
-                  <p className="stitch-mono text-[10px] uppercase tracking-[0.3em] text-black/45">{strings.usage}</p>
-                  <Layers3 className="h-4 w-4 text-black/60" />
-                </div>
-                <div className="mt-6 space-y-4">
-                  <div>
-                    <p className="stitch-mono text-[10px] uppercase tracking-[0.3em] text-black/45">{strings.title}</p>
-                    <p className="stitch-display mt-3 text-4xl font-semibold uppercase tracking-[-0.08em]">
-                      {stackItems.length}
-                    </p>
-                  </div>
-                  <div className="grid gap-4 border-t border-black/10 pt-4 sm:grid-cols-2">
-                    <div>
-                      <p className="stitch-mono text-[10px] uppercase tracking-[0.3em] text-black/45">{strings.categories.tool}</p>
-                      <p className="stitch-display mt-2 text-2xl font-semibold uppercase tracking-[-0.08em]">
-                        {stackItems.filter((item) => item.category === "tool").length}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="stitch-mono text-[10px] uppercase tracking-[0.3em] text-black/45">{strings.categories.ai_skill}</p>
-                      <p className="stitch-display mt-2 text-2xl font-semibold uppercase tracking-[-0.08em]">
-                        {stackItems.filter((item) => item.category === "ai_skill").length}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+        <section className="stack-tier-intro">
+          <div>
+            <p className="claws-label">{strings.eyebrow}</p>
+            <h1>{strings.title}</h1>
+            <p className="stack-tier-description">{strings.description}</p>
+          </div>
+          <div className="stack-tier-total">
+            <span>{stackItems.length}</span>
+            <p className="claws-label">{copy.tools} / {copy.skills}</p>
           </div>
         </section>
-
-        <section className="bg-white">
-          <div className="mx-auto max-w-7xl px-6 py-12 md:px-10 md:py-16">
-            {stackItems.length > 0 ? (
-              <Tabs value={view} onValueChange={(value) => setView(value as "cards" | "matrix")} className="space-y-6">
-                <TabsList className="border border-black/15 bg-[#f3f1ed] p-1">
-                  <TabsTrigger value="matrix" className="stitch-mono text-[10px] uppercase tracking-[0.28em]">
-                    <Table2 className="mr-2 h-3.5 w-3.5" />
-                    {strings.views.matrix}
-                  </TabsTrigger>
-                  <TabsTrigger value="cards" className="stitch-mono text-[10px] uppercase tracking-[0.28em]">
-                    {strings.views.cards}
-                  </TabsTrigger>
-                </TabsList>
-
-                <TabsContent value="cards" className="mt-0">
-                  <div className="grid gap-px border border-black/15 bg-black/15 lg:grid-cols-2">
-                    {stackItems.map((item) => (
-                      <article key={item.id} className="flex h-full flex-col gap-6 bg-white p-6 md:p-8">
-                        <div className="flex flex-wrap items-start justify-between gap-4">
-                          <div>
-                            <p className="stitch-mono text-[10px] uppercase tracking-[0.32em] text-black/45">{strings.category}</p>
-                            <h2 className="stitch-display mt-3 text-3xl font-semibold uppercase tracking-[-0.08em] text-black">
-                              {item.name}
-                            </h2>
-                          </div>
-                          <div className="flex flex-wrap gap-2">
-                            <span className="stitch-mono inline-flex border border-black/15 px-3 py-2 text-[10px] uppercase tracking-[0.28em] text-black/65">
-                              {strings.categories[item.category]}
-                            </span>
-                            <GradeBar grade={item.grade} ar={locale === "ar"} node />
-                            <span className="stitch-mono inline-flex border border-black bg-[#f3f1ed] px-3 py-2 text-[10px] uppercase tracking-[0.28em] text-black">
-                              {getFamiliarityLabel(item.familiarity)}
-                            </span>
-                          </div>
-                        </div>
-
-                        {item.reason ? (
-                          <div className="border-l border-black pl-4">
-                            <p className="stitch-mono text-[10px] uppercase tracking-[0.3em] text-black/45">{strings.reason}</p>
-                            <p className="mt-2 text-sm leading-7 text-black/72">{item.reason}</p>
-                          </div>
-                        ) : null}
-
-                        {item.notes ? <p className="text-sm leading-7 text-black/68">{item.notes}</p> : null}
-
-                        <div>
-                          <p className="stitch-mono text-[10px] uppercase tracking-[0.3em] text-black/45">{strings.usage}</p>
-                          <p className="stitch-display mt-2 text-2xl font-semibold uppercase tracking-[-0.08em]">{item.usageCount}</p>
-                        </div>
-
-                        <div className="space-y-3 border-t border-black/10 pt-4">
-                          <p className="stitch-mono text-[10px] uppercase tracking-[0.3em] text-black/45">{strings.backToProjects}</p>
-                          {item.projects.length > 0 ? (
-                            <div className="flex flex-wrap gap-2">
-                              {item.projects.map((project) => (
-                                <a
-                                  key={`${item.id}-${project.id}`}
-                                  href={projectHref(project)}
-                                  target={project.url ? "_blank" : undefined}
-                                  rel={project.url ? "noreferrer" : undefined}
-                                  className="stitch-mono inline-flex items-center gap-2 border border-black/15 px-3 py-2 text-[10px] uppercase tracking-[0.28em] text-black transition-colors hover:border-black"
-                                >
-                                  {project.title}
-                                  {project.url ? <ArrowUpRight className="h-3.5 w-3.5" /> : null}
-                                </a>
-                              ))}
-                            </div>
-                          ) : (
-                            <p className="text-sm text-black/55">{strings.noProjects}</p>
-                          )}
-                        </div>
-                      </article>
-                    ))}
-                  </div>
-                </TabsContent>
-
-                <TabsContent value="matrix" className="mt-0">
-                  <div className="overflow-x-auto border border-black/15">
-                    <table className="min-w-full border-collapse bg-white text-sm">
-                      <thead className="bg-[#f3f1ed]">
-                        <tr className="border-b border-black/15">
-                          <th className="sticky left-0 z-20 min-w-[240px] border-r border-black/15 bg-[#f3f1ed] px-4 py-4 text-left">
-                            <span className="stitch-mono text-[10px] uppercase tracking-[0.28em] text-black/60">{strings.stack}</span>
-                          </th>
-                          <th className="min-w-[180px] border-r border-black/15 px-4 py-4 text-left">
-                            <span className="stitch-mono text-[10px] uppercase tracking-[0.28em] text-black/60">{strings.useCase}</span>
-                          </th>
-                          <th className="min-w-[120px] border-r border-black/15 px-4 py-4 text-left">
-                            <span className="stitch-mono text-[10px] uppercase tracking-[0.28em] text-black/60">{strings.category}</span>
-                          </th>
-                          <th className="min-w-[100px] border-r border-black/15 px-4 py-4 text-left">
-                            <span className="stitch-mono text-[10px] uppercase tracking-[0.28em] text-black/60">{strings.grade}</span>
-                          </th>
-                          <th className="min-w-[150px] border-r border-black/15 px-4 py-4 text-left">
-                            <span className="stitch-mono text-[10px] uppercase tracking-[0.28em] text-black/60">{strings.familiarity}</span>
-                          </th>
-                          <th className="min-w-[120px] border-r border-black/15 px-4 py-4 text-left">
-                            <span className="stitch-mono text-[10px] uppercase tracking-[0.28em] text-black/60">{strings.usage}</span>
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {stackItems.map((item) => (
-                          <tr key={item.id} className="border-b border-black/10 last:border-b-0">
-                            <td className="sticky left-0 z-10 border-r border-black/15 bg-white px-4 py-4 align-top">
-                              <div className="space-y-3">
-                                <p className="font-medium text-black">{item.name}</p>
-                                {item.notes ? <p className="text-xs leading-6 text-black/55">{item.notes}</p> : null}
-                                {item.projects.length > 0 ? (
-                                  <div className="flex flex-wrap gap-2 pt-1">
-                                    {item.projects.map((project) => (
-                                      <a
-                                        key={`${item.id}-${project.id}`}
-                                        href={projectHref(project)}
-                                        target={project.url ? "_blank" : undefined}
-                                        rel={project.url ? "noreferrer" : undefined}
-                                        className="stitch-mono inline-flex items-center gap-1.5 border border-black/15 px-2.5 py-1.5 text-[9px] uppercase tracking-[0.22em] text-black transition-colors hover:border-black"
-                                      >
-                                        {project.title}
-                                        {project.url ? <ArrowUpRight className="h-3 w-3" /> : null}
-                                      </a>
-                                    ))}
-                                  </div>
-                                ) : null}
-                              </div>
-                            </td>
-                            <td className="border-r border-black/15 px-4 py-4 align-top">
-                              <p className="text-sm leading-6 text-black/70">{item.reason || "-"}</p>
-                            </td>
-                            <td className="border-r border-black/15 px-4 py-4 align-top">
-                              <span className="stitch-mono inline-flex border border-black/15 px-3 py-2 text-[10px] uppercase tracking-[0.28em] text-black/65">
-                                {strings.categories[item.category]}
-                              </span>
-                            </td>
-                            <td className="border-r border-black/15 px-4 py-4 align-top">
-                              <GradeBar grade={item.grade} ar={locale === "ar"} node />
-                            </td>
-                            <td className="border-r border-black/15 px-4 py-4 align-top">
-                              <span className="stitch-mono inline-flex border border-black/15 px-3 py-2 text-[10px] uppercase tracking-[0.28em] text-black/65">
-                                {getFamiliarityLabel(item.familiarity)}
-                              </span>
-                            </td>
-                            <td className="border-r border-black/15 px-4 py-4 align-top">
-                              <span className="stitch-display text-xl font-semibold uppercase tracking-[-0.08em] text-black">{item.usageCount}</span>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </TabsContent>
-              </Tabs>
-            ) : (
-              <div className="border border-black/15 bg-white px-6 py-12 text-center">
-                <p className="stitch-mono text-[10px] uppercase tracking-[0.32em] text-black/45">{strings.empty}</p>
-              </div>
-            )}
+        <section className="stack-tier-inventory" id="stack-board" aria-label={strings.stack}>
+          <div className="stack-tier-toolbar">
+            <div className="stack-tier-filters" role="group" aria-label={strings.category}>
+              {[["all", copy.all], ["tool", copy.tools], ["ai_skill", copy.skills]].map(([value, label]) => (
+                <button key={value} type="button" aria-pressed={category === value} onClick={() => setCategory(value)}>
+                  {label}<span>{value === "all" ? stackItems.length : stackItems.filter((item) => item.category === value).length}</span>
+                </button>
+              ))}
+            </div>
+            <p>{copy.hint}</p>
           </div>
+          {filtered.length ? (
+            <div className="stack-tier-board">
+              {tiers.map((tier) => {
+                const items = filtered.filter((item) => (item.grade ?? "U") === tier)
+                return (
+                  <section key={tier} className="stack-tier-row" data-tier={tier} data-empty={!items.length} aria-label={tier === "U" ? copy.ungraded : `${strings.grade} ${tier}`}>
+                    <div className="stack-tier-rank">
+                      <h2 dir="ltr">{tier === "U" ? "—" : tier}</h2>
+                      <span>{items.length}</span>
+                      {tier === "U" && <small>{copy.ungraded}</small>}
+                    </div>
+                    {items.length ? (
+                      <div className="stack-tier-tiles">
+                        {items.map((item) => {
+                          const asset = getStackLogo(item.name)
+                          return (
+                            <button type="button" key={item.id} className="stack-tier-tile" aria-label={`${item.name} — ${copy.details}`} aria-haspopup="dialog" onClick={(event) => { triggerRef.current = event.currentTarget; setSelected(item) }}>
+                              <span className="stack-tier-logo"><Image src={asset.src} alt="" width={64} height={64} unoptimized /></span>
+                              <b dir="auto">{item.name}</b>
+                              <span className="stack-tier-domain" dir={asset.domain ? "ltr" : undefined}>{asset.domain || copy.skill}</span>
+                            </button>
+                          )
+                        })}
+                      </div>
+                    ) : <p className="stack-tier-empty">{copy.unrated}</p>}
+                  </section>
+                )
+              })}
+            </div>
+          ) : <p className="stack-tier-empty">{strings.empty}</p>}
+          <p className="stack-tier-note">{copy.ratings}</p>
         </section>
       </main>
-
-      <footer className="border-t border-black/15 bg-[#f7f5f1]">
-        <div className="mx-auto flex max-w-7xl flex-col gap-5 px-6 py-6 md:flex-row md:items-center md:justify-between md:px-10">
-          <div className="flex items-center gap-3">
-            <Image src="/10claws.svg" alt="10 Claws logo" width={40} height={40} className="h-10 w-10" />
-            <div>
-              <p className="stitch-display text-xl font-semibold uppercase tracking-[-0.08em] text-black">10 Claws</p>
-              <p className="mt-2 text-sm text-black/62">{strings.description}</p>
-            </div>
-          </div>
-          <div className="flex flex-wrap items-center gap-5">
-            <Link className="stitch-mono text-[10px] uppercase tracking-[0.28em] text-black/55 transition-colors hover:text-black" href="/">
-              {strings.nav.home}
-            </Link>
-            <Link className="stitch-mono text-[10px] uppercase tracking-[0.28em] text-black/55 transition-colors hover:text-black" href="/progress">
-              {strings.nav.progress}
-            </Link>
-          </div>
-        </div>
+      <footer className="stack-tier-footer">
+        <Link href="/" className="claws-brand"><Image src="/10claws.svg" alt="" width={18} height={18} /><bdi>10 CLAWS</bdi></Link>
+        <nav aria-label={ar ? "روابط التذييل" : "Footer"}>
+          <Link href="/">{strings.nav.home}</Link>
+          <Link href="/magic-follow">{copy.follow}</Link>
+          <Link href="/track">{ar ? "التتبع" : "Track"}</Link>
+        </nav>
       </footer>
+      <Sheet open={!!selected} onOpenChange={(open) => { if (!open) setSelected(null) }}>
+        <SheetContent side={ar ? "left" : "right"} showCloseButton={false} className="claws-home stack-tier-detail" data-theme="dark" dir={ar ? "rtl" : "ltr"} onCloseAutoFocus={(event) => { event.preventDefault(); triggerRef.current?.focus() }}>
+          {selected && logo && <>
+            <div className="stack-tier-detail-top"><p className="claws-label">{copy.details}</p><SheetClose className="stack-tier-close">{copy.close} ×</SheetClose></div>
+            <Image className="stack-tier-detail-logo" src={logo.src} alt="" width={72} height={72} unoptimized />
+            <SheetTitle className="stack-tier-detail-title" dir="auto">{selected.name}</SheetTitle>
+            <SheetDescription className="stack-tier-detail-description">{selected.reason || strings.categories[selected.category]}</SheetDescription>
+            {selected.notes && <p className="stack-tier-detail-notes">{selected.notes}</p>}
+            <dl className="stack-tier-facts">
+              <div><dt>{strings.grade}</dt><dd><GradeBar grade={selected.grade} ar={ar} node /></dd></div>
+              <div><dt>{strings.familiarity}</dt><dd>{selected.familiarity ? strings.familiarityLevels[selected.familiarity] : (ar ? "غير مسجّل" : "Not recorded")}</dd></div>
+              <div><dt>{strings.usage}</dt><dd>{selected.usageCount}</dd></div>
+            </dl>
+            <p className="claws-label">{strings.backToProjects}</p>
+            <div className="stack-tier-projects">
+              {selected.projects.map((project) => <a key={project.id} href={project.url || `/${locale}#projects`} target={project.url ? "_blank" : undefined} rel={project.url ? "noreferrer" : undefined}>{project.title}<span aria-hidden="true">↗</span></a>)}
+              {!selected.projects.length && <p>{strings.noProjects}</p>}
+            </div>
+            {logo.domain && <a className="stack-tier-visit" href={`https://${logo.domain}`} target="_blank" rel="noreferrer"><bdi>{logo.domain}</bdi><span aria-hidden="true">↗</span></a>}
+          </>}
+        </SheetContent>
+      </Sheet>
     </div>
   )
 }
