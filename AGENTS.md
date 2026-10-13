@@ -21,7 +21,7 @@
 - Use path aliases like `@/components`, `@/lib`, and `@/types` instead of deep relative paths.
 
 ## Testing Guidelines
-- No `test` script is defined; tests are standalone scripts in `tests/`.
+- `pnpm test` runs the `node --test` files in `tests/`.
 - Example: `tests/project-update.test.ts` checks persisted project updates and requires `.env.local`. Run via a TS-capable runner.
 
 ## Commit & Pull Request Guidelines

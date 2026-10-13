@@ -5,7 +5,7 @@ description: "Prove behaviour of the 10x Next.js app by launching it locally and
 
 # Verify 10x
 
-The app is a Next.js 15 site with `en` and `ar` locales, backed by Convex. A user touches the public pages (`/`, `/stack`, `/progress`, `/future`, `/track`, `/magic-follow`) and an admin dashboard at `/admin`.
+The app is a Next.js 15 site with `en` and `ar` locales, backed by Convex. A user touches the public pages (`/`, `/stack`, `/assistants`, `/progress`, `/future`, `/track`, `/magic-follow`) and an admin dashboard at `/admin`.
 
 **The app's envs point at the production Convex deployment.** This skill only sends GET requests. Never POST, PATCH or DELETE to `/api/admin/*` from here, never sign in, and never run the translation backfill or stack migrate routes. To prove a write path, call the route and Convex handlers against an in-memory database in a `node --test` file instead.
 
