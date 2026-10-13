@@ -1,6 +1,12 @@
 type StackLogo = { file: string; domain?: string; custom?: boolean }
 
 const logos: Record<string, StackLogo> = {
+  openclaw: { file: "openclaw-color", domain: "openclaw.ai" },
+  muse: { file: "meta-color", domain: "ai.meta.com" },
+  "grok bot": { file: "grok", domain: "x.ai" },
+  dots: { file: "openai", domain: "openai.com" },
+  mausbot: { file: "mausbot", domain: "mausbot.com" },
+  hermes: { file: "hermesagent", domain: "hermes-agent.nousresearch.com" },
   codex: { file: "codex-color", domain: "openai.com" },
   chatgpt: { file: "openai", domain: "chatgpt.com" },
   "stripe projects": { file: "stripe", domain: "stripe.com" },

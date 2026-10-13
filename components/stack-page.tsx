@@ -9,6 +9,8 @@ import { GradeBar } from "@/components/grade-bar"
 import { getStackLogo } from "@/lib/stack-logos"
 import type { StackFamiliarity, SupportedLocale } from "@/types/database"
 import type { PublicStackItem } from "@/lib/home/project-presentation"
+import { TierBoard } from "@/components/tier-board"
+import { filterStackByProject, stackProjectOptions } from "@/lib/stack-filter"
 import "@/styles/stack-tier.css"
 
 type StackPageProps = {
@@ -27,26 +29,30 @@ type StackPageProps = {
 
 export function StackPage({ locale, stackItems, strings }: StackPageProps) {
   const ar = locale === "ar"
+  const [projectId, setProjectId] = useState("")
   const [category, setCategory] = useState("all")
   const [selected, setSelected] = useState<PublicStackItem | null>(null)
   const triggerRef = useRef<HTMLButtonElement | null>(null)
   const copy = ar ? {
+    noMatches: "لا توجد عناصر تطابق عوامل التصفية.",
     all: "الكل", tools: "الأدوات", skills: "مهارات الذكاء الاصطناعي", ungraded: "غير مقيّم",
     hint: "اختر أداة لمعرفة أين وكيف أستخدمها.", unrated: "لم تُقيّم الأدوات في هذا المستوى بعد.",
     close: "إغلاق", follow: "متابعات مميزة", skill: "مهارة مخصصة", details: "تفاصيل الأداة",
     ratings: "التقييمات من كتالوج الأدوات. الأدوات غير المقيّمة تظهر في صف مستقل.",
   } : {
+    noMatches: "No items match these filters.",
     all: "All", tools: "Tools", skills: "AI skills", ungraded: "Ungraded",
     hint: "Select a tool to see where and how I use it.", unrated: "No tools rated in this tier yet.",
     close: "Close", follow: "Magic follow", skill: "Custom skill", details: "Tool details",
     ratings: "Ratings come from the Stack Catalog. Unrated tools live in their own row.",
   }
-  const filtered = stackItems.filter((item) => category === "all" || item.category === category)
-  const tiers = ["A", "B", "C", "D", "E", ...(stackItems.some((item) => item.grade === "F") ? ["F"] : []), "U"]
+  const projectItems = filterStackByProject(stackItems, projectId)
+  const filtered = projectItems.filter((item) => category === "all" || item.category === category)
+  const projects = stackProjectOptions(stackItems)
   const logo = selected ? getStackLogo(selected.name) : null
 
   return (
-    <div className="claws-home stack-tier-page" data-theme="dark" dir={ar ? "rtl" : "ltr"}>
+    <div className="claws-home stack-tier-page" data-theme="light" dir={ar ? "rtl" : "ltr"}>
       <a className="claws-skip" href="#stack-board">{strings.stack}</a>
       <StitchPublicHeader locale={locale} />
       <main>
@@ -66,42 +72,22 @@ export function StackPage({ locale, stackItems, strings }: StackPageProps) {
             <div className="stack-tier-filters" role="group" aria-label={strings.category}>
               {[["all", copy.all], ["tool", copy.tools], ["ai_skill", copy.skills]].map(([value, label]) => (
                 <button key={value} type="button" aria-pressed={category === value} onClick={() => setCategory(value)}>
-                  {label}<span>{value === "all" ? stackItems.length : stackItems.filter((item) => item.category === value).length}</span>
+                  {label}<span>{value === "all" ? projectItems.length : projectItems.filter((item) => item.category === value).length}</span>
                 </button>
               ))}
             </div>
+            <label className="stack-tier-project-filter">
+              <span>{strings.backToProjects}</span>
+              <select value={projectId} onChange={(event) => setProjectId(event.target.value)} aria-label={ar ? "التصفية حسب المشروع" : "Filter by project"}>
+                <option value="">{ar ? "كل المشاريع" : "All projects"}</option>
+                {projects.map((project) => <option key={project.id} value={String(project.id)}>{project.title}</option>)}
+              </select>
+            </label>
             <p>{copy.hint}</p>
           </div>
           {filtered.length ? (
-            <div className="stack-tier-board">
-              {tiers.map((tier) => {
-                const items = filtered.filter((item) => (item.grade ?? "U") === tier)
-                return (
-                  <section key={tier} className="stack-tier-row" data-tier={tier} data-empty={!items.length} aria-label={tier === "U" ? copy.ungraded : `${strings.grade} ${tier}`}>
-                    <div className="stack-tier-rank">
-                      <h2 dir="ltr">{tier === "U" ? "—" : tier}</h2>
-                      <span>{items.length}</span>
-                      {tier === "U" && <small>{copy.ungraded}</small>}
-                    </div>
-                    {items.length ? (
-                      <div className="stack-tier-tiles">
-                        {items.map((item) => {
-                          const asset = getStackLogo(item.name)
-                          return (
-                            <button type="button" key={item.id} className="stack-tier-tile" aria-label={`${item.name} — ${copy.details}`} aria-haspopup="dialog" onClick={(event) => { triggerRef.current = event.currentTarget; setSelected(item) }}>
-                              <span className="stack-tier-logo"><Image src={asset.src} alt="" width={64} height={64} unoptimized /></span>
-                              <b dir="auto">{item.name}</b>
-                              <span className="stack-tier-domain" dir={asset.domain ? "ltr" : undefined}>{asset.domain || copy.skill}</span>
-                            </button>
-                          )
-                        })}
-                      </div>
-                    ) : <p className="stack-tier-empty">{copy.unrated}</p>}
-                  </section>
-                )
-              })}
-            </div>
-          ) : <p className="stack-tier-empty">{strings.empty}</p>}
+            <TierBoard items={filtered} labels={{ grade: strings.grade, ungraded: copy.ungraded, unrated: copy.unrated, skill: copy.skill, details: copy.details }} onSelect={(item, trigger) => { triggerRef.current = trigger; setSelected(item) }} />
+          ) : <p className="stack-tier-empty">{stackItems.length ? copy.noMatches : strings.empty}</p>}
           <p className="stack-tier-note">{copy.ratings}</p>
         </section>
       </main>
@@ -114,10 +100,10 @@ export function StackPage({ locale, stackItems, strings }: StackPageProps) {
         </nav>
       </footer>
       <Sheet open={!!selected} onOpenChange={(open) => { if (!open) setSelected(null) }}>
-        <SheetContent side={ar ? "left" : "right"} showCloseButton={false} className="claws-home stack-tier-detail" data-theme="dark" dir={ar ? "rtl" : "ltr"} onCloseAutoFocus={(event) => { event.preventDefault(); triggerRef.current?.focus() }}>
+        <SheetContent side={ar ? "left" : "right"} showCloseButton={false} className="claws-home stack-tier-detail" data-theme="light" dir={ar ? "rtl" : "ltr"} onCloseAutoFocus={(event) => { event.preventDefault(); triggerRef.current?.focus() }}>
           {selected && logo && <>
             <div className="stack-tier-detail-top"><p className="claws-label">{copy.details}</p><SheetClose className="stack-tier-close">{copy.close} ×</SheetClose></div>
-            <Image className="stack-tier-detail-logo" src={logo.src} alt="" width={72} height={72} unoptimized />
+            <Image className="stack-tier-detail-logo" data-logo={logo.file} src={logo.src} alt="" width={48} height={48} unoptimized />
             <SheetTitle className="stack-tier-detail-title" dir="auto">{selected.name}</SheetTitle>
             <SheetDescription className="stack-tier-detail-description">{selected.reason || strings.categories[selected.category]}</SheetDescription>
             {selected.notes && <p className="stack-tier-detail-notes">{selected.notes}</p>}

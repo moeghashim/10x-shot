@@ -59,7 +59,7 @@ status() {
 drive() {
   for locale in en ar; do
     [ "$locale" = ar ] && dir=rtl || dir=ltr
-    for route in "" /stack /progress /future /track /magic-follow; do
+    for route in "" /stack /assistants /progress /future /track /magic-follow; do
       name="${locale}${route//\//-}"
       page "/$locale$route" "$name" "lang=\"$locale\"" "dir=\"$dir\""
     done

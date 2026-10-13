@@ -17,6 +17,7 @@ All public pages are available in English and Arabic through the `app/[locale]/`
 | `/en/stack` · `/ar/stack` | Tool and AI-skill inventory with grades, familiarity, and project usage | Convex |
 | `/en/future` · `/ar/future` | Reviewed future bets rendered through a constrained component catalog | `lib/future/specs.ts` |
 | `/en/track` · `/ar/track` | Curated updates for coding agents, infrastructure, and agentic commerce | `lib/track/data.ts` |
+| `/en/assistants` · `/ar/assistants` | Curated AI assistants with official links; grades appear only when assigned | `lib/assistants/data.ts` |
 | `/en/magic-follow` · `/ar/magic-follow` | People to follow on X: name, handle, and reasons | `lib/magic-follow/content.ts` |
 | `/en/admin` · `/ar/admin` | Authenticated management for projects, stack, metrics, roadmap, copy, and users | Convex + Better Auth |
 
@@ -95,6 +96,7 @@ The current local runtime configuration points at production Convex URLs, while 
 | `pnpm dev` | Start the local development server |
 | `pnpm lint` | Run Next.js ESLint checks |
 | `pnpm exec tsc --noEmit` | Run TypeScript validation explicitly |
+| `pnpm test` | Run the `node --test` files in `tests/` |
 | `pnpm build` | Create an optimized production build |
 | `pnpm start` | Serve the completed production build |
 | `npx convex dev` | Push Convex changes to the configured development deployment |
@@ -105,7 +107,7 @@ The current local runtime configuration points at production Convex URLs, while 
 
 Run `pnpm lint` separately as part of validation; the current Next.js ESLint checks pass with the installed configuration.
 
-There is no general unit-test runner configured. The `tests/` directory contains standalone integration scripts, including a persisted project-update check that requires `.env.local` and a TypeScript-capable runner.
+`pnpm test` runs the `node --test` files in `tests/`. The directory also contains a persisted project-update check (`tests/project-update.test.ts`) that requires `.env.local` and a TypeScript-capable runner.
 
 For a public-page change, the expected verification path is:
 
@@ -168,6 +170,6 @@ Public project lists show launched projects first, newest launch first. Future l
 
 Magic follow entries are curated in `lib/magic-follow/content.ts`, with a name, X handle (without `@`), and English/Arabic reasons. An empty list displays a coming-soon message. Former `/en/about` and `/ar/about` URLs redirect permanently to the corresponding Magic follow page.
 
-Public pages share `StitchPublicHeader`: Projects, Stack, Future, Track, and a language toggle that retains the current route. Magic follow remains in footer navigation. Stack opens the dedicated catalog page.
+Public pages share `StitchPublicHeader`: Projects, Stack, Assistants, Future, Track, and a language toggle that retains the current route. Magic follow remains in footer navigation. Stack opens the dedicated catalog page.
 
-The public Stack inventory is derived from canonical project assignments, including legacy tool/skill names. Catalog records provide grades, familiarity, and notes; unknown ratings remain ungraded. Names are deduplicated within each category without regard to casing, and usage counts unique projects. Unassigned catalog entries stay in the admin catalog but are omitted from the public inventory. The homepage tool count uses the same inventory.
+The public Stack inventory is derived from canonical project assignments, including legacy tool/skill names. Catalog records provide grades, familiarity, and notes; unknown ratings remain ungraded. Names are deduplicated within each category without regard to casing, and usage counts unique projects. Unassigned catalog entries stay in the admin catalog but are omitted from the public inventory. A project filter narrows the inventory to tools assigned to that project, intersecting any category filter. The homepage tool count uses the same inventory.

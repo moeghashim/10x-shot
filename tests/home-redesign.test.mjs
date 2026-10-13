@@ -29,7 +29,7 @@ test("catalog IDs resolve grades even when legacy tool names are translated", ()
 });
 
 test("grades use the specified five segments without inventing missing ratings", () => {
-  assert.deepEqual(["A", "B", "C", "D", "E", undefined, "F"].map(gradeSegments), [5, 4, 3, 2, 1, 0, 0]);
+  assert.deepEqual(["S", "A", "B", "C", "D", "E", undefined, "F"].map(gradeSegments), [5, 5, 4, 3, 2, 1, 0, 0]);
 });
 
 test("visits compact thousands and retain values below 1000", () => {

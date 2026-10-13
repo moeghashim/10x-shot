@@ -60,7 +60,7 @@ export function hasSpotlightData(project: Project): project is SpotlightProject 
 }
 
 export function gradeSegments(grade?: StackGrade) {
-  return ({ A: 5, B: 4, C: 3, D: 2, E: 1, F: 0 } as const)[grade as StackGrade] ?? 0;
+  return ({ S: 5, A: 5, B: 4, C: 3, D: 2, E: 1, F: 0 } as const)[grade as StackGrade] ?? 0;
 }
 
 export function formatVisits(value: number) {
