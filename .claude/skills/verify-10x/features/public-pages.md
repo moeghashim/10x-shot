@@ -2,7 +2,7 @@
 
 ## Sub-features
 
-- Home (`/`), stack, progress, future, track and magic-follow pages.
+- Home (`/`), stack, assistants, progress, future, track and magic-follow pages.
 - English (`/en/...`, left to right) and Arabic (`/ar/...`, right to left).
 - `/about` redirects, so it is not checked directly.
 
