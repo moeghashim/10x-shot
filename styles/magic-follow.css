@@ -8,7 +8,7 @@
 .magic-follow thead th { padding-block: 12px; color: var(--claws-muted); font-size: 10px; font-weight: 400; text-transform: uppercase; letter-spacing: .12em; }
 .magic-follow thead th:nth-child(1) { width: 25%; }
 .magic-follow thead th:nth-child(2) { width: 25%; }
-.magic-follow-person th { font-family: var(--font-bricolage), var(--font-alexandria), sans-serif; font-size: 28px; font-weight: 500; line-height: 1.2; }
+.magic-follow-person th { font-family: var(--font-space-grotesk), var(--font-alexandria), sans-serif; font-size: 28px; font-weight: 500; line-height: 1.2; }
 .magic-follow-person:hover { background: var(--claws-hover); }
 .magic-follow-person a { display: inline-block; border-bottom: 1px solid var(--claws-line); }
 .magic-follow-person p { max-width: 65ch; line-height: 1.8; }

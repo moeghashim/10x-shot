@@ -10,7 +10,7 @@
   min-height: 100vh;
   background: var(--claws-bg);
   color: var(--claws-ink);
-  font-family: var(--font-jetbrains), var(--font-alexandria), monospace;
+  font-family: var(--font-geist-sans), var(--font-alexandria), sans-serif;
   font-size: 13px;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
@@ -29,7 +29,7 @@
 .claws-home[data-density="compact"] { --claws-row-pad: 14px; }
 .claws-home * { box-sizing: border-box; }
 .claws-home :is(h1, h2, h3, p) { margin: 0; }
-.claws-home :is(h1, h2, h3, .claws-stat, .claws-metric) { font-family: var(--font-bricolage), var(--font-alexandria), sans-serif; }
+.claws-home :is(h1, h2, h3, .claws-stat, .claws-metric) { font-family: var(--font-space-grotesk), var(--font-alexandria), sans-serif; }
 .claws-home a { color: inherit; text-decoration: none; transition: opacity .15s; }
 .claws-home a:hover { opacity: .6; }
 .claws-home button { font: inherit; cursor: pointer; }
@@ -40,7 +40,7 @@
 .claws-label { color: var(--claws-muted); font-size: 10px; text-transform: uppercase; letter-spacing: .12em; }
 .claws-skip { position: fixed; inset-inline-start: 20px; top: -80px; padding: 12px; background: var(--claws-bg); z-index: 100; }
 .claws-skip:focus { top: 12px; }
-.claws-header { position: sticky; top: 0; z-index: 40; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 16px; padding: 14px var(--claws-pad, 32px); border-bottom: 1px solid var(--claws-line, #E2E2E2); background: var(--claws-bg, #FFFFFF); color: var(--claws-ink, #0A0A0A); font-family: var(--font-jetbrains), var(--font-alexandria), monospace; font-size: 12px; line-height: 1.5; }
+.claws-header { position: sticky; top: 0; z-index: 40; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 16px; padding: 14px var(--claws-pad, 32px); border-bottom: 1px solid var(--claws-line, #E2E2E2); background: var(--claws-bg, #FFFFFF); color: var(--claws-ink, #0A0A0A); font-family: var(--font-geist-mono), var(--font-alexandria), monospace; font-size: 12px; line-height: 1.5; }
 .claws-header a { color: inherit; text-decoration: none; transition: opacity .15s; }
 .claws-header a:hover { opacity: .6; }
 .claws-header a:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
@@ -192,3 +192,6 @@ html[dir="rtl"] .claws-home :is(.claws-label, .claws-status, .claws-launch, .cla
   .claws-home *, .claws-home *::after { transition: none !important; }
   .claws-stats { transform: none; }
 }
+
+.claws-home :is(.claws-label, .claws-kicker, .claws-status, .claws-launch-date, .claws-launch, .claws-language, .claws-grade-label) { font-family: var(--font-geist-mono), var(--font-alexandria), monospace; }
+html[dir="rtl"] .claws-home :is(h1, h2, h3, .claws-stat, .claws-metric, .claws-label, .claws-kicker, .claws-status, .claws-launch-date, .claws-launch, .claws-language, .claws-grade-label) { font-family: var(--font-alexandria), sans-serif; }

@@ -24,4 +24,26 @@ Desktop evidence: `docs/screenshots/stack-tier-desktop.png` (1542 × 1078 viewpo
 
 Final production capture reviewed against the reference at 1542 × 1078. Stable Arabic details fill the 390px viewport without clipping. Escape and Close restore focus to the originating tile in both languages. All / Tools / AI skills show 22 / 14 / 8 tiles. No overflow at 1542px, 390px, or Arabic 320px. No browser console errors in the verified production session. All local SVGs load. `pnpm lint`, `pnpm typecheck`, `pnpm test` (38 passing), and `pnpm build` passed. No remaining P0/P1/P2 findings.
 
+Initial version result: passed
+
+## Light-background revision (user review)
+
+The user requested the original light site background with smaller logos, while retaining the colored tier labels. This instruction supersedes the reference image's charcoal surfaces and 64px logos. Page, header, tier rows, footer, and details now use the shared white background, #0A0A0A ink, #6B6B6B muted text, and #E2E2E2 hairlines. Logo sizes are 40px desktop, 32px mobile, and 48px in details. Monochrome SVGs use dark ink; custom icons use stronger colors for visibility on white.
+
+Evidence: `docs/screenshots/stack-tier-light-preview.png` (full page in the default 774px-wide browser), `stack-tier-light-desktop.png` (1542 × 1078), `stack-tier-light-mobile.png`, `stack-tier-light-ar-mobile.png`, and `stack-tier-light-ar-details.png` (390 × 844). Source and desktop revision were compared together, with the explicit light-background override. Colored grade labels and tile hierarchy remain aligned to the reference. Arabic and English mobile have no horizontal overflow; all current SVGs load; details use white surfaces without clipping. `pnpm lint`, `pnpm typecheck`, and `pnpm build` pass. No additional tests needed for these visual-only changes.
+
+Review state: local preview is running; this revision is uncommitted and unpushed at the user's request.
+
+final result: passed
+
+## Assistants, project filters, and Track fonts
+
+The latest user instructions add S above A, an Assistants page with six supplied assistants, a project filter on Stack, a slightly smaller Stripe Projects mark, and Track's fonts across the public site. Space Grotesk now handles headings and numbers, Geist Sans body text, and Geist Mono labels; Arabic retains Alexandria. Stripe is 32px versus 40px desktop and 26px versus 32px mobile. Assistant ratings are unassigned rather than inferred.
+
+Evidence: `docs/screenshots/assistants-desktop.png`, `stack-project-filter.png`, `track-font-reference.png`, `home-track-fonts.png`, `assistants-ar-mobile.png`, and `stack-filter-ar-mobile.png`. The reference and the desktop tier pages were inspected together. English and Arabic mobile layouts fit 390px without horizontal overflow. Arabic viewport screenshots replace full-page captures affected by an RTL capture offset. Browser-computed homepage fonts match Track, and the final homepage image shows completed counters.
+
+Project filtering uses actual tool assignments: 10 Signals shows Stripe Projects, ChatGPT, and Trigger.dev; Bannaa shows Stripe Projects and ChatGPT. Category filters intersect the selected project and display a clear message when empty. Clearing filters restores all 22 entries. Details close with focus restored to the originating tile. All six assistant links and local SVGs were verified. S appears before A on both boards; S validator changes have not been deployed to Convex.
+
+`pnpm lint`, `pnpm typecheck`, `pnpm test` (40 passing), `pnpm build`, and `git diff --check` passed. No remaining P0/P1/P2 findings. Local production preview runs on port 4176; changes remain uncommitted and unpushed pending user review.
+
 final result: passed

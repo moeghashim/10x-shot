@@ -10,6 +10,7 @@ export function PublicNavigation({ locale, isHomepage = false }: { locale: Suppo
   return <>
     <Link href={isHomepage ? "#projects" : "/#projects"}>{ar ? "المشاريع" : "Projects"}</Link>
     <Link href="/stack">{ar ? "الأدوات" : "Stack"}</Link>
+    <Link href="/assistants">{ar ? "المساعدون" : "Assistants"}</Link>
     <Link href="/future">{ar ? "المستقبل" : "Future"}</Link>
     <Link href="/track">{ar ? "المتابعة" : "Track"}</Link>
   </>;

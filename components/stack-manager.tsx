@@ -25,7 +25,7 @@ type StackFormProps = {
   isInline?: boolean
 }
 
-const stackGrades: StackGrade[] = ["A", "B", "C", "D", "E", "F"]
+const stackGrades: StackGrade[] = ["S", "A", "B", "C", "D", "E", "F"]
 const stackFamiliarityLevels: Array<{ value: StackFamiliarity; label: string }> = [
   { value: "learning", label: "Learning" },
   { value: "comfortable", label: "Comfortable" },

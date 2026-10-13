@@ -16,6 +16,7 @@ export const planningCardColumnValidator = v.union(
 );
 
 export const stackGradeValidator = v.union(
+  v.literal("S"),
   v.literal("A"),
   v.literal("B"),
   v.literal("C"),

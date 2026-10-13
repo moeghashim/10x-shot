@@ -53,6 +53,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         changeFrequency: 'weekly' as const,
         priority: 0.7,
       },
+      {
+        url: `${baseUrl}/${locale}/assistants`,
+        changeFrequency: 'monthly' as const,
+        priority: 0.7,
+      },
     ]),
     ...projectUrls,
   ]
