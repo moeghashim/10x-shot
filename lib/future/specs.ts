@@ -49,7 +49,7 @@ export const futureSpecs: Record<"en" | "ar", FutureSpec> = {
             },
             {
               label: "Shipped surfaces",
-              value: "Progress + roadmap cards + stack matrix",
+              value: "Progress + roadmap cards + stack tier board",
               hint: "Future bets must map back to a public surface we can measure or ship.",
             },
             {
@@ -98,16 +98,16 @@ export const futureSpecs: Record<"en" | "ar", FutureSpec> = {
         type: "FutureBet",
         props: {
           label: "Bet 02",
-          title: "Portfolio intelligence beats isolated dashboards",
+          title: "Portfolio intelligence starts with an inspectable stack",
           horizonLabel: "Horizon",
           horizon: "Next 6 months",
           confidenceLabel: "Confidence",
           confidence: "High",
           description:
-            "The strongest view is not one project at a time. The system should compare projects, surface stalled bets, and show where leverage is compounding across the portfolio.",
+            "The Stack tier board now makes the operating layers inspectable. The next bet is to connect those choices to projects, surface stalled bets, and show where leverage is compounding across the portfolio.",
           proof: [
-            "Project filters produce sharper decisions",
-            "Stack items stay linked to projects, usage, and reasons",
+            "The tier board is a public source of truth for operating layers",
+            "Next: connect tier choices to projects, usage, and reasons",
             "Projections stay private while public pages stay factual",
           ],
         },
@@ -148,7 +148,7 @@ export const futureSpecs: Record<"en" | "ar", FutureSpec> = {
             {
               date: "Now",
               title: "Keep the public surfaces current",
-              description: "Progress, roadmap cards, and the stack view should stay accurate and easy to inspect.",
+              description: "Progress, roadmap cards, and the stack tier board should stay accurate and easy to inspect.",
             },
             {
               date: "Next",
@@ -196,7 +196,7 @@ export const futureSpecs: Record<"en" | "ar", FutureSpec> = {
             },
             {
               title: "Make every claim inspectable",
-              description: "Future bets should point back to progress, stack decisions, experiments, or explicit things not being built yet.",
+              description: "Future bets should point back to progress, stack tiers, experiments, or explicit things not being built yet.",
             },
           ],
         },
@@ -245,7 +245,7 @@ export const futureSpecs: Record<"en" | "ar", FutureSpec> = {
             },
             {
               label: "أسطح تم شحنها",
-              value: "التقدم + بطاقات خارطة الطريق + مصفوفة التقنيات",
+              value: "التقدم + بطاقات خارطة الطريق + لوحة طبقات التقنيات",
               hint: "يجب أن تعود الرهانات المستقبلية إلى سطح عام يمكن قياسه أو شحنه.",
             },
             {
@@ -294,16 +294,16 @@ export const futureSpecs: Record<"en" | "ar", FutureSpec> = {
         type: "FutureBet",
         props: {
           label: "رهان 02",
-          title: "ذكاء المحفظة يتفوق على اللوحات المعزولة",
+          title: "ذكاء المحفظة يبدأ بتقنيات قابلة للفحص",
           horizonLabel: "الأفق",
           horizon: "خلال 6 أشهر",
           confidenceLabel: "الثقة",
           confidence: "عال",
           description:
-            "أقوى عرض ليس مشروعاً واحداً في كل مرة. يجب أن يقارن النظام المشاريع، ويظهر الرهانات المتوقفة، ويوضح أين تتراكم الرافعة عبر المحفظة.",
+            "لوحة طبقات التقنيات تجعل طبقات التشغيل قابلة للفحص الآن. الرهان التالي هو ربط هذه الاختيارات بالمشاريع، وإظهار الرهانات المتوقفة، وتوضيح أين تتراكم الرافعة عبر المحفظة.",
           proof: [
-            "فلاتر المشاريع تقود قرارات أوضح",
-            "عناصر التقنية تبقى مرتبطة بالمشاريع والاستخدام وأسباب الاختيار",
+            "لوحة الطبقات مصدر عام للحقيقة حول طبقات التشغيل",
+            "التالي: ربط اختيارات الطبقات بالمشاريع والاستخدام وأسباب الاختيار",
             "التوقعات تبقى خاصة بينما تبقى الصفحات العامة واقعية",
           ],
         },
@@ -343,7 +343,7 @@ export const futureSpecs: Record<"en" | "ar", FutureSpec> = {
             {
               date: "الآن",
               title: "إبقاء الأسطح العامة محدثة",
-              description: "التقدم وبطاقات خارطة الطريق وعرض التقنيات يجب أن تبقى دقيقة وسهلة الفحص.",
+              description: "التقدم وبطاقات خارطة الطريق ولوحة طبقات التقنيات يجب أن تبقى دقيقة وسهلة الفحص.",
             },
             {
               date: "التالي",
@@ -391,7 +391,7 @@ export const futureSpecs: Record<"en" | "ar", FutureSpec> = {
             },
             {
               title: "اجعل كل ادعاء قابلاً للفحص",
-              description: "يجب أن تعود الرهانات المستقبلية إلى التقدم أو قرارات التقنية أو التجارب أو الأشياء التي لن نبنيها بعد.",
+              description: "يجب أن تعود الرهانات المستقبلية إلى التقدم أو طبقات التقنيات أو التجارب أو الأشياء التي لن نبنيها بعد.",
             },
           ],
         },
